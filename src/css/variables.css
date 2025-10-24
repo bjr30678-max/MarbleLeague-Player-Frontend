@@ -1,0 +1,83 @@
+/**
+ * CSS 變數定義
+ * 統一管理顏色、間距等設計 token
+ */
+
+:root {
+    /* 主色調 */
+    --primary-color: #FF6B6B;
+    --primary-gradient: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+    --secondary-color: #4ECDC4;
+
+    /* 功能色 */
+    --success-color: #51CF66;
+    --warning-color: #FFD93D;
+    --error-color: #FF6B6B;
+    --info-color: #4DABF7;
+
+    /* 中性色 */
+    --text-primary: #333;
+    --text-secondary: #666;
+    --text-disabled: #999;
+    --border-color: #ddd;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --bg-tertiary: #f8f9fa;
+
+    /* 間距 */
+    --spacing-xs: 5px;
+    --spacing-sm: 10px;
+    --spacing-md: 15px;
+    --spacing-lg: 20px;
+    --spacing-xl: 30px;
+
+    /* 邊框半徑 */
+    --radius-sm: 5px;
+    --radius-md: 10px;
+    --radius-lg: 20px;
+    --radius-full: 50%;
+
+    /* 陰影 */
+    --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.2);
+
+    /* 過渡 */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
+
+    /* Z-index */
+    --z-index-dropdown: 100;
+    --z-index-sticky: 200;
+    --z-index-modal: 1000;
+    --z-index-toast: 2000;
+    --z-index-loading: 9999;
+
+    /* 字體大小 */
+    --font-xs: 12px;
+    --font-sm: 14px;
+    --font-base: 16px;
+    --font-lg: 18px;
+    --font-xl: 24px;
+    --font-2xl: 36px;
+
+    /* 容器寬度 */
+    --container-max-width: 500px;
+
+    /* 安全區域 (iPhone X+) */
+    --safe-area-inset-top: env(safe-area-inset-top);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+}
+
+/* 暗色主題變數 (預留) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-primary: #e0e0e0;
+        --text-secondary: #b0b0b0;
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2a2a2a;
+        --bg-tertiary: #333333;
+        --border-color: #444;
+    }
+}
