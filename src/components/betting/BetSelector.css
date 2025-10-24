@@ -1,0 +1,161 @@
+.bet-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Category Selection */
+.bet-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.5rem;
+}
+
+.category-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.category-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.category-btn.active {
+  background: rgba(102, 126, 234, 0.2);
+  border-color: #667eea;
+  color: #fff;
+}
+
+.category-icon {
+  font-size: 1.5rem;
+}
+
+.category-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Amount Selection */
+.amount-selector h3 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  color: #e2e8f0;
+}
+
+.amount-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.5rem;
+}
+
+.amount-btn {
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.amount-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.amount-btn.active {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+  color: #10b981;
+}
+
+/* Betting Options */
+.betting-options h3 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  color: #e2e8f0;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.5rem;
+}
+
+.option-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.option-btn:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.option-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.option-label {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.option-odds {
+  font-size: 0.75rem;
+  color: #fbbf24;
+}
+
+.no-options {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+}
+
+@media (max-width: 640px) {
+  .bet-categories {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .category-btn {
+    padding: 0.75rem 0.25rem;
+  }
+
+  .category-icon {
+    font-size: 1.25rem;
+  }
+
+  .category-label {
+    font-size: 0.75rem;
+  }
+
+  .amount-buttons {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .options-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+}

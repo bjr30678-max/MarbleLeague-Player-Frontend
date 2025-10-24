@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Loading, ToastContainer } from './components/common'
+import { BetSelector, BetList } from './components/betting'
+import { GameStatus, RecentResults } from './components/game'
+import { LivePlayer } from './components/live'
+import { UserProfile } from './components/profile'
 import { useAuth, useWebSocket } from './hooks'
 import { useUserStore } from './stores/useUserStore'
 import { useGameStore } from './stores/useGameStore'
@@ -100,26 +104,19 @@ const App: React.FC = () => {
   )
 }
 
-// Simplified tab components
+// Tab components
 const GameTab: React.FC = () => {
-  const { currentGame } = useGameStore()
-
   return (
-    <div className="tab-content">
-      <div className="game-info">
-        <h2>遊戲大廳</h2>
-        {currentGame ? (
-          <div className="game-status">
-            <p>當前期數: {currentGame.period}</p>
-            <p>狀態: {getStatusText(currentGame.status)}</p>
-          </div>
-        ) : (
-          <p>載入中...</p>
-        )}
-      </div>
-      <div className="betting-area">
-        <p className="info-text">投注功能開發中...</p>
-        <p className="info-text">所有核心服務已就緒</p>
+    <div className="tab-content game-tab">
+      <GameStatus />
+      <div className="game-layout">
+        <div className="betting-section">
+          <BetSelector />
+          <BetList />
+        </div>
+        <div className="results-section">
+          <RecentResults />
+        </div>
       </div>
     </div>
   )
@@ -128,74 +125,92 @@ const GameTab: React.FC = () => {
 const LiveTab: React.FC = () => {
   return (
     <div className="tab-content">
-      <h2>直播</h2>
-      <div className="live-placeholder">
-        <p>直播功能將在此顯示</p>
+      <LivePlayer />
+      <div className="live-game-info">
+        <GameStatus />
+        <RecentResults />
       </div>
     </div>
   )
 }
 
 const HistoryTab: React.FC = () => {
-  const { history } = useGameStore()
+  const { history, fetchHistory, historyPage, historyTotalPages, isLoading } = useGameStore()
+
+  useEffect(() => {
+    if (history.length === 0) {
+      fetchHistory(1)
+    }
+  }, [])
+
+  const handleLoadMore = () => {
+    if (historyPage < historyTotalPages && !isLoading) {
+      fetchHistory(historyPage + 1)
+    }
+  }
 
   return (
     <div className="tab-content">
       <h2>遊戲記錄</h2>
       {history.length > 0 ? (
-        <div className="history-list">
-          {history.map((record) => (
-            <div key={record.id} className="history-item">
-              <span>期數: {record.period}</span>
-              <span>{record.timestamp}</span>
-            </div>
-          ))}
-        </div>
+        <>
+          <div className="history-list">
+            {history.map((record) => (
+              <div key={record.id} className="history-record">
+                <div className="record-header">
+                  <span className="record-period">第 {record.period} 期</span>
+                  <span className="record-time">{record.timestamp}</span>
+                </div>
+                <div className="record-positions">
+                  {record.positions.slice(0, 3).map((pos, idx) => (
+                    <span key={idx} className={`position-badge rank-${idx + 1}`}>
+                      {pos}
+                    </span>
+                  ))}
+                </div>
+                {record.myBets && record.myBets.length > 0 && (
+                  <div className="record-bets">
+                    <div className="bets-header">我的投注</div>
+                    {record.myBets.map((bet, idx) => (
+                      <div key={idx} className={`bet-record ${bet.result}`}>
+                        <span>{bet.label}</span>
+                        <span>{bet.amount}</span>
+                        <span className="bet-result-icon">
+                          {bet.result === 'win' ? '✓' : '✕'}
+                        </span>
+                      </div>
+                    ))}
+                    {record.winAmount && record.winAmount > 0 && (
+                      <div className="win-amount">獲得: {formatCurrency(record.winAmount)}</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          {historyPage < historyTotalPages && (
+            <button
+              className="load-more-btn"
+              onClick={handleLoadMore}
+              disabled={isLoading}
+            >
+              {isLoading ? '載入中...' : '載入更多'}
+            </button>
+          )}
+        </>
       ) : (
-        <p>暫無記錄</p>
+        <p className="empty-message">暫無記錄</p>
       )}
     </div>
   )
 }
 
 const ProfileTab: React.FC = () => {
-  const { user, logout } = useUserStore()
-
-  if (!user) return null
-
   return (
     <div className="tab-content">
-      <div className="profile-card">
-        {user.pictureUrl && (
-          <img src={user.pictureUrl} alt={user.displayName} className="profile-avatar" />
-        )}
-        <h2>{user.displayName}</h2>
-        <div className="profile-info">
-          <div className="info-row">
-            <span>用戶ID:</span>
-            <span>{user.userId}</span>
-          </div>
-          <div className="info-row">
-            <span>餘額:</span>
-            <span className="balance">{formatCurrency(user.balance)}</span>
-          </div>
-        </div>
-        <button className="btn btn-danger" onClick={logout}>
-          登出
-        </button>
-      </div>
+      <UserProfile />
     </div>
   )
-}
-
-const getStatusText = (status: string) => {
-  const statusMap: Record<string, string> = {
-    waiting: '等待中',
-    betting: '投注中',
-    closed: '已封盤',
-    finished: '已結束',
-  }
-  return statusMap[status] || status
 }
 
 export default App

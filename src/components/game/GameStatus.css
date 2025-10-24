@@ -1,0 +1,117 @@
+.game-status {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: all 0.3s;
+}
+
+.game-status.empty {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+}
+
+.game-status.empty .status-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+}
+
+.status-icon {
+  font-size: 1.5rem;
+}
+
+.status-label {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.period-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.period-label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.period-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+}
+
+.countdown-label {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.countdown-timer {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #10b981;
+  font-variant-numeric: tabular-nums;
+  font-family: 'Courier New', monospace;
+}
+
+.status-message {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #94a3b8;
+  padding: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .game-status {
+    padding: 1rem;
+  }
+
+  .status-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .period-info {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .countdown-timer {
+    font-size: 1.5rem;
+  }
+}
