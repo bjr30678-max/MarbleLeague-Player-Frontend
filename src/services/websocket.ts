@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client'
 import type { GameState, GameResult } from '@/types'
-import { config } from '@/config'
+import { config, isDevelopment } from '@/config'
 import { storage } from './storage'
 
 type SocketEventCallback = (...args: any[]) => void
@@ -10,6 +10,7 @@ class WebSocketService {
   private reconnectAttempts = 0
   private maxReconnectAttempts = 5
   private reconnectDelay = 2000
+  private connectionWarningShown = false
 
   /**
    * Connect to WebSocket server
@@ -47,10 +48,15 @@ class WebSocketService {
 
     this.socket.on('connect', () => {
       this.reconnectAttempts = 0
+      if (isDevelopment) {
+        console.warn('✅ WebSocket 已連線')
+      }
     })
 
     this.socket.on('disconnect', (reason) => {
-      console.warn('WebSocket disconnected:', reason)
+      if (isDevelopment) {
+        console.warn('⚠️ WebSocket 已斷線:', reason)
+      }
 
       // Auto reconnect if not intentional disconnect
       if (reason === 'io server disconnect') {
@@ -62,16 +68,32 @@ class WebSocketService {
     })
 
     this.socket.on('connect_error', (error) => {
-      console.error('WebSocket connection error:', error)
       this.reconnectAttempts++
 
+      if (isDevelopment && !this.connectionWarningShown) {
+        console.warn(
+          '🔧 WebSocket 連線錯誤 (開發模式)\n' +
+          `   這在開發環境中是正常的，如果後端服務未啟動\n` +
+          `   嘗試連線到: ${config.apiUrl}\n` +
+          `   錯誤: ${error.message || 'Timeout'}`
+        )
+        this.connectionWarningShown = true
+      }
+
       if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-        console.error('Max reconnect attempts reached')
+        if (isDevelopment) {
+          console.warn(
+            `⚠️ WebSocket 已達最大重連次數 (${this.maxReconnectAttempts})\n` +
+            '   應用程式將以離線模式運行'
+          )
+        }
       }
     })
 
     this.socket.on('error', (error) => {
-      console.error('WebSocket error:', error)
+      if (!isDevelopment) {
+        console.error('WebSocket error:', error)
+      }
     })
   }
 

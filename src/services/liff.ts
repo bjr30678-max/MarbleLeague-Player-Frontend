@@ -21,7 +21,10 @@ class LiffService {
     try {
       // Development mode - use mock authentication
       if (isDevelopment) {
-        console.warn('Development mode: Using mock LIFF authentication')
+        console.warn(
+          '🔧 開發模式: 使用模擬 LIFF 驗證\n' +
+          '   這是正常的開發環境行為，不會影響生產環境'
+        )
         this.initialized = true
         return true
       }
