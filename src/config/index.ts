@@ -43,12 +43,12 @@ export const isDevelopment = config.env === 'development' ||
   window.location.hostname === '127.0.0.1'
 
 // WebSocket URL configuration
-// WebSocket cannot use Vite proxy, so it needs the actual backend URL
+// Socket.io CAN use Vite proxy in development mode to avoid CORS issues
 export const getWebSocketUrl = (): string => {
   const apiFromUrl = new URLSearchParams(window.location.search).get('api')
   const envApiUrl = import.meta.env.VITE_API_URL
 
-  // If we have an explicit API URL from env or URL param, use it
+  // If we have an explicit API URL from env or URL param, use it (production mode)
   if (apiFromUrl) {
     return apiFromUrl
   }
@@ -57,11 +57,12 @@ export const getWebSocketUrl = (): string => {
     return envApiUrl
   }
 
-  // In development mode with empty API URL, use the default backend
+  // In development mode with empty API URL, use Vite proxy
+  // Socket.io will connect to localhost:3000/socket.io
+  // Vite proxy will forward to https://api.bjr8888.com/socket.io
   if (isDevelopment) {
-    const defaultBackendUrl = 'https://api.bjr8888.com'
-    console.warn('🔧 WebSocket 開發模式: 連接到實際後端:', defaultBackendUrl)
-    return defaultBackendUrl
+    console.warn('🔧 WebSocket 開發模式: 使用 Vite proxy (localhost:3000 → api.bjr8888.com)')
+    return window.location.origin // localhost:3000
   }
 
   // Production: use current origin (same domain)

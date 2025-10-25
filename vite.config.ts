@@ -23,10 +23,10 @@ export default defineConfig({
       },
       // WebSocket proxy for Socket.IO
       '/socket.io': {
-        target: 'wss://api.bjr8888.com',
+        target: 'https://api.bjr8888.com',
         changeOrigin: true,
         secure: false,
-        ws: true,
+        ws: true, // Enable WebSocket proxying
       },
     },
     headers: {
