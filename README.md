@@ -17,6 +17,11 @@
 ### 通訊與即時功能
 - **Socket.IO Client** - WebSocket 即時通訊
 - **LIFF SDK** - LINE 平台整合
+- **AWS IVS (Interactive Video Service)** - 互動式直播串流
+
+### 直播串流
+- **AWS IVS Web Broadcast SDK** - 觀眾加入直播
+- **OvenPlayer** - 傳統 WebRTC 播放器 (向後相容)
 
 ### 程式碼品質
 - **ESLint** - 程式碼檢查
@@ -52,6 +57,7 @@ src/
 │   ├── api.ts         # API 服務
 │   ├── liff.ts        # LIFF SDK 封裝
 │   ├── websocket.ts   # WebSocket 管理
+│   ├── awsIvs.ts      # AWS IVS 直播服務
 │   └── storage.ts     # 安全的儲存管理
 ├── stores/             # Zustand 狀態管理
 │   ├── useUserStore.ts    # 用戶狀態
@@ -203,6 +209,129 @@ npm run format
    toast.error('操作失敗')
    ```
 
+## 📺 AWS IVS 直播整合
+
+本應用程式整合了 AWS Interactive Video Service (IVS) 提供低延遲的互動式直播功能。
+
+### 功能特性
+
+- ✅ **觀眾服務** - 自動加入直播間並管理觀眾 Token
+- ✅ **主播服務** - 支援推流 (WHIP 協議 / Web SDK)
+- ✅ **心跳機制** - 每 30 秒自動發送心跳維持在線狀態
+- ✅ **Token 自動刷新** - 提前 5 分鐘自動刷新 Token
+- ✅ **即時統計** - WebSocket 推送觀眾數與直播狀態
+- ✅ **雙模式支援** - 支援 AWS IVS 和 OvenPlayer (向後相容)
+
+### 使用方式
+
+#### 1. 環境設定
+
+在 `.env` 中配置 (可選,預設使用 VITE_API_URL):
+
+```env
+# AWS IVS 配置 (可選)
+VITE_AWS_IVS_API_URL=https://api.example.com
+VITE_AWS_IVS_API_KEY=your-api-key
+```
+
+#### 2. 觀眾模式 (預設)
+
+應用程式會自動以 AWS IVS 模式啟動直播功能:
+
+```typescript
+// LivePlayer 組件會自動處理
+// 1. 獲取觀眾 Token
+// 2. 加入 IVS Stage
+// 3. 顯示主播視訊
+// 4. 發送心跳維持連線
+// 5. 顯示即時觀眾統計
+```
+
+#### 3. 切換到 OvenPlayer 模式
+
+如需使用傳統 WebRTC 串流,在 URL 添加參數:
+
+```
+?mode=ovenplayer&host=stream.example.com&stream=live
+```
+
+### 服務架構
+
+#### ViewerService (觀眾服務)
+
+```typescript
+import { createViewerService } from '@/services/awsIvs'
+
+// 創建觀眾服務
+const viewerService = createViewerService(userId)
+
+// 加入直播
+const tokenResponse = await viewerService.join()
+// 自動處理: Token 獲取、心跳、自動刷新
+
+// 離開直播
+await viewerService.leave()
+```
+
+#### PublisherService (主播服務)
+
+```typescript
+import { createPublisherService } from '@/services/awsIvs'
+
+// 創建主播服務
+const publisherService = createPublisherService(userId)
+
+// 開始推流
+const tokenResponse = await publisherService.startPublishing()
+// 返回 WHIP endpoint 和 Token 用於 OBS 或 Web SDK
+
+// 停止推流
+await publisherService.stopPublishing()
+```
+
+#### IVSStatsService (統計服務)
+
+```typescript
+import { ivsStatsService } from '@/services/awsIvs'
+
+// 訂閱統計更新
+ivsStatsService.onStatsUpdate((stats) => {
+  console.log('觀眾數:', stats.totalViewers)
+  console.log('直播狀態:', stats.isPublisherLive)
+})
+```
+
+### API 端點
+
+所有 AWS IVS API 端點已在 `src/config/index.ts` 中定義:
+
+- `POST /api/token/viewer` - 獲取觀眾 Token
+- `POST /api/token/publisher` - 獲取主播 Token
+- `POST /api/viewer/heartbeat` - 發送心跳
+- `POST /api/viewer/leave` - 離開直播
+- `GET /api/stats` - 獲取統計資訊
+
+### 配置參數
+
+所有 AWS IVS 相關配置位於 `src/config/index.ts`:
+
+```typescript
+CONSTANTS.IVS = {
+  VIEWER_TOKEN_EXPIRY: 3600,      // 1 小時
+  PUBLISHER_TOKEN_EXPIRY: 14400,   // 4 小時
+  HEARTBEAT_INTERVAL: 30000,       // 30 秒
+  TOKEN_REFRESH_BUFFER: 300000,    // 提前 5 分鐘刷新
+  MAX_VIEWERS_PER_STAGE: 50,       // 每個 Stage 最大觀眾數
+}
+```
+
+### 開發文檔
+
+詳細的 AWS IVS 整合文檔位於:
+
+- `doc/AWS-IVS-Frontend-Integration-Guide.md` - 完整整合指南 (1700+ 行)
+- `doc/AWS-IVS-Quick-Reference.md` - API 快速參考
+
 ## 🎯 核心功能
 
 ### 已實作
@@ -216,14 +345,19 @@ npm run format
 - ✅ 載入狀態管理
 - ✅ 響應式設計
 - ✅ 底部導航
+- ✅ **AWS IVS 直播整合** (觀眾/主播服務、心跳、統計)
+- ✅ **完整投注介面** (5 種投注類型)
+- ✅ **遊戲結果顯示**
+- ✅ **直播播放器** (AWS IVS + OvenPlayer 雙模式)
+- ✅ **歷史記錄分頁**
 
-### 待實作 (架構已就緒)
+### 可選擴展功能
 
-- ⏳ 完整投注介面 (5 種投注類型)
-- ⏳ 遊戲結果顯示
-- ⏳ 直播播放器整合
-- ⏳ 歷史記錄分頁
-- ⏳ 詳細投注統計
+- ⏳ 投注歷史詳細分析
+- ⏳ 投注策略儲存
+- ⏳ 趨勢分析圖表
+- ⏳ 主題切換 (深色/淺色)
+- ⏳ 多語言支援
 
 ## 🔧 配置選項
 

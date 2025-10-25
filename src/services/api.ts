@@ -177,6 +177,25 @@ class ApiService {
       return false
     }
   }
+
+  /**
+   * Generic POST request
+   */
+  async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: data ? JSON.stringify(data) : undefined,
+    })
+  }
+
+  /**
+   * Generic GET request
+   */
+  async get<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'GET',
+    })
+  }
 }
 
 // Export singleton instance

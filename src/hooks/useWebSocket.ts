@@ -1,10 +1,12 @@
 import { useEffect } from 'react'
 import { websocket } from '@/services/websocket'
+import { ivsStatsService } from '@/services/awsIvs'
 import { useGameStore } from '@/stores/useGameStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useBettingStore } from '@/stores/useBettingStore'
 import { toast } from '@/stores/useToastStore'
 import type { GameState, GameResult } from '@/types'
+import type { IVSStatsUpdate } from '@/services/awsIvs'
 
 export const useWebSocket = () => {
   const { setCurrentGame, addResult } = useGameStore()
@@ -35,15 +37,37 @@ export const useWebSocket = () => {
       updateBalance(data.balance)
     }
 
+    const handleIVSStatsUpdate = (data: IVSStatsUpdate) => {
+      // Forward stats to IVS stats service
+      ivsStatsService.handleStatsUpdate(data)
+    }
+
     // Subscribe to events
     websocket.onRoundStarted(handleRoundStarted)
     websocket.onBettingClosed(handleBettingClosed)
     websocket.onResultConfirmed(handleResultConfirmed)
     websocket.onBalanceUpdated(handleBalanceUpdated)
 
+    // Subscribe to AWS IVS stats
+    websocket.onIVSStatsUpdate(handleIVSStatsUpdate)
+
+    // Wait for connection then subscribe to stats channel
+    const connectHandler = () => {
+      websocket.subscribeToIVSStats()
+    }
+    websocket.on('connect', connectHandler)
+
+    // If already connected, subscribe immediately
+    if (websocket.isConnected()) {
+      websocket.subscribeToIVSStats()
+    }
+
     // Cleanup on unmount
     return () => {
       websocket.offAllGameEvents()
+      websocket.offIVSStatsUpdate()
+      websocket.unsubscribeFromIVSStats()
+      websocket.off('connect', connectHandler)
       websocket.disconnect()
     }
   }, [setCurrentGame, addResult, updateBalance, clearBets])

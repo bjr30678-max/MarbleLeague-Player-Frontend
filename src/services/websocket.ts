@@ -1,5 +1,6 @@
 import { io, Socket } from 'socket.io-client'
 import type { GameState, GameResult } from '@/types'
+import type { IVSStatsUpdate } from './awsIvs'
 import { config, isDevelopment } from '@/config'
 import { storage } from './storage'
 
@@ -211,6 +212,60 @@ class WebSocketService {
     events.forEach((event) => {
       this.off(event)
     })
+  }
+
+  // AWS IVS Stats event handlers
+
+  /**
+   * Subscribe to AWS IVS stats channel
+   * Receives real-time viewer statistics every 5 seconds
+   */
+  subscribeToIVSStats(): void {
+    if (!this.socket?.connected) {
+      console.warn('Socket not connected. Cannot subscribe to IVS stats.')
+      return
+    }
+
+    // Send subscribe message to stats channel
+    this.emit('subscribe', { channel: 'stats' })
+
+    if (isDevelopment) {
+      console.log('📊 Subscribed to IVS stats channel')
+    }
+  }
+
+  /**
+   * Unsubscribe from AWS IVS stats channel
+   */
+  unsubscribeFromIVSStats(): void {
+    if (!this.socket?.connected) {
+      return
+    }
+
+    this.emit('unsubscribe', { channel: 'stats' })
+
+    if (isDevelopment) {
+      console.log('📊 Unsubscribed from IVS stats channel')
+    }
+  }
+
+  /**
+   * Subscribe to IVS stats update event
+   * The server broadcasts stats every 5 seconds
+   */
+  onIVSStatsUpdate(callback: (data: IVSStatsUpdate) => void): void {
+    this.on('stats_update', (message: { type: string; data: IVSStatsUpdate }) => {
+      if (message.type === 'stats_update' && message.data) {
+        callback(message.data)
+      }
+    })
+  }
+
+  /**
+   * Unsubscribe from IVS stats update event
+   */
+  offIVSStatsUpdate(callback?: SocketEventCallback): void {
+    this.off('stats_update', callback)
   }
 
   /**

@@ -52,6 +52,14 @@ export const API_ENDPOINTS = {
   RESULTS: {
     RECENT: '/api/results/recent',
   },
+  IVS: {
+    VIEWER_TOKEN: '/api/token/viewer',
+    PUBLISHER_TOKEN: '/api/token/publisher',
+    HEARTBEAT: '/api/viewer/heartbeat',
+    LEAVE: '/api/viewer/leave',
+    REJOIN: '/api/viewer/rejoin',
+    STATS: '/api/stats',
+  },
 } as const
 
 // Constants
@@ -64,6 +72,17 @@ export const CONSTANTS = {
   TOKEN_KEY: 'auth_token',
   USER_KEY: 'user_profile',
   CONFIG_VERSION: '2.0.0',
+  // AWS IVS Configuration
+  IVS: {
+    VIEWER_TOKEN_EXPIRY: 3600, // 1 hour in seconds
+    PUBLISHER_TOKEN_EXPIRY: 14400, // 4 hours in seconds
+    HEARTBEAT_INTERVAL: 30000, // 30 seconds in ms
+    HEARTBEAT_TIMEOUT: 60000, // 60 seconds in ms
+    TOKEN_REFRESH_BUFFER: 300000, // Refresh 5 minutes before expiry (in ms)
+    MAX_VIEWERS_PER_STAGE: 50,
+    MAX_STAGES: 20,
+    AUTO_SCALE_THRESHOLD: 45, // Create new stage when viewers >= 45
+  },
 } as const
 
 // Betting categories configuration
