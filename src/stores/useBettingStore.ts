@@ -180,13 +180,21 @@ export const useBettingStore = create<BettingState>((set, get) => ({
     const { bettingLimits, selectedCategory } = get()
     const user = useUserStore.getState().user
 
-    if (!bettingLimits || !user) {
+    if (!bettingLimits?.limits || !user) {
       return false
     }
 
     const totalAmount = get().getTotalBetAmount() + amount
-    const categoryLimit = bettingLimits[selectedCategory]
+    const categoryLimit = bettingLimits.limits[selectedCategory]
 
-    return totalAmount <= user.balance && amount <= categoryLimit
+    if (!categoryLimit) {
+      return false
+    }
+
+    return (
+      totalAmount <= user.balance &&
+      amount >= categoryLimit.minAmount &&
+      amount <= categoryLimit.maxAmount
+    )
   },
 }))

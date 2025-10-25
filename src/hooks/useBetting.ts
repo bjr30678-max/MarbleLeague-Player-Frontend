@@ -49,9 +49,16 @@ export const useBetting = () => {
     }
 
     // Check category limit
-    if (bettingLimits && selectedAmount > bettingLimits[selectedCategory]) {
-      toast.error(`超過 ${selectedCategory} 類別的最大投注限額`)
-      return false
+    if (bettingLimits?.limits?.[selectedCategory]) {
+      const limit = bettingLimits.limits[selectedCategory]
+      if (selectedAmount < limit.minAmount) {
+        toast.error(`最小投注金額為 ${limit.minAmount}`)
+        return false
+      }
+      if (selectedAmount > limit.maxAmount) {
+        toast.error(`最大投注金額為 ${limit.maxAmount}`)
+        return false
+      }
     }
 
     // Check balance

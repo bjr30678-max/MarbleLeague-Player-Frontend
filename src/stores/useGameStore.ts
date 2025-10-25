@@ -64,9 +64,9 @@ export const useGameStore = create<GameStoreState>((set) => ({
     set({ isLoading: true })
     try {
       const response = await api.getGameHistory(limit)
-      if (response.success && response.data) {
+      if (response.success && response.data?.games) {
         set({
-          history: response.data,
+          history: response.data.games,
           historyPage: 1,
           historyTotalPages: 1,
         })

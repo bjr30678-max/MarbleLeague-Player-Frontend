@@ -6,7 +6,7 @@ import type {
   BettingLimits,
   BetSubmitRequest,
   BetSubmitResponse,
-  GameHistoryRecord,
+  GameHistoryResponse,
 } from '@/types'
 import { config, API_ENDPOINTS } from '@/config'
 import { storage } from './storage'
@@ -143,9 +143,10 @@ class ApiService {
 
   /**
    * Get game history (原始路徑: /api/game/history)
+   * Returns { games: GameHistoryRecord[] }
    */
-  async getGameHistory(limit: number = 20): Promise<ApiResponse<GameHistoryRecord[]>> {
-    return this.request<GameHistoryRecord[]>(
+  async getGameHistory(limit: number = 20): Promise<ApiResponse<GameHistoryResponse>> {
+    return this.request<GameHistoryResponse>(
       `${API_ENDPOINTS.GAME.HISTORY}?limit=${limit}`,
       {
         method: 'GET',

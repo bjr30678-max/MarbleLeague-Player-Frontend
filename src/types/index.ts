@@ -40,13 +40,21 @@ export interface Bet {
   potentialWin: number
 }
 
+// Backend betting limits format
+export interface BettingLimit {
+  minAmount: number
+  maxAmount: number
+  maxPerPeriod: number
+}
+
 export interface BettingLimits {
-  position: number
-  sum: number
-  bigsmall: number
-  oddeven: number
-  dragontiger: number
-  minBet: number
+  limits: {
+    position: BettingLimit
+    sum: BettingLimit
+    bigsmall: BettingLimit
+    oddeven: BettingLimit
+    dragontiger: BettingLimit
+  }
 }
 
 // Game Types
@@ -71,15 +79,22 @@ export interface GameResult {
   timestamp: number
 }
 
+// Backend game history format
 export interface GameHistoryRecord {
-  id: string
-  period: number
-  positions: number[]
-  sum: number
-  result: string
-  timestamp: string
-  myBets?: UserBet[]
+  roundId: string | number
+  betType: string
+  betTypeName?: string
+  betContent: any
+  betContentDisplay?: string
+  betAmount: number
+  status: 'win' | 'lose' | 'pending'
+  createdAt: string
+  odds: number
   winAmount?: number
+}
+
+export interface GameHistoryResponse {
+  games: GameHistoryRecord[]
 }
 
 export interface UserBet {
@@ -121,7 +136,6 @@ export interface LoginResponse {
 
 export interface BalanceResponse {
   balance: number
-  lastUpdated: string
 }
 
 export interface BetSubmitRequest {

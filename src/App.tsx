@@ -159,38 +159,40 @@ const HistoryTab: React.FC = () => {
       {history.length > 0 ? (
         <>
           <div className="history-list">
-            {history.map((record) => (
-              <div key={record.id} className="history-record">
-                <div className="record-header">
-                  <span className="record-period">第 {record.period} 期</span>
-                  <span className="record-time">{record.timestamp}</span>
-                </div>
-                <div className="record-positions">
-                  {record.positions.slice(0, 3).map((pos, idx) => (
-                    <span key={idx} className={`position-badge rank-${idx + 1}`}>
-                      {pos}
-                    </span>
-                  ))}
-                </div>
-                {record.myBets && record.myBets.length > 0 && (
-                  <div className="record-bets">
-                    <div className="bets-header">我的投注</div>
-                    {record.myBets.map((bet, idx) => (
-                      <div key={idx} className={`bet-record ${bet.result}`}>
-                        <span>{bet.label}</span>
-                        <span>{bet.amount}</span>
-                        <span className="bet-result-icon">
-                          {bet.result === 'win' ? '✓' : '✕'}
-                        </span>
+            {history.map((record, idx) => {
+              const statusClass = record.status === 'win' ? 'status-win' :
+                                  record.status === 'lose' ? 'status-lose' : ''
+              const statusText = record.status === 'win' ? '獲勝' :
+                                record.status === 'lose' ? '未中' : '等待結果'
+
+              return (
+                <div key={record.roundId + '-' + idx} className="history-record">
+                  <div className="record-header">
+                    <div>
+                      <div style={{ fontWeight: 'bold' }}>第 {record.roundId} 回合</div>
+                      <div style={{ fontSize: '12px', color: '#666' }}>
+                        {new Date(record.createdAt).toLocaleString('zh-TW')}
                       </div>
-                    ))}
-                    {record.winAmount && record.winAmount > 0 && (
-                      <div className="win-amount">獲得: {formatCurrency(record.winAmount)}</div>
-                    )}
+                    </div>
+                    <div className={`status-badge ${statusClass}`}>{statusText}</div>
                   </div>
-                )}
-              </div>
-            ))}
+                  <div style={{ marginBottom: '10px' }}>
+                    <span style={{ color: '#666' }}>{record.betTypeName || record.betType}</span>
+                    {' '}
+                    <span style={{ fontWeight: 'bold' }}>
+                      {record.betContentDisplay || JSON.stringify(record.betContent)}
+                    </span>
+                    {' '}
+                    <span style={{ color: '#FF6B6B' }}>- {record.betAmount} 積分</span>
+                  </div>
+                  {record.status === 'win' && record.winAmount && (
+                    <div className="win-amount" style={{ color: '#00D9FF', fontWeight: 'bold' }}>
+                      獲得: {formatCurrency(record.winAmount)}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
           {historyPage < historyTotalPages && (
             <button
