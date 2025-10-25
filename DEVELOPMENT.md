@@ -89,9 +89,27 @@ cp .env.example .env
 
 編輯 `.env`:
 
+**方式 A: 使用 Vite Proxy (推薦 - 繞過 CORS)**
+
 ```env
 VITE_LIFF_ID=your-liff-id-here
-VITE_API_URL=http://localhost:8080  # 本地後端
+VITE_API_URL=                      # 留空，使用 Vite proxy
+VITE_ENV=development
+```
+
+**方式 B: 使用本地後端**
+
+```env
+VITE_LIFF_ID=your-liff-id-here
+VITE_API_URL=http://localhost:8080
+VITE_ENV=development
+```
+
+**方式 C: 直接連接生產 API (可能遇到 CORS)**
+
+```env
+VITE_LIFF_ID=your-liff-id-here
+VITE_API_URL=https://api.bjr8888.com
 VITE_ENV=development
 ```
 
@@ -146,6 +164,47 @@ npm run dev
 ---
 
 ## 🐛 常見開發問題
+
+### Q: 遇到 CORS 錯誤怎麼辦?
+
+**錯誤訊息範例**:
+```
+Access to fetch at 'https://api.bjr8888.com/api/auth/liff-login' from origin
+'http://localhost:3000' has been blocked by CORS policy: Response to preflight
+request doesn't pass access control check: No 'Access-Control-Allow-Origin'
+header is present on the requested resource.
+```
+
+**解決方案 A: 使用 Vite Proxy (推薦)**
+
+1. 編輯 `.env`，將 `VITE_API_URL` 設為空:
+   ```env
+   VITE_API_URL=
+   VITE_ENV=development
+   ```
+
+2. Vite 會自動使用內建的 proxy 配置 (已在 `vite.config.ts` 設定)
+
+3. 重啟開發伺服器:
+   ```bash
+   npm run dev
+   ```
+
+**解決方案 B: 配置後端 CORS**
+
+如果你控制後端，可以在後端加入 CORS headers:
+```javascript
+// Express.js 範例
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}))
+```
+
+**Vite Proxy 運作原理**:
+- 前端請求: `http://localhost:3000/api/auth/liff-login`
+- Vite 代理到: `https://api.bjr8888.com/api/auth/liff-login`
+- 繞過瀏覽器的 CORS 限制
 
 ### Q: 為什麼看到 "WebSocket 連線錯誤"?
 

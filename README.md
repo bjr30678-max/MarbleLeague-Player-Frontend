@@ -137,11 +137,28 @@ VITE_ENV=production
 
 ### 3. 開發模式
 
+**開發環境配置 (繞過 CORS)**:
+
+```env
+# .env
+VITE_LIFF_ID=your-liff-id-here
+VITE_API_URL=                    # 留空使用 Vite proxy
+VITE_ENV=development
+```
+
+**啟動開發伺服器**:
+
 ```bash
 npm run dev
 ```
 
 應用程式將在 `http://localhost:3000` 啟動
+
+**Vite Proxy 功能**:
+- ✅ 自動代理 `/api` 到 `https://api.bjr8888.com`
+- ✅ 自動代理 `/socket.io` WebSocket 連線
+- ✅ 完全繞過瀏覽器 CORS 限制
+- ✅ 無需配置後端 CORS headers
 
 ### 4. 建構生產版本
 

@@ -13,11 +13,27 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
+    // Proxy configuration for development to bypass CORS
+    proxy: {
+      '/api': {
+        target: 'https://api.bjr8888.com',
+        changeOrigin: true,
+        secure: false,
+        // rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+      // WebSocket proxy for Socket.IO
+      '/socket.io': {
+        target: 'wss://api.bjr8888.com',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+      },
+    },
     headers: {
       // Security headers
       'Content-Security-Policy':
         "default-src 'self'; " +
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.line-scdn.net https://cdn.socket.io https://cdn.jsdelivr.net; " +
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.line-scdn.net https://cdn.socket.io https://cdn.jsdelivr.net https://web-broadcast.live-video.net; " +
         "style-src 'self' 'unsafe-inline'; " +
         "img-src 'self' data: https: blob:; " +
         "font-src 'self' data:; " +

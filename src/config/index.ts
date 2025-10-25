@@ -9,12 +9,23 @@ const getConfig = (): AppConfig => {
 
   // Get from environment variables (Vite)
   const liffId = liffFromUrl || import.meta.env.VITE_LIFF_ID
-  const apiUrl = apiFromUrl || import.meta.env.VITE_API_URL
+  let apiUrl = apiFromUrl || import.meta.env.VITE_API_URL
   const env = (import.meta.env.VITE_ENV as 'development' | 'production') || 'production'
 
-  if (!liffId || !apiUrl) {
-    console.error('Missing required configuration. Please check your .env file.')
-    throw new Error('Configuration error: LIFF ID and API URL are required')
+  // In development mode, if API URL is empty, use current origin for Vite proxy
+  if (!apiUrl && (env === 'development' || import.meta.env.DEV)) {
+    apiUrl = window.location.origin
+    console.warn('🔧 開發模式: 使用 Vite proxy，API URL:', apiUrl)
+  }
+
+  if (!liffId) {
+    console.error('Missing LIFF ID. Please check your .env file.')
+    throw new Error('Configuration error: LIFF ID is required')
+  }
+
+  if (!apiUrl) {
+    console.error('Missing API URL. Please check your .env file.')
+    throw new Error('Configuration error: API URL is required')
   }
 
   return {
