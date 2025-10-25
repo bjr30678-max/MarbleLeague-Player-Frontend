@@ -7,88 +7,79 @@ export const GameStatus: React.FC = () => {
   const { currentGame, countdown } = useGameStore()
   const { formattedCountdown } = useCountdown()
 
-  // 等待狀態顯示
+  // 等待狀態顯示（matching original updateWaitingDisplay）
   if (!currentGame) {
     return (
-      <div className="game-status empty">
-        <div className="status-icon">⏳</div>
-        <p>等待遊戲開始...</p>
+      <div className="countdown">
+        <div id="roundInfo">
+          <div className="waiting-message">目前無進行中遊戲</div>
+        </div>
+        <div className="countdown-timer" id="countdown">等待新期數</div>
+        <div id="countdownLabel">請稍候...</div>
       </div>
     )
   }
 
-  const getStatusInfo = () => {
+  // 獲取倒數計時顯示內容（matching original updateRoundDisplay & updateCountdown）
+  const getCountdownDisplay = () => {
     switch (currentGame.status) {
-      case 'waiting':
-        return {
-          icon: '⏰',
-          label: '準備中',
-          color: '#94a3b8',
-          message: '下一輪即將開始',
-        }
       case 'betting':
+        // 投注中：顯示倒數計時
         return {
-          icon: '🎲',
-          label: '投注中',
-          color: '#10b981',
-          message: '請選擇您的投注',
+          label: '距離封盤',
+          timer: formattedCountdown,
+          timerClass: 'large', // 36px
+          timerColor: countdown <= 10 && countdown > 0 ? '#ef4444' : '#667eea',
         }
       case 'closed':
+        // 已封盤：顯示準備開獎
         return {
-          icon: '🔒',
           label: '已封盤',
-          color: '#ef4444',
-          message: '停止接受投注',
+          timer: '準備開獎',
+          timerClass: 'medium', // 24px
+          timerColor: '#667eea',
+        }
+      case 'playing':
+        // 遊戲進行中
+        return {
+          label: '遊戲進行中',
+          timer: '等待結果',
+          timerClass: 'medium', // 24px
+          timerColor: '#667eea',
         }
       case 'finished':
+        // 已開獎
         return {
-          icon: '✅',
-          label: '已結束',
-          color: '#3b82f6',
-          message: '本輪已結算',
+          label: '已開獎',
+          timer: '等待下一期數',
+          timerClass: 'small', // 20px
+          timerColor: '#667eea',
         }
+      case 'waiting':
       default:
         return {
-          icon: '❓',
-          label: '未知',
-          color: '#64748b',
-          message: '',
+          label: '請稍候...',
+          timer: '--:--',
+          timerClass: 'large',
+          timerColor: '#667eea',
         }
     }
   }
 
-  const statusInfo = getStatusInfo()
+  const displayInfo = getCountdownDisplay()
 
+  // 正常狀態顯示（matching original updateRoundDisplay）
   return (
-    <div className="game-status" style={{ borderColor: statusInfo.color }}>
-      <div className="status-header">
-        <div className="status-badge" style={{ background: `${statusInfo.color}20` }}>
-          <span className="status-icon">{statusInfo.icon}</span>
-          <span className="status-label" style={{ color: statusInfo.color }}>
-            {statusInfo.label}
-          </span>
-        </div>
-        <div className="period-info">
-          <span className="period-label">期數</span>
-          <span className="period-number">{currentGame.roundId}</span>
-        </div>
+    <div className="countdown">
+      <div id="roundInfo">-第- {currentGame.roundId} -期數-</div>
+      <div
+        className={`countdown-timer ${displayInfo.timerClass}`}
+        id="countdown"
+        style={{ color: displayInfo.timerColor }}
+      >
+        {displayInfo.timer}
       </div>
-
-      {currentGame.status === 'betting' && countdown > 0 && (
-        <div className="countdown-section">
-          <div className="countdown-label">封盤倒計時</div>
-          <div
-            className="countdown-timer"
-            style={{ color: countdown <= 10 && countdown > 0 ? '#ff0000' : '#10b981' }}
-          >
-            {formattedCountdown}
-          </div>
-        </div>
-      )}
-
-      {statusInfo.message && (
-        <div className="status-message">{statusInfo.message}</div>
-      )}
+      <div id="countdownLabel">{displayInfo.label}</div>
     </div>
   )
 }
