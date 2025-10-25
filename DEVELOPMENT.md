@@ -20,20 +20,25 @@
 
 以下訊息是**正常的開發環境行為**，不會影響生產環境：
 
-#### 1. LIFF 模擬驗證
+#### 1. LIFF 模擬驗證與後端 API 呼叫
 
 ```
 🔧 開發模式: 使用模擬 LIFF 驗證
    這是正常的開發環境行為，不會影響生產環境
+
+🔧 開發模式: 使用模擬 LIFF profile，但仍會呼叫後端 API
+   Profile: 測試用戶 (dev-user-123456)
+   這允許測試完整的前後端流程
 ```
 
 **說明**:
-- 開發環境使用模擬的 LINE LIFF 認證
-- 自動創建測試用戶
-- 餘額設定為 10,000
-- **完全跳過後端 `/api/auth/liff-login` API 呼叫**
-- **不需要後端 API 即可啟動和測試前端**
-- 生產環境會使用真實的 LIFF SDK 和後端驗證
+- 開發環境使用模擬的 LINE LIFF 認證（不需要真的在 LINE 中打開）
+- 自動創建測試用戶 profile (userId: `dev-user-123456`)
+- **仍然會呼叫後端 `/api/auth/liff-login` API**（透過 Vite proxy）
+- 後端會收到模擬的 profile 並正常處理
+- 餘額、token 等資料由真實的後端 API 返回
+- 這樣可以測試完整的前後端流程
+- 生產環境會使用真實的 LIFF SDK
 
 #### 2. WebSocket 連線錯誤
 
@@ -153,29 +158,47 @@ npm run dev
    - `result-confirmed`
    - `balance-updated`
 
-### 無後端開發
+### 開發模式的 API 行為
 
-**✨ 新功能：完全支援無後端開發！**
+**開發模式設計理念**（與原始 app.js 一致）：
 
-開發模式下，前端會完全跳過後端 API 呼叫，使用模擬資料：
+開發模式下會：
+- ✅ **模擬 LIFF 登入** - 不需要真的在 LINE 環境中
+- ✅ **仍然呼叫後端 API** - 測試完整的前後端流程
+- ✅ **使用 Vite Proxy** - 繞過 CORS 問題
 
-**支援的功能**:
-- ✅ **LIFF 登入** - 完全模擬，不打 `/api/auth/liff-login`
-- ✅ UI 組件正常瀏覽
-- ✅ 投注介面正常操作
-- ✅ 模擬用戶資料（餘額 10,000）
-- ✅ 完整的開發體驗
+**工作流程**:
+```
+1. 前端創建模擬 profile:
+   {
+     userId: 'dev-user-123456',
+     displayName: '測試用戶',
+     accessToken: 'dev-mock-token'
+   }
 
-**限制**:
-- ❌ 無法提交真實投注到後端
-- ❌ 無法獲取即時遊戲狀態（WebSocket）
-- ❌ 無法同步餘額變更
+2. 透過 Vite proxy 發送到後端:
+   POST http://localhost:3000/api/auth/liff-login
+   ↓ (Vite proxy)
+   POST https://api.bjr8888.com/api/auth/liff-login
 
-**適用場景**:
-- 前端 UI 開發和調整
-- 組件測試
-- 樣式開發
-- 不需要後端資料的功能開發
+3. 後端正常處理並返回:
+   {
+     token: 'real-backend-token',
+     balance: 10000
+   }
+
+4. 前端使用真實的後端 token 和資料
+```
+
+**優勢**:
+- ✅ 前端不依賴 LINE LIFF SDK
+- ✅ 後端 API、資料庫、業務邏輯都可以正常測試
+- ✅ 完整的前後端整合測試
+- ✅ 接近生產環境的開發體驗
+
+**要求**:
+- ⚠️ 需要後端 API 運行（或使用 Vite proxy 連接到遠端）
+- ⚠️ 後端需要能夠處理開發模式的 mock profile
 
 ---
 

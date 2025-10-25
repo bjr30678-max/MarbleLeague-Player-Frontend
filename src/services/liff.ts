@@ -174,39 +174,36 @@ class LiffService {
    */
   async authenticate(): Promise<UserProfile | null> {
     try {
-      // Get LIFF profile
+      // Get LIFF profile (mock in dev mode, real in production)
       const profile = await this.getProfile()
       if (!profile) {
         throw new Error('Failed to get user profile')
       }
 
-      // Development mode - skip backend authentication
-      if (isDevelopment) {
-        console.warn('🔧 開發模式: 跳過後端驗證，使用模擬資料')
-
-        // Store mock token
-        storage.setToken('dev-mock-token-' + Date.now())
-
-        // Store user profile with mock balance
-        storage.setUserProfile(profile)
-
-        return profile
-      }
-
-      // Get LIFF access token
+      // Get LIFF access token (mock in dev mode, real in production)
       const liffToken = this.getAccessToken()
       if (!liffToken) {
         throw new Error('Failed to get access token')
       }
 
-      // Authenticate with backend (production only)
+      if (isDevelopment) {
+        console.warn(
+          '🔧 開發模式: 使用模擬 LIFF profile，但仍會呼叫後端 API\n' +
+          `   Profile: ${profile.displayName} (${profile.userId})\n` +
+          '   這允許測試完整的前後端流程'
+        )
+      }
+
+      // Authenticate with backend (both dev and production)
+      // In dev mode: sends mock profile to real backend API
+      // In production: sends real LIFF profile to backend API
       const response = await api.loginWithLiff(liffToken, profile.userId)
 
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Backend authentication failed')
       }
 
-      // Store token
+      // Store token from backend
       storage.setToken(response.data.token)
 
       // Update profile with balance from backend
