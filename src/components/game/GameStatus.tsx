@@ -4,85 +4,83 @@ import { useCountdown } from '@/hooks/useCountdown'
 import './GameStatus.css'
 
 export const GameStatus: React.FC = () => {
-  const { currentGame } = useGameStore()
+  const { currentGame, countdown } = useGameStore()
   const { formattedCountdown } = useCountdown()
 
+  // 等待狀態顯示（matching original updateWaitingDisplay）
   if (!currentGame) {
     return (
-      <div className="game-status empty">
-        <div className="status-icon">⏳</div>
-        <p>等待遊戲開始...</p>
+      <div className="game-status waiting">
+        <div className="round-info">
+          <div className="waiting-message">目前無進行中遊戲</div>
+        </div>
+        <div className="countdown-timer large">等待新期數</div>
+        <div className="countdown-label">請稍候...</div>
       </div>
     )
   }
 
-  const getStatusInfo = () => {
+  // 獲取倒數計時顯示內容（matching original updateRoundDisplay & updateCountdown）
+  const getCountdownDisplay = () => {
     switch (currentGame.status) {
-      case 'waiting':
-        return {
-          icon: '⏰',
-          label: '準備中',
-          color: '#94a3b8',
-          message: '下一輪即將開始',
-        }
       case 'betting':
+        // 投注中：顯示倒數計時
         return {
-          icon: '🎲',
-          label: '投注中',
-          color: '#10b981',
-          message: '請選擇您的投注',
+          label: '距離封盤',
+          timer: formattedCountdown,
+          timerSize: 'large', // 36px
+          timerColor: countdown <= 10 && countdown > 0 ? '#ff0000' : '#FF6B6B',
         }
       case 'closed':
+        // 已封盤：顯示準備開獎
         return {
-          icon: '🔒',
           label: '已封盤',
-          color: '#ef4444',
-          message: '停止接受投注',
+          timer: '準備開獎',
+          timerSize: 'medium', // 24px
+          timerColor: '#FF6B6B',
+        }
+      case 'playing':
+        // 遊戲進行中
+        return {
+          label: '遊戲進行中',
+          timer: '等待結果',
+          timerSize: 'medium', // 24px
+          timerColor: '#FF6B6B',
         }
       case 'finished':
+        // 已開獎
         return {
-          icon: '✅',
-          label: '已結束',
-          color: '#3b82f6',
-          message: '本輪已結算',
+          label: '已開獎',
+          timer: '等待下一期數',
+          timerSize: 'small', // 20px
+          timerColor: '#FF6B6B',
         }
+      case 'waiting':
       default:
         return {
-          icon: '❓',
-          label: '未知',
-          color: '#64748b',
-          message: '',
+          label: '請稍候...',
+          timer: '--:--',
+          timerSize: 'large',
+          timerColor: '#FF6B6B',
         }
     }
   }
 
-  const statusInfo = getStatusInfo()
+  const displayInfo = getCountdownDisplay()
 
+  // 正常狀態顯示（matching original updateRoundDisplay）
   return (
-    <div className="game-status" style={{ borderColor: statusInfo.color }}>
-      <div className="status-header">
-        <div className="status-badge" style={{ background: `${statusInfo.color}20` }}>
-          <span className="status-icon">{statusInfo.icon}</span>
-          <span className="status-label" style={{ color: statusInfo.color }}>
-            {statusInfo.label}
-          </span>
-        </div>
-        <div className="period-info">
-          <span className="period-label">期數</span>
-          <span className="period-number">{currentGame.period}</span>
-        </div>
+    <div className="game-status active">
+      <div className="round-info">
+        -第- {currentGame.roundId} -期數-
       </div>
-
-      {currentGame.status === 'betting' && currentGame.countdown > 0 && (
-        <div className="countdown-section">
-          <div className="countdown-label">封盤倒計時</div>
-          <div className="countdown-timer">{formattedCountdown}</div>
-        </div>
-      )}
-
-      {statusInfo.message && (
-        <div className="status-message">{statusInfo.message}</div>
-      )}
+      <div
+        className={`countdown-timer ${displayInfo.timerSize}`}
+        style={{ color: displayInfo.timerColor }}
+      >
+        {displayInfo.timer}
+      </div>
+      <div className="countdown-label">{displayInfo.label}</div>
     </div>
   )
 }
