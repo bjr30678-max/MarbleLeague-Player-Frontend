@@ -19,6 +19,17 @@ export interface BetOption {
   enabled?: boolean
 }
 
+// Backend bet options format (from original app.js)
+export interface BetOptionsData {
+  positions?: Array<{ odds: number }>
+  sumValues?: Array<{ value: number; odds: number }>
+  sumOptions?: Array<{
+    type: string
+    options: Array<{ name: string; value: string; odds: number }>
+  }>
+  [key: string]: any // Allow other categories
+}
+
 export interface Bet {
   id: string
   category: BetCategory
@@ -100,10 +111,12 @@ export interface ApiResponse<T = any> {
 
 export interface LoginResponse {
   token: string
-  userId: string
-  balance: number
-  displayName: string
-  pictureUrl?: string
+  user: {
+    userId: string
+    displayName: string
+    pictureUrl?: string
+    bettingStatus?: 'active' | 'disabled'
+  }
 }
 
 export interface BalanceResponse {

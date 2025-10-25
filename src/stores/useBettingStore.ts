@@ -1,12 +1,12 @@
 import { create } from 'zustand'
-import type { Bet, BetOption, BettingLimits, BetCategory } from '@/types'
+import type { Bet, BetOptionsData, BettingLimits, BetCategory } from '@/types'
 import { api } from '@/services/api'
 import { useUserStore } from './useUserStore'
 import { useGameStore } from './useGameStore'
 import { generateSecureId } from '@/utils/security'
 
 interface BettingState {
-  betOptions: BetOption[]
+  betOptionsData: BetOptionsData | null // Raw data from backend
   bettingLimits: BettingLimits | null
   currentBets: Bet[]
   selectedCategory: BetCategory
@@ -14,7 +14,7 @@ interface BettingState {
   isSubmitting: boolean
 
   // Actions
-  setBetOptions: (options: BetOption[]) => void
+  setBetOptions: (options: BetOptionsData) => void
   setBettingLimits: (limits: BettingLimits) => void
   setSelectedCategory: (category: BetCategory) => void
   setSelectedAmount: (amount: number) => void
@@ -29,14 +29,14 @@ interface BettingState {
 }
 
 export const useBettingStore = create<BettingState>((set, get) => ({
-  betOptions: [],
+  betOptionsData: null,
   bettingLimits: null,
   currentBets: [],
   selectedCategory: 'position',
   selectedAmount: 100,
   isSubmitting: false,
 
-  setBetOptions: (options) => set({ betOptions: options }),
+  setBetOptions: (options) => set({ betOptionsData: options }),
 
   setBettingLimits: (limits) => set({ bettingLimits: limits }),
 

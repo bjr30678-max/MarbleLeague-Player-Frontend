@@ -2,7 +2,7 @@ import type {
   ApiResponse,
   LoginResponse,
   BalanceResponse,
-  BetOption,
+  BetOptionsData,
   BettingLimits,
   BetSubmitRequest,
   BetSubmitResponse,
@@ -75,14 +75,21 @@ class ApiService {
   }
 
   /**
-   * Login with LIFF token
+   * Login with LIFF token (原始格式: userId, displayName, pictureUrl, accessToken)
    */
-  async loginWithLiff(liffToken: string, userId: string): Promise<ApiResponse<LoginResponse>> {
+  async loginWithLiff(profile: {
+    userId: string
+    displayName: string
+    pictureUrl?: string
+    accessToken: string
+  }): Promise<ApiResponse<LoginResponse>> {
     return this.request<LoginResponse>(API_ENDPOINTS.AUTH.LIFF_LOGIN, {
       method: 'POST',
       body: JSON.stringify({
-        liffToken,
-        userId,
+        userId: profile.userId,
+        displayName: profile.displayName,
+        pictureUrl: profile.pictureUrl,
+        accessToken: profile.accessToken,
       }),
     })
   }
@@ -98,9 +105,10 @@ class ApiService {
 
   /**
    * Get betting options (原始路徑: /api/game/bet-options)
+   * Returns object with different bet categories
    */
-  async getBettingOptions(): Promise<ApiResponse<BetOption[]>> {
-    return this.request<BetOption[]>(API_ENDPOINTS.GAME.BET_OPTIONS, {
+  async getBettingOptions(): Promise<ApiResponse<BetOptionsData>> {
+    return this.request<BetOptionsData>(API_ENDPOINTS.GAME.BET_OPTIONS, {
       method: 'GET',
     })
   }

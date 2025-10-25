@@ -197,19 +197,29 @@ class LiffService {
       // Authenticate with backend (both dev and production)
       // In dev mode: sends mock profile to real backend API
       // In production: sends real LIFF profile to backend API
-      const response = await api.loginWithLiff(liffToken, profile.userId)
+      const response = await api.loginWithLiff({
+        userId: profile.userId,
+        displayName: profile.displayName,
+        pictureUrl: profile.pictureUrl,
+        accessToken: liffToken,
+      })
 
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Backend authentication failed')
       }
 
-      // Store token from backend
-      storage.setToken(response.data.token)
+      // Backend returns: { success, token, user }
+      const { token, user } = response.data
 
-      // Update profile with balance from backend
+      // Store token from backend
+      storage.setToken(token)
+
+      // Update profile with user data from backend
       const userProfile: UserProfile = {
-        ...profile,
-        balance: response.data.balance,
+        userId: user.userId,
+        displayName: user.displayName,
+        pictureUrl: user.pictureUrl,
+        balance: 0, // Will be fetched separately
       }
 
       // Store user profile
