@@ -42,6 +42,32 @@ export const isDevelopment = config.env === 'development' ||
   window.location.hostname === 'localhost' ||
   window.location.hostname === '127.0.0.1'
 
+// WebSocket URL configuration
+// WebSocket cannot use Vite proxy, so it needs the actual backend URL
+export const getWebSocketUrl = (): string => {
+  const apiFromUrl = new URLSearchParams(window.location.search).get('api')
+  const envApiUrl = import.meta.env.VITE_API_URL
+
+  // If we have an explicit API URL from env or URL param, use it
+  if (apiFromUrl) {
+    return apiFromUrl
+  }
+
+  if (envApiUrl) {
+    return envApiUrl
+  }
+
+  // In development mode with empty API URL, use the default backend
+  if (isDevelopment) {
+    const defaultBackendUrl = 'https://api.bjr8888.com'
+    console.warn('🔧 WebSocket 開發模式: 連接到實際後端:', defaultBackendUrl)
+    return defaultBackendUrl
+  }
+
+  // Production: use current origin (same domain)
+  return window.location.origin
+}
+
 // API endpoints (matching original app.js)
 export const API_ENDPOINTS = {
   AUTH: {

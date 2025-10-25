@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client'
 import type { GameState, GameResult } from '@/types'
 import type { IVSStatsUpdate } from './awsIvs'
-import { config, isDevelopment } from '@/config'
+import { getWebSocketUrl, isDevelopment } from '@/config'
 import { storage } from './storage'
 
 type SocketEventCallback = (...args: any[]) => void
@@ -12,6 +12,7 @@ class WebSocketService {
   private maxReconnectAttempts = 5
   private reconnectDelay = 2000
   private connectionWarningShown = false
+  private wsUrl = ''
 
   /**
    * Connect to WebSocket server
@@ -22,9 +23,14 @@ class WebSocketService {
     }
 
     const token = storage.getToken()
+    this.wsUrl = getWebSocketUrl()
+
+    if (isDevelopment) {
+      console.log('🔌 WebSocket 連接 URL:', this.wsUrl)
+    }
 
     try {
-      this.socket = io(config.apiUrl, {
+      this.socket = io(this.wsUrl, {
         auth: {
           token,
         },
@@ -75,7 +81,7 @@ class WebSocketService {
         console.warn(
           '🔧 WebSocket 連線錯誤 (開發模式)\n' +
           `   這在開發環境中是正常的，如果後端服務未啟動\n` +
-          `   嘗試連線到: ${config.apiUrl}\n` +
+          `   嘗試連線到: ${this.wsUrl}\n` +
           `   錯誤: ${error.message || 'Timeout'}`
         )
         this.connectionWarningShown = true
@@ -85,6 +91,7 @@ class WebSocketService {
         if (isDevelopment) {
           console.warn(
             `⚠️ WebSocket 已達最大重連次數 (${this.maxReconnectAttempts})\n` +
+            `   連線 URL: ${this.wsUrl}\n` +
             '   應用程式將以離線模式運行'
           )
         }
