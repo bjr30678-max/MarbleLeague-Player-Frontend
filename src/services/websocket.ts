@@ -3,6 +3,7 @@ import type { GameState, GameResult } from '@/types'
 import type { IVSStatsUpdate } from './awsIvs'
 import { getWebSocketUrl, isDevelopment } from '@/config'
 import { storage } from './storage'
+import { toast } from '@/stores/useToastStore'
 
 type SocketEventCallback = (...args: any[]) => void
 
@@ -41,6 +42,7 @@ class WebSocketService {
       this.setupEventListeners()
     } catch (error) {
       console.error('WebSocket connection failed:', error)
+      toast.error('WebSocket 連線失敗')
     }
   }
 
@@ -85,6 +87,7 @@ class WebSocketService {
 
       if (this.reconnectAttempts >= this.maxReconnectAttempts) {
         console.warn(`WebSocket 已達最大重連次數 (${this.maxReconnectAttempts})，應用將以離線模式運行`)
+        toast.warning('無法連接到遊戲伺服器，部分功能可能無法使用')
       }
     })
 

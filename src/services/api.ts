@@ -13,6 +13,7 @@ import type {
 import { config, API_ENDPOINTS } from '@/config'
 import { storage } from './storage'
 import { validateToken } from '@/utils/validation'
+import { toast } from '@/stores/useToastStore'
 
 class ApiService {
   private baseUrl: string
@@ -51,15 +52,28 @@ class ApiService {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({
           message: 'Network error',
+          error: 'Network error',
         }))
 
         // Handle 401 Unauthorized - clear token
-        if (response.status === 401) {
+        if (response.status === 401 || response.status === 403) {
           storage.clearAuth()
-          throw new Error('認證失敗，請重新登入')
+          const errorMsg = '認證失敗，請重新登入'
+
+          // Only show toast if not a login request (matching original app.js)
+          if (!endpoint.includes('/auth/liff-login')) {
+            toast.error('登入已失效，請重新整理頁面')
+            setTimeout(() => {
+              window.location.reload()
+            }, 2000)
+          }
+
+          throw new Error(errorMsg)
         }
 
-        throw new Error(errorData.message || `HTTP Error: ${response.status}`)
+        // Use errorData.error (backend format) or errorData.message
+        const errorMsg = errorData.error || errorData.message || `HTTP Error: ${response.status}`
+        throw new Error(errorMsg)
       }
 
       const data = await response.json()
@@ -68,10 +82,16 @@ class ApiService {
         data,
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       console.error(`API request failed for ${endpoint}:`, error)
+
+      // Show toast for all errors (matching original app.js behavior)
+      // The toast will display the error message to the user
+      toast.error(errorMessage || '網路錯誤')
+
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: errorMessage,
       }
     }
   }
