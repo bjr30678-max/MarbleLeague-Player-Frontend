@@ -134,6 +134,124 @@
   color: #64748b;
 }
 
+/* Position Betting Grid */
+.position-betting {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.odds-info {
+  font-size: 0.875rem;
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+.position-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow-x: auto;
+}
+
+.position-header,
+.position-row {
+  display: grid;
+  grid-template-columns: 60px repeat(10, 1fr);
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.position-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.position-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.position-cell:hover {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: #3b82f6;
+  transform: scale(1.05);
+}
+
+.position-cell.selected {
+  background: rgba(16, 185, 129, 0.3);
+  border-color: #10b981;
+}
+
+/* Sum Betting */
+.sum-betting {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sum-values h4,
+.sum-options h4 {
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  margin-bottom: 0.75rem;
+}
+
+.sum-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 0.5rem;
+}
+
+.sum-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sum-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.sum-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.sum-odds {
+  font-size: 0.75rem;
+  color: #fbbf24;
+}
+
+/* Simple Options (Big/Small, Odd/Even, Dragon/Tiger) */
+.simple-options .option-btn.large {
+  min-height: 100px;
+  font-size: 1.5rem;
+}
+
 @media (max-width: 640px) {
   .bet-categories {
     grid-template-columns: repeat(5, 1fr);

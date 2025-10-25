@@ -51,13 +51,12 @@ export const useGameStore = create<GameStoreState>((set) => ({
 
   fetchCurrentGame: async () => {
     // TODO: 原始 app.js 沒有這個 API，透過 WebSocket 獲取遊戲狀態
-    console.warn('fetchCurrentGame: 使用 WebSocket 事件獲取遊戲狀態')
+    // WebSocket 會透過 'round-started' 事件推送遊戲狀態
   },
 
   fetchRecentResults: async () => {
     // TODO: 原始 app.js 沒有獨立的 recent results API
     // 結果通過 WebSocket 推送或從 history 中取得
-    console.warn('fetchRecentResults: 使用 WebSocket 或 history API')
   },
 
   fetchHistory: async (limit = 20) => {
