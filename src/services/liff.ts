@@ -180,13 +180,26 @@ class LiffService {
         throw new Error('Failed to get user profile')
       }
 
+      // Development mode - skip backend authentication
+      if (isDevelopment) {
+        console.warn('🔧 開發模式: 跳過後端驗證，使用模擬資料')
+
+        // Store mock token
+        storage.setToken('dev-mock-token-' + Date.now())
+
+        // Store user profile with mock balance
+        storage.setUserProfile(profile)
+
+        return profile
+      }
+
       // Get LIFF access token
       const liffToken = this.getAccessToken()
       if (!liffToken) {
         throw new Error('Failed to get access token')
       }
 
-      // Authenticate with backend
+      // Authenticate with backend (production only)
       const response = await api.loginWithLiff(liffToken, profile.userId)
 
       if (!response.success || !response.data) {
