@@ -27,18 +27,15 @@ class WebSocketService {
 
     if (isDevelopment) {
       console.log('🔌 WebSocket 連接 URL:', this.wsUrl)
+      console.log('🔑 使用 Token:', token ? '已提供' : '未提供')
     }
 
     try {
+      // 使用與原始代碼相同的簡單配置
       this.socket = io(this.wsUrl, {
         auth: {
-          token,
-        },
-        transports: ['websocket', 'polling'],
-        reconnection: true,
-        reconnectionAttempts: this.maxReconnectAttempts,
-        reconnectionDelay: this.reconnectDelay,
-        timeout: 10000,
+          token
+        }
       })
 
       this.setupEventListeners()
@@ -77,24 +74,17 @@ class WebSocketService {
     this.socket.on('connect_error', (error) => {
       this.reconnectAttempts++
 
-      if (isDevelopment && !this.connectionWarningShown) {
-        console.warn(
-          '🔧 WebSocket 連線錯誤 (開發模式)\n' +
-          `   這在開發環境中是正常的，如果後端服務未啟動\n` +
-          `   嘗試連線到: ${this.wsUrl}\n` +
-          `   錯誤: ${error.message || 'Timeout'}`
-        )
+      if (!this.connectionWarningShown) {
+        console.error('WebSocket 連線失敗:', {
+          url: this.wsUrl,
+          error: error.message || error,
+          attempts: this.reconnectAttempts
+        })
         this.connectionWarningShown = true
       }
 
       if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-        if (isDevelopment) {
-          console.warn(
-            `⚠️ WebSocket 已達最大重連次數 (${this.maxReconnectAttempts})\n` +
-            `   連線 URL: ${this.wsUrl}\n` +
-            '   應用程式將以離線模式運行'
-          )
-        }
+        console.warn(`WebSocket 已達最大重連次數 (${this.maxReconnectAttempts})，應用將以離線模式運行`)
       }
     })
 
