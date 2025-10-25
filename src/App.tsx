@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Loading, ToastContainer } from './components/common'
 import { BetSelector, BetList } from './components/betting'
 import { GameStatus, RecentResults } from './components/game'
@@ -18,10 +18,12 @@ const App: React.FC = () => {
   const { isConnected } = useWebSocket()
   const { user } = useUserStore()
   const [activeTab, setActiveTab] = useState<Tab>('game')
+  const dataFetchedRef = useRef(false) // Prevent duplicate data fetching
 
   // Fetch initial data
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !dataFetchedRef.current) {
+      dataFetchedRef.current = true
       useBettingStore.getState().fetchBettingData()
       useGameStore.getState().fetchCurrentGame()
       useGameStore.getState().fetchRecentResults()
@@ -136,9 +138,11 @@ const LiveTab: React.FC = () => {
 
 const HistoryTab: React.FC = () => {
   const { history, fetchHistory, historyPage, historyTotalPages, isLoading } = useGameStore()
+  const historyFetchedRef = useRef(false)
 
   useEffect(() => {
-    if (history.length === 0) {
+    if (history.length === 0 && !historyFetchedRef.current) {
+      historyFetchedRef.current = true
       fetchHistory(1)
     }
   }, [])

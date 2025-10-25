@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { liff } from '@/services/liff'
 import { useUserStore } from '@/stores/useUserStore'
 import { toast } from '@/stores/useToastStore'
@@ -6,8 +6,15 @@ import { toast } from '@/stores/useToastStore'
 export const useAuth = () => {
   const [isInitializing, setIsInitializing] = useState(true)
   const { user, setUser, isAuthenticated } = useUserStore()
+  const initializeRef = useRef(false) // Prevent duplicate initialization in StrictMode
 
   useEffect(() => {
+    // Prevent duplicate initialization (React StrictMode runs effects twice)
+    if (initializeRef.current) {
+      return
+    }
+    initializeRef.current = true
+
     const initialize = async () => {
       try {
         // Initialize LIFF
