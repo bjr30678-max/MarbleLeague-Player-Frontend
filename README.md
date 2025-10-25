@@ -139,11 +139,16 @@ VITE_ENV=production
 
 **開發環境配置 (繞過 CORS)**:
 
-```env
-# .env
-VITE_LIFF_ID=your-liff-id-here
-VITE_API_URL=                    # 留空使用 Vite proxy
+```bash
+# 複製開發環境範例檔
+cp .env.development.example .env
+
+# 或手動建立 .env
+cat > .env << EOF
+VITE_LIFF_ID=2008123093-KR57QjDP  # 預設 LIFF ID
+VITE_API_URL=                      # 留空使用 Vite proxy
 VITE_ENV=development
+EOF
 ```
 
 **啟動開發伺服器**:
