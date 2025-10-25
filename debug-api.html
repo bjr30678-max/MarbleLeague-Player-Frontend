@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 診斷工具</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background: #2d2d2d;
+        }
+        .success { border-left: 4px solid #4ec9b0; }
+        .error { border-left: 4px solid #f48771; }
+        .warning { border-left: 4px solid #dcdcaa; }
+        button {
+            padding: 10px 20px;
+            margin: 10px 0;
+            background: #0e639c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+        pre {
+            background: #1e1e1e;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 API 診斷工具</h1>
+    <p>這個工具會測試 Vite proxy 和後端 API 的連線狀態</p>
+
+    <button onclick="runTests()">🚀 開始測試</button>
+    <button onclick="clearResults()">🗑️ 清除結果</button>
+
+    <div id="results"></div>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            resultsDiv.appendChild(div);
+        }
+
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+        }
+
+        async function testProxyAPI() {
+            log('📡 測試 1: 透過 Vite Proxy 呼叫 API...', 'warning');
+
+            try {
+                const response = await fetch('/api/auth/liff-login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: 'test-user-123',
+                        displayName: '測試用戶',
+                        pictureUrl: 'https://via.placeholder.com/100',
+                        accessToken: 'test-token'
+                    })
+                });
+
+                const text = await response.text();
+
+                log(`
+                    <strong>狀態碼:</strong> ${response.status}<br>
+                    <strong>響應:</strong><br>
+                    <pre>${text}</pre>
+                `, response.ok ? 'success' : 'error');
+
+            } catch (error) {
+                log(`
+                    <strong>❌ 錯誤:</strong><br>
+                    <pre>${error.message}</pre>
+                `, 'error');
+            }
+        }
+
+        async function testDirectAPI() {
+            log('🌐 測試 2: 直接呼叫後端 API (會遇到 CORS)...', 'warning');
+
+            try {
+                const response = await fetch('https://api.bjr8888.com/api/auth/liff-login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: 'test-user-123',
+                        displayName: '測試用戶',
+                        pictureUrl: 'https://via.placeholder.com/100',
+                        accessToken: 'test-token'
+                    })
+                });
+
+                const text = await response.text();
+
+                log(`
+                    <strong>狀態碼:</strong> ${response.status}<br>
+                    <strong>響應:</strong><br>
+                    <pre>${text}</pre>
+                `, response.ok ? 'success' : 'error');
+
+            } catch (error) {
+                log(`
+                    <strong>❌ CORS 錯誤 (預期的):</strong><br>
+                    <pre>${error.message}</pre>
+                `, 'warning');
+            }
+        }
+
+        async function testConfig() {
+            log('⚙️ 測試 3: 檢查環境配置...', 'warning');
+
+            const checks = [
+                { name: '當前 URL', value: window.location.href },
+                { name: 'Hostname', value: window.location.hostname },
+                { name: 'Port', value: window.location.port },
+                { name: 'Protocol', value: window.location.protocol },
+            ];
+
+            const html = checks.map(c => `<strong>${c.name}:</strong> ${c.value}`).join('<br>');
+            log(html, 'success');
+        }
+
+        async function testHealthCheck() {
+            log('💊 測試 4: 後端健康檢查...', 'warning');
+
+            try {
+                const response = await fetch('https://api.bjr8888.com/health', {
+                    method: 'GET'
+                });
+
+                const text = await response.text();
+
+                log(`
+                    <strong>狀態碼:</strong> ${response.status}<br>
+                    <strong>響應:</strong><br>
+                    <pre>${text || '(空響應)'}</pre>
+                `, response.ok ? 'success' : 'error');
+
+            } catch (error) {
+                log(`
+                    <strong>❌ 錯誤:</strong><br>
+                    <pre>${error.message}</pre>
+                `, 'error');
+            }
+        }
+
+        async function runTests() {
+            clearResults();
+            log('🎯 開始 API 診斷測試...', 'success');
+            log('──────────────────────────────────', 'info');
+
+            await testConfig();
+            log('──────────────────────────────────', 'info');
+
+            await testProxyAPI();
+            log('──────────────────────────────────', 'info');
+
+            await testDirectAPI();
+            log('──────────────────────────────────', 'info');
+
+            await testHealthCheck();
+            log('──────────────────────────────────', 'info');
+
+            log('✅ 測試完成！', 'success');
+        }
+
+        // 頁面載入時顯示說明
+        log(`
+            <strong>使用說明:</strong><br>
+            1. 確保開發伺服器正在運行 (npm run dev)<br>
+            2. 點擊 "開始測試" 按鈕<br>
+            3. 查看測試結果，找出問題所在<br><br>
+            <strong>預期結果:</strong><br>
+            - 測試 1 (Proxy): 應該成功或返回後端錯誤訊息（不是 404）<br>
+            - 測試 2 (Direct): 應該遇到 CORS 錯誤（這是正常的）<br>
+            - 測試 3 (Config): 顯示當前配置<br>
+            - 測試 4 (Health): 檢查後端是否在線
+        `, 'warning');
+    </script>
+</body>
+</html>
