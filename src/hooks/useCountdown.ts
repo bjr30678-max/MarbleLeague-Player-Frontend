@@ -2,17 +2,25 @@ import { useEffect, useRef } from 'react'
 import { useGameStore } from '@/stores/useGameStore'
 
 export const useCountdown = () => {
-  const { countdown } = useGameStore()
+  const { countdown, currentGame } = useGameStore()
   const intervalRef = useRef<number | null>(null)
 
   useEffect(() => {
-    if (countdown > 0) {
+    // Clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+
+    // Only start countdown if game is in betting status and countdown > 0
+    if (currentGame?.status === 'betting' && countdown > 0) {
       intervalRef.current = window.setInterval(() => {
         useGameStore.setState((state) => {
           const newCountdown = state.countdown - 1
           if (newCountdown <= 0) {
             if (intervalRef.current) {
               clearInterval(intervalRef.current)
+              intervalRef.current = null
             }
             return { countdown: 0 }
           }
@@ -24,9 +32,10 @@ export const useCountdown = () => {
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
+        intervalRef.current = null
       }
     }
-  }, [countdown])
+  }, [currentGame?.status, currentGame?.roundId]) // Only restart when game changes
 
   const formatCountdown = (seconds: number): string => {
     const mins = Math.floor(seconds / 60)

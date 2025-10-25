@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { websocket } from '@/services/websocket'
 import { ivsStatsService } from '@/services/awsIvs'
 import { useGameStore } from '@/stores/useGameStore'
@@ -9,35 +9,44 @@ import type { GameState, GameResult } from '@/types'
 import type { IVSStatsUpdate } from '@/services/awsIvs'
 
 export const useWebSocket = () => {
-  const { setCurrentGame, addResult } = useGameStore()
-  const { updateBalance } = useUserStore()
-  const { clearBets } = useBettingStore()
+  const isInitialized = useRef(false)
 
   useEffect(() => {
+    // Prevent duplicate initialization in StrictMode
+    if (isInitialized.current) {
+      return
+    }
+    isInitialized.current = true
+
     // Connect to WebSocket
     websocket.connect()
 
-    // Setup event handlers
+    // Setup event handlers with store getState to avoid dependency issues
     const handleRoundStarted = (data: GameState) => {
-      setCurrentGame(data)
-      clearBets()
+      console.log('🎮 [WebSocket] Round started:', data)
+      useGameStore.getState().setCurrentGame(data)
+      useBettingStore.getState().clearBets()
       toast.info(`新一輪開始: 第 ${data.period} 期`)
     }
 
     const handleBettingClosed = () => {
+      console.log('🔒 [WebSocket] Betting closed')
       toast.warning('投注已封盤')
     }
 
     const handleResultConfirmed = (data: GameResult) => {
-      addResult(data)
+      console.log('✅ [WebSocket] Result confirmed:', data)
+      useGameStore.getState().addResult(data)
       toast.success('開獎結果已公布')
     }
 
     const handleBalanceUpdated = (data: { balance: number }) => {
-      updateBalance(data.balance)
+      console.log('💰 [WebSocket] Balance updated:', data)
+      useUserStore.getState().updateBalance(data.balance)
     }
 
     const handleIVSStatsUpdate = (data: IVSStatsUpdate) => {
+      console.log('📊 [WebSocket] IVS stats update:', data)
       // Forward stats to IVS stats service
       ivsStatsService.handleStatsUpdate(data)
     }
@@ -70,7 +79,7 @@ export const useWebSocket = () => {
       websocket.off('connect', connectHandler)
       websocket.disconnect()
     }
-  }, [setCurrentGame, addResult, updateBalance, clearBets])
+  }, []) // Empty dependency array - only run once
 
   return {
     isConnected: websocket.isConnected(),
