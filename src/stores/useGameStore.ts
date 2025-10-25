@@ -50,13 +50,61 @@ export const useGameStore = create<GameStoreState>((set) => ({
   },
 
   fetchCurrentGame: async () => {
-    // TODO: 原始 app.js 沒有這個 API，透過 WebSocket 獲取遊戲狀態
-    // WebSocket 會透過 'round-started' 事件推送遊戲狀態
+    // Load current round state from API (原始: /api/game/current-round)
+    try {
+      const response = await api.getCurrentRound()
+      if (response.success && response.data) {
+        const data = response.data
+
+        if (data.status === 'waiting') {
+          // No active round
+          set({
+            currentGame: null,
+            countdown: 0,
+          })
+        } else if (data.roundId) {
+          // Active round
+          set({
+            currentGame: {
+              roundId: data.roundId,
+              period: data.period || 0,
+              status: data.status,
+              countdown: data.timeLeft || 0,
+              timestamp: Date.now(),
+            },
+            countdown: data.timeLeft || 0,
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch current game:', error)
+    }
   },
 
   fetchRecentResults: async () => {
-    // TODO: 原始 app.js 沒有獨立的 recent results API
-    // 結果通過 WebSocket 推送或從 history 中取得
+    // Load recent results from API (原始: /api/game/results?limit=10)
+    try {
+      const response = await api.getRecentResults(10)
+      if (response.success && response.data && Array.isArray(response.data)) {
+        // Convert RecentResult[] to GameResult[]
+        const results = response.data.map((item) => {
+          const sum = item.result.slice(0, 2).reduce((a, b) => a + b, 0)
+          return {
+            roundId: item.roundId,
+            period: parseInt(item.roundId) || 0,
+            positions: item.result,
+            sum,
+            bigsmall: sum > 11 ? 'big' : 'small',
+            oddeven: sum % 2 === 0 ? 'even' : 'odd',
+            dragontiger: {},
+            timestamp: new Date(item.resultTime).getTime(),
+          } as GameResult
+        })
+        set({ recentResults: results })
+      }
+    } catch (error) {
+      console.error('Failed to fetch recent results:', error)
+    }
   },
 
   fetchHistory: async (limit = 20) => {

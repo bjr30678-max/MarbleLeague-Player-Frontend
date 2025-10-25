@@ -80,6 +80,8 @@ export const API_ENDPOINTS = {
     BATCH_PLAY: '/api/game/batch-play',
     HISTORY: '/api/game/history',
     USER_PERIOD_STATS: '/api/game/user-period-stats',
+    CURRENT_ROUND: '/api/game/current-round', // Get current round state
+    RESULTS: '/api/game/results', // Get recent results with ?limit=N
   },
   POINTS: {
     BALANCE: '/api/points/balance', // /{userId} will be appended

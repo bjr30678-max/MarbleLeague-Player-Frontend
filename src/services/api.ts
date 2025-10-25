@@ -7,6 +7,8 @@ import type {
   BetSubmitRequest,
   BetSubmitResponse,
   GameHistoryResponse,
+  CurrentRoundResponse,
+  RecentResultsResponse,
 } from '@/types'
 import { config, API_ENDPOINTS } from '@/config'
 import { storage } from './storage'
@@ -148,6 +150,29 @@ class ApiService {
   async getGameHistory(limit: number = 20): Promise<ApiResponse<GameHistoryResponse>> {
     return this.request<GameHistoryResponse>(
       `${API_ENDPOINTS.GAME.HISTORY}?limit=${limit}`,
+      {
+        method: 'GET',
+      }
+    )
+  }
+
+  /**
+   * Get current round state (原始路徑: /api/game/current-round)
+   * Returns current round status, roundId, timeLeft, canBet
+   */
+  async getCurrentRound(): Promise<ApiResponse<CurrentRoundResponse>> {
+    return this.request<CurrentRoundResponse>(API_ENDPOINTS.GAME.CURRENT_ROUND, {
+      method: 'GET',
+    })
+  }
+
+  /**
+   * Get recent results (原始路徑: /api/game/results?limit=N)
+   * Returns array of recent game results
+   */
+  async getRecentResults(limit: number = 10): Promise<ApiResponse<RecentResultsResponse>> {
+    return this.request<RecentResultsResponse>(
+      `${API_ENDPOINTS.GAME.RESULTS}?limit=${limit}`,
       {
         method: 'GET',
       }

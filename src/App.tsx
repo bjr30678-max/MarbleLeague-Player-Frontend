@@ -20,13 +20,12 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('game')
   const dataFetchedRef = useRef(false) // Prevent duplicate data fetching
 
-  // Fetch initial data
+  // Fetch betting data only (game data is fetched by useWebSocket)
   useEffect(() => {
     if (isAuthenticated && !dataFetchedRef.current) {
       dataFetchedRef.current = true
       useBettingStore.getState().fetchBettingData()
-      useGameStore.getState().fetchCurrentGame()
-      useGameStore.getState().fetchRecentResults()
+      // Note: fetchCurrentGame and fetchRecentResults are now called in useWebSocket initialization
     }
   }, [isAuthenticated])
 

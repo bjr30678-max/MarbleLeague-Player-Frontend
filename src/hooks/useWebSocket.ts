@@ -18,26 +18,78 @@ export const useWebSocket = () => {
     }
     isInitialized.current = true
 
-    // Connect to WebSocket
-    websocket.connect()
+    // Initialize game connection (matching original initializeGame)
+    const initializeGame = async () => {
+      // 1. Connect to WebSocket
+      websocket.connect()
+
+      // 2. Load current round info
+      await useGameStore.getState().fetchCurrentGame()
+
+      // 3. Load recent results
+      await useGameStore.getState().fetchRecentResults()
+
+      // Timer is handled by useCountdown hook
+    }
+
+    initializeGame()
 
     // Setup event handlers with store getState to avoid dependency issues
     const handleRoundStarted = (data: GameState) => {
       console.log('🎮 [WebSocket] Round started:', data)
+
+      // Update game state
       useGameStore.getState().setCurrentGame(data)
+
+      // Clear previous bets (matching original)
       useBettingStore.getState().clearBets()
+
+      // Show toast notification
       toast.info(`新一輪開始: 第 ${data.period} 期`)
     }
 
     const handleBettingClosed = () => {
       console.log('🔒 [WebSocket] Betting closed')
+
+      // Update game status to closed
+      const currentGame = useGameStore.getState().currentGame
+      if (currentGame) {
+        useGameStore.getState().setCurrentGame({
+          ...currentGame,
+          status: 'closed',
+          countdown: 0,
+        })
+      }
+
       toast.warning('投注已封盤')
     }
 
     const handleResultConfirmed = (data: GameResult) => {
       console.log('✅ [WebSocket] Result confirmed:', data)
+
+      // Add result to recent results
       useGameStore.getState().addResult(data)
+
+      // Show toast
       toast.success('開獎結果已公布')
+
+      // Reload game history (matching original)
+      useGameStore.getState().fetchHistory()
+
+      // Reload user balance (matching original)
+      useUserStore.getState().fetchBalance()
+
+      // Reload recent results (matching original)
+      useGameStore.getState().fetchRecentResults()
+
+      // After 5 seconds, check if we should show waiting state
+      setTimeout(() => {
+        const currentGame = useGameStore.getState().currentGame
+        if (!currentGame || currentGame.roundId === data.roundId) {
+          // Set to waiting state
+          useGameStore.getState().resetGame()
+        }
+      }, 5000)
     }
 
     const handleBalanceUpdated = (data: { balance: number }) => {

@@ -97,6 +97,26 @@ export interface GameHistoryResponse {
   games: GameHistoryRecord[]
 }
 
+// Current round response (from /api/game/current-round)
+export interface CurrentRoundResponse {
+  status: GameStatus
+  roundId?: string
+  period?: number
+  timeLeft?: number
+  canBet?: boolean
+  startTime?: string
+  createdAt?: string
+}
+
+// Recent results response (from /api/game/results?limit=N)
+export interface RecentResult {
+  roundId: string
+  result: number[] // Array of 10 numbers (positions)
+  resultTime: string
+}
+
+export type RecentResultsResponse = RecentResult[]
+
 export interface UserBet {
   category: BetCategory
   label: string
