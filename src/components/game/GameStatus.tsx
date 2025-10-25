@@ -7,80 +7,88 @@ export const GameStatus: React.FC = () => {
   const { currentGame, countdown } = useGameStore()
   const { formattedCountdown } = useCountdown()
 
-  // 等待狀態顯示（matching original updateWaitingDisplay）
+  // 等待狀態顯示
   if (!currentGame) {
     return (
-      <div className="game-status waiting">
-        <div className="round-info">
-          <div className="waiting-message">目前無進行中遊戲</div>
-        </div>
-        <div className="countdown-timer large">等待新期數</div>
-        <div className="countdown-label">請稍候...</div>
+      <div className="game-status empty">
+        <div className="status-icon">⏳</div>
+        <p>等待遊戲開始...</p>
       </div>
     )
   }
 
-  // 獲取倒數計時顯示內容（matching original updateRoundDisplay & updateCountdown）
-  const getCountdownDisplay = () => {
+  const getStatusInfo = () => {
     switch (currentGame.status) {
-      case 'betting':
-        // 投注中：顯示倒數計時
+      case 'waiting':
         return {
-          label: '距離封盤',
-          timer: formattedCountdown,
-          timerSize: 'large', // 36px
-          timerColor: countdown <= 10 && countdown > 0 ? '#ff0000' : '#FF6B6B',
+          icon: '⏰',
+          label: '準備中',
+          color: '#94a3b8',
+          message: '下一輪即將開始',
+        }
+      case 'betting':
+        return {
+          icon: '🎲',
+          label: '投注中',
+          color: '#10b981',
+          message: '請選擇您的投注',
         }
       case 'closed':
-        // 已封盤：顯示準備開獎
         return {
+          icon: '🔒',
           label: '已封盤',
-          timer: '準備開獎',
-          timerSize: 'medium', // 24px
-          timerColor: '#FF6B6B',
-        }
-      case 'playing':
-        // 遊戲進行中
-        return {
-          label: '遊戲進行中',
-          timer: '等待結果',
-          timerSize: 'medium', // 24px
-          timerColor: '#FF6B6B',
+          color: '#ef4444',
+          message: '停止接受投注',
         }
       case 'finished':
-        // 已開獎
         return {
-          label: '已開獎',
-          timer: '等待下一期數',
-          timerSize: 'small', // 20px
-          timerColor: '#FF6B6B',
+          icon: '✅',
+          label: '已結束',
+          color: '#3b82f6',
+          message: '本輪已結算',
         }
-      case 'waiting':
       default:
         return {
-          label: '請稍候...',
-          timer: '--:--',
-          timerSize: 'large',
-          timerColor: '#FF6B6B',
+          icon: '❓',
+          label: '未知',
+          color: '#64748b',
+          message: '',
         }
     }
   }
 
-  const displayInfo = getCountdownDisplay()
+  const statusInfo = getStatusInfo()
 
-  // 正常狀態顯示（matching original updateRoundDisplay）
   return (
-    <div className="game-status active">
-      <div className="round-info">
-        -第- {currentGame.roundId} -期數-
+    <div className="game-status" style={{ borderColor: statusInfo.color }}>
+      <div className="status-header">
+        <div className="status-badge" style={{ background: `${statusInfo.color}20` }}>
+          <span className="status-icon">{statusInfo.icon}</span>
+          <span className="status-label" style={{ color: statusInfo.color }}>
+            {statusInfo.label}
+          </span>
+        </div>
+        <div className="period-info">
+          <span className="period-label">期數</span>
+          <span className="period-number">{currentGame.roundId}</span>
+        </div>
       </div>
-      <div
-        className={`countdown-timer ${displayInfo.timerSize}`}
-        style={{ color: displayInfo.timerColor }}
-      >
-        {displayInfo.timer}
-      </div>
-      <div className="countdown-label">{displayInfo.label}</div>
+
+      {currentGame.status === 'betting' && countdown > 0 && (
+        <div className="countdown-section">
+          <div className="countdown-label">封盤倒計時</div>
+          <div
+            className="countdown-timer"
+            style={{ color: countdown <= 10 && countdown > 0 ? '#ff0000' : '#10b981' }}
+          >
+            {formattedCountdown}
+          </div>
+        </div>
+      )}
+
+      {statusInfo.message && (
+        <div className="status-message">{statusInfo.message}</div>
+      )}
     </div>
   )
 }
