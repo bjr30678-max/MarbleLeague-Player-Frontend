@@ -42,9 +42,15 @@ export const useUserStore = create<UserState>((set, get) => ({
   },
 
   fetchBalance: async () => {
+    const { user } = get()
+    if (!user) {
+      console.error('Cannot fetch balance: user not logged in')
+      return
+    }
+
     set({ isLoading: true })
     try {
-      const response = await api.getUserBalance()
+      const response = await api.getUserBalance(user.userId)
       if (response.success && response.data) {
         get().updateBalance(response.data.balance)
       }

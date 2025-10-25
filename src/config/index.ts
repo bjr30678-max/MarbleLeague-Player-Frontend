@@ -42,26 +42,20 @@ export const isDevelopment = config.env === 'development' ||
   window.location.hostname === 'localhost' ||
   window.location.hostname === '127.0.0.1'
 
-// API endpoints
+// API endpoints (matching original app.js)
 export const API_ENDPOINTS = {
   AUTH: {
     LIFF_LOGIN: '/api/auth/liff-login',
   },
-  USER: {
-    BALANCE: '/api/user/balance',
-    PROFILE: '/api/user/profile',
+  GAME: {
+    BET_OPTIONS: '/api/game/bet-options',
+    BETTING_LIMITS: '/api/game/betting-limits',
+    BATCH_PLAY: '/api/game/batch-play',
+    HISTORY: '/api/game/history',
+    USER_PERIOD_STATS: '/api/game/user-period-stats',
   },
-  BETTING: {
-    OPTIONS: '/api/betting/options',
-    LIMITS: '/api/betting/limits',
-    SUBMIT: '/api/bets/submit',
-  },
-  GAMES: {
-    CURRENT: '/api/games/current',
-    HISTORY: '/api/games/history',
-  },
-  RESULTS: {
-    RECENT: '/api/results/recent',
+  POINTS: {
+    BALANCE: '/api/points/balance', // /{userId} will be appended
   },
   IVS: {
     VIEWER_TOKEN: '/api/token/viewer',

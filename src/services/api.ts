@@ -6,10 +6,7 @@ import type {
   BettingLimits,
   BetSubmitRequest,
   BetSubmitResponse,
-  GameState,
   GameHistoryRecord,
-  GameResult,
-  PaginatedResponse,
 } from '@/types'
 import { config, API_ENDPOINTS } from '@/config'
 import { storage } from './storage'
@@ -91,72 +88,57 @@ class ApiService {
   }
 
   /**
-   * Get user balance
+   * Get user balance (原始路徑: /api/points/balance/{userId})
    */
-  async getUserBalance(): Promise<ApiResponse<BalanceResponse>> {
-    return this.request<BalanceResponse>(API_ENDPOINTS.USER.BALANCE, {
+  async getUserBalance(userId: string): Promise<ApiResponse<BalanceResponse>> {
+    return this.request<BalanceResponse>(`${API_ENDPOINTS.POINTS.BALANCE}/${userId}`, {
       method: 'GET',
     })
   }
 
   /**
-   * Get betting options
+   * Get betting options (原始路徑: /api/game/bet-options)
    */
   async getBettingOptions(): Promise<ApiResponse<BetOption[]>> {
-    return this.request<BetOption[]>(API_ENDPOINTS.BETTING.OPTIONS, {
+    return this.request<BetOption[]>(API_ENDPOINTS.GAME.BET_OPTIONS, {
       method: 'GET',
     })
   }
 
   /**
-   * Get betting limits
+   * Get betting limits (原始路徑: /api/game/betting-limits)
    */
   async getBettingLimits(): Promise<ApiResponse<BettingLimits>> {
-    return this.request<BettingLimits>(API_ENDPOINTS.BETTING.LIMITS, {
+    return this.request<BettingLimits>(API_ENDPOINTS.GAME.BETTING_LIMITS, {
       method: 'GET',
     })
   }
 
   /**
-   * Submit bets
+   * Get user period stats (原始路徑: /api/game/user-period-stats)
+   */
+  async getUserPeriodStats(): Promise<ApiResponse<any>> {
+    return this.request<any>(API_ENDPOINTS.GAME.USER_PERIOD_STATS, {
+      method: 'GET',
+    })
+  }
+
+  /**
+   * Submit bets (原始路徑: /api/game/batch-play)
    */
   async submitBets(request: BetSubmitRequest): Promise<ApiResponse<BetSubmitResponse>> {
-    return this.request<BetSubmitResponse>(API_ENDPOINTS.BETTING.SUBMIT, {
+    return this.request<BetSubmitResponse>(API_ENDPOINTS.GAME.BATCH_PLAY, {
       method: 'POST',
       body: JSON.stringify(request),
     })
   }
 
   /**
-   * Get current game state
+   * Get game history (原始路徑: /api/game/history)
    */
-  async getCurrentGame(): Promise<ApiResponse<GameState>> {
-    return this.request<GameState>(API_ENDPOINTS.GAMES.CURRENT, {
-      method: 'GET',
-    })
-  }
-
-  /**
-   * Get game history with pagination
-   */
-  async getGameHistory(
-    page: number = 1,
-    pageSize: number = 20
-  ): Promise<ApiResponse<PaginatedResponse<GameHistoryRecord>>> {
-    return this.request<PaginatedResponse<GameHistoryRecord>>(
-      `${API_ENDPOINTS.GAMES.HISTORY}?page=${page}&pageSize=${pageSize}`,
-      {
-        method: 'GET',
-      }
-    )
-  }
-
-  /**
-   * Get recent results
-   */
-  async getRecentResults(limit: number = 10): Promise<ApiResponse<GameResult[]>> {
-    return this.request<GameResult[]>(
-      `${API_ENDPOINTS.RESULTS.RECENT}?limit=${limit}`,
+  async getGameHistory(limit: number = 20): Promise<ApiResponse<GameHistoryRecord[]>> {
+    return this.request<GameHistoryRecord[]>(
+      `${API_ENDPOINTS.GAME.HISTORY}?limit=${limit}`,
       {
         method: 'GET',
       }
