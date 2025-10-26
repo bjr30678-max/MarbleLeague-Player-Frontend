@@ -49,14 +49,20 @@ const App: React.FC = () => {
       {/* Header */}
       <header className="app-header">
         <div className="header-content">
-          <h1 className="app-title">彈珠聯盟</h1>
-          <div className="header-info">
-            <div className="connection-status">
-              <span className={`status-dot ${isConnected ? 'connected' : 'disconnected'}`} />
-              {isConnected ? '已連線' : '未連線'}
+          <div className="header-left">
+            <div className="app-logo">🎯</div>
+            <div className="header-text">
+              <h1 className="app-title">彈珠聯賽</h1>
+              <div className="connection-status">
+                <span className={`status-dot ${isConnected ? 'connected' : 'disconnected'}`} />
+                <span className="status-text">{isConnected ? '已連線' : '未連線'}</span>
+              </div>
             </div>
+          </div>
+          <div className="header-right">
             <div className="user-balance">
-              餘額: {formatCurrency(user.balance)}
+              <div className="balance-label">積分</div>
+              <div className="balance-amount">{formatCurrency(user.balance)}</div>
             </div>
           </div>
         </div>

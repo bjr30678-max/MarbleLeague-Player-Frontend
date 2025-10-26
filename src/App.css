@@ -29,9 +29,14 @@ body {
 }
 
 .app-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-bottom: 1px solid rgba(102, 126, 234, 0.3);
+  padding: 1rem 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
 }
 
 .header-content {
@@ -42,28 +47,44 @@ body {
   align-items: center;
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.app-logo {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 8px rgba(102, 126, 234, 0.5));
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .app-title {
   font-size: 1.5rem;
   font-weight: bold;
-}
-
-.header-info {
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
-  font-size: 0.9rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.5px;
 }
 
 .connection-status {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 .status-dot.connected {
@@ -73,13 +94,56 @@ body {
 
 .status-dot.disconnected {
   background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+}
+
+.status-text {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
 }
 
 .user-balance {
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.balance-label {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.balance-amount {
+  font-size: 1.25rem;
+  font-weight: bold;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }
 
 .app-content {
@@ -306,14 +370,32 @@ body {
 }
 
 @media (max-width: 640px) {
-  .header-info {
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.5rem;
+  .app-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .header-left {
+    gap: 0.75rem;
+  }
+
+  .app-logo {
+    font-size: 2rem;
   }
 
   .app-title {
     font-size: 1.2rem;
+  }
+
+  .balance-label {
+    font-size: 0.65rem;
+  }
+
+  .balance-amount {
+    font-size: 1.1rem;
+  }
+
+  .user-balance {
+    padding: 0.5rem 0.875rem;
   }
 
   .tab-content {
