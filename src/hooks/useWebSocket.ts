@@ -53,21 +53,41 @@ export const useWebSocket = () => {
     initializeGame()
 
     // Setup event handlers with store getState to avoid dependency issues
-    const handleRoundStarted = (data: GameState) => {
+    // WebSocket event data types (from backend, matching original app.js)
+    interface RoundStartedData {
+      roundId: string
+      startTime?: string
+      timeLeft?: number
+    }
+
+    interface BettingClosedData {
+      roundId?: string
+    }
+
+    const handleRoundStarted = (data: RoundStartedData) => {
       console.log('🎮 [WebSocket] Round started:', data)
 
+      // Construct complete GameState from WebSocket data (matching original)
+      const gameState: GameState = {
+        roundId: data.roundId,
+        period: parseInt(data.roundId) || 0,
+        status: 'betting',
+        countdown: data.timeLeft || 60, // 預設60秒（matching original）
+        timestamp: Date.now(),
+      }
+
       // Update game state
-      useGameStore.getState().setCurrentGame(data)
+      useGameStore.getState().setCurrentGame(gameState)
 
       // Clear previous bets (matching original)
       useBettingStore.getState().clearBets()
 
       // Show toast notification
-      toast.info(`新一輪開始: 第 ${data.period} 期`)
+      toast.info(`新回合開始: 第 ${data.roundId} 期`)
     }
 
-    const handleBettingClosed = () => {
-      console.log('🔒 [WebSocket] Betting closed')
+    const handleBettingClosed = (data?: BettingClosedData) => {
+      console.log('🔒 [WebSocket] Betting closed:', data)
 
       // Update game status to closed
       const currentGame = useGameStore.getState().currentGame
@@ -82,11 +102,29 @@ export const useWebSocket = () => {
       toast.warning('投注已封盤')
     }
 
-    const handleResultConfirmed = (data: GameResult) => {
+    interface ResultConfirmedData {
+      roundId: string
+      result: number[] // Array of 10 numbers
+    }
+
+    const handleResultConfirmed = (data: ResultConfirmedData) => {
       console.log('✅ [WebSocket] Result confirmed:', data)
 
+      // Convert WebSocket data to GameResult (matching fetchRecentResults logic)
+      const sum = data.result.slice(0, 2).reduce((a, b) => a + b, 0)
+      const gameResult: GameResult = {
+        roundId: data.roundId,
+        period: parseInt(data.roundId) || 0,
+        positions: data.result,
+        sum,
+        bigsmall: sum > 11 ? 'big' : 'small',
+        oddeven: sum % 2 === 0 ? 'even' : 'odd',
+        dragontiger: {},
+        timestamp: Date.now(),
+      }
+
       // Add result to recent results
-      useGameStore.getState().addResult(data)
+      useGameStore.getState().addResult(gameResult)
 
       // Show toast
       toast.success('開獎結果已公布')

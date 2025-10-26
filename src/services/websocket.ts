@@ -1,5 +1,4 @@
 import { io, Socket } from 'socket.io-client'
-import type { GameState, GameResult } from '@/types'
 import type { IVSStatsUpdate } from './awsIvs'
 import { getWebSocketUrl, isDevelopment } from '@/config'
 import { storage } from './storage'
@@ -184,22 +183,25 @@ class WebSocketService {
 
   /**
    * Subscribe to round started event
+   * WebSocket sends: { roundId: string, startTime?: string, timeLeft?: number }
    */
-  onRoundStarted(callback: (data: GameState) => void): void {
+  onRoundStarted(callback: (data: any) => void): void {
     this.on('round-started', callback)
   }
 
   /**
    * Subscribe to betting closed event
+   * WebSocket sends: { roundId?: string }
    */
-  onBettingClosed(callback: () => void): void {
+  onBettingClosed(callback: (data?: any) => void): void {
     this.on('betting-closed', callback)
   }
 
   /**
    * Subscribe to result confirmed event
+   * WebSocket sends: { roundId: string, result: number[] }
    */
-  onResultConfirmed(callback: (data: GameResult) => void): void {
+  onResultConfirmed(callback: (data: any) => void): void {
     this.on('result-confirmed', callback)
   }
 
