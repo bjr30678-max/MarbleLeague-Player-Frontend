@@ -6,16 +6,24 @@ const getConfig = (): AppConfig => {
   const urlParams = new URLSearchParams(window.location.search)
   const liffFromUrl = urlParams.get('liff')
   const apiFromUrl = urlParams.get('api')
+  const liveApiFromUrl = urlParams.get('liveApi')
 
   // Get from environment variables (Vite)
   const liffId = liffFromUrl || import.meta.env.VITE_LIFF_ID
   let apiUrl = apiFromUrl || import.meta.env.VITE_API_URL
+  let liveApiUrl = liveApiFromUrl || import.meta.env.VITE_LIVE_API_URL || ''
   const env = (import.meta.env.VITE_ENV as 'development' | 'production') || 'production'
 
   // In development mode, if API URL is empty, use current origin for Vite proxy
   if (!apiUrl && (env === 'development' || import.meta.env.DEV)) {
     apiUrl = window.location.origin
     console.warn('🔧 開發模式: 使用 Vite proxy，API URL:', apiUrl)
+  }
+
+  // If live API URL is not set, fall back to main API URL
+  if (!liveApiUrl) {
+    liveApiUrl = apiUrl
+    console.warn('⚠️ VITE_LIVE_API_URL 未設定，使用主 API URL:', liveApiUrl)
   }
 
   if (!liffId) {
@@ -31,6 +39,7 @@ const getConfig = (): AppConfig => {
   return {
     liffId,
     apiUrl,
+    liveApiUrl,
     env,
   }
 }

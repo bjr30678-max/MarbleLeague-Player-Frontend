@@ -8,7 +8,7 @@
  * 4. Heartbeat mechanism for tracking active viewers
  */
 
-import { api } from './api'
+import { liveApi } from './liveApi'
 import { isDevelopment } from '../config'
 
 // ==================== Types ====================
@@ -70,7 +70,7 @@ export class ViewerService {
    */
   async join(stageArn?: string): Promise<IVSTokenResponse> {
     try {
-      const response = await api.post<IVSTokenResponse>('/api/token/viewer', {
+      const response = await liveApi.post<IVSTokenResponse>('/api/token/viewer', {
         userId: this.userId,
         ...(stageArn && { stageArn })
       })
@@ -116,7 +116,7 @@ export class ViewerService {
     }
 
     try {
-      const response = await api.post<IVSHeartbeatResponse>('/api/viewer/heartbeat', {
+      const response = await liveApi.post<IVSHeartbeatResponse>('/api/viewer/heartbeat', {
         userId: this.userId,
         stageArn: this.stageArn
       })
@@ -214,7 +214,7 @@ export class ViewerService {
 
     if (this.stageArn) {
       try {
-        await api.post('/api/viewer/leave', {
+        await liveApi.post('/api/viewer/leave', {
           userId: this.userId,
           stageArn: this.stageArn
         })
@@ -278,7 +278,7 @@ export class PublisherService {
    */
   async startPublishing(): Promise<IVSTokenResponse> {
     try {
-      const response = await api.post<IVSTokenResponse>('/api/token/publisher', {
+      const response = await liveApi.post<IVSTokenResponse>('/api/token/publisher', {
         userId: this.userId
       })
 

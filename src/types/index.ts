@@ -213,6 +213,7 @@ export interface BettingBan {
 export interface AppConfig {
   liffId: string
   apiUrl: string
+  liveApiUrl: string
   env: 'development' | 'production'
 }
 
