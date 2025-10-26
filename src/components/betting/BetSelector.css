@@ -473,6 +473,13 @@
   font-weight: 600;
 }
 
+/* 大小單雙選項網格（固定2列並排顯示） */
+.option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
 /* Dragon Tiger Betting */
 .dragon-tiger-betting {
   display: flex;
