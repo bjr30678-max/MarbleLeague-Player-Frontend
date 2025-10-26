@@ -91,9 +91,14 @@ export const LivePlayer: React.FC = () => {
 
       // For viewers, we need to provide a strategy to subscribe to publisher's streams
       const stage = new Stage(tokenResponse.token, {
-        strategy: {
-          shouldSubscribeToParticipant: () => SubscribeType.AUDIO_VIDEO,
-          stageStreamsToPublish: () => [], // Viewer doesn't publish, return empty array
+        stageStrategy: {
+          shouldSubscribeToParticipant: (participant: any) => {
+            // Subscribe to all participants (mainly the publisher)
+            if (isDevelopment) {
+              console.log('👤 Participant joined, subscribing:', participant.userId)
+            }
+            return SubscribeType.AUDIO_VIDEO
+          }
         }
       })
 
