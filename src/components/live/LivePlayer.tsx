@@ -24,6 +24,7 @@ export const LivePlayer: React.FC = () => {
   const [viewerStats, setViewerStats] = useState<IVSStatsUpdate | null>(null)
   const [ivsStage, setIvsStage] = useState<any>(null) // IVS Stage instance
   const viewerServiceRef = useRef<ReturnType<typeof createViewerService> | null>(null)
+  const isInitializingRef = useRef(false) // 防止重複初始化（包括 StrictMode 的雙重執行）
 
   const { user } = useUserStore()
 
@@ -58,6 +59,16 @@ export const LivePlayer: React.FC = () => {
       toast.error('請先登入')
       return
     }
+
+    // 防止重複初始化（包括 StrictMode 的雙重執行）
+    if (isInitializingRef.current) {
+      if (isDevelopment) {
+        console.log('⏭️ IVS 已在初始化中，跳過重複調用')
+      }
+      return
+    }
+
+    isInitializingRef.current = true
 
     try {
       // Check if AWS IVS SDK is loaded
@@ -194,6 +205,8 @@ export const LivePlayer: React.FC = () => {
     } catch (error) {
       console.error('❌ Failed to join IVS stream:', error)
       toast.error('無法加入直播，請稍後再試')
+      // 初始化失敗，重置標誌以允許重試
+      isInitializingRef.current = false
     }
   }
 
@@ -223,6 +236,9 @@ export const LivePlayer: React.FC = () => {
       setIsPlaying(false)
     } catch (error) {
       console.error('❌ Failed to cleanup IVS:', error)
+    } finally {
+      // 重置初始化標誌，允許下次重新初始化
+      isInitializingRef.current = false
     }
   }
 
@@ -342,43 +358,44 @@ export const LivePlayer: React.FC = () => {
 
   // ==================== Effects ====================
 
-  // Initialize player based on mode
+  // Initialize IVS player
   useEffect(() => {
-    if (playerMode === 'ivs') {
+    if (playerMode === 'ivs' && user) {
       // Auto-join IVS stream if user is authenticated
-      if (user) {
-        loadIVSSDK()
-          .then(() => {
-            // Auto-start after a short delay
-            setTimeout(() => initIVSViewer(), 1000)
-          })
-          .catch(err => {
-            console.error('Failed to load IVS SDK:', err)
-            toast.error('無法載入直播 SDK')
-          })
-      }
+      loadIVSSDK()
+        .then(() => {
+          // Auto-start after a short delay
+          setTimeout(() => initIVSViewer(), 1000)
+        })
+        .catch(err => {
+          console.error('Failed to load IVS SDK:', err)
+          toast.error('無法載入直播 SDK')
+        })
 
       // Cleanup on unmount
       return () => {
         cleanupIVS()
       }
-    } else if (playerMode === 'ovenplayer') {
-      // Load OvenPlayer for legacy mode
-      if (streamConfig.host && streamConfig.stream) {
-        loadOvenPlayerSDK()
-          .then(() => {
-            setTimeout(initOvenPlayer, 500)
-          })
-          .catch(err => {
-            console.error('Failed to load OvenPlayer:', err)
-          })
+    }
+  }, [playerMode, user]) // 移除 streamConfig 依賴，因為 IVS 模式不需要
 
-        return () => {
-          cleanupOvenPlayer()
-        }
+  // Initialize OvenPlayer
+  useEffect(() => {
+    if (playerMode === 'ovenplayer' && streamConfig.host && streamConfig.stream) {
+      // Load OvenPlayer for legacy mode
+      loadOvenPlayerSDK()
+        .then(() => {
+          setTimeout(initOvenPlayer, 500)
+        })
+        .catch(err => {
+          console.error('Failed to load OvenPlayer:', err)
+        })
+
+      return () => {
+        cleanupOvenPlayer()
       }
     }
-  }, [playerMode, streamConfig, user])
+  }, [playerMode, streamConfig.host, streamConfig.stream]) // 只依賴需要的具體屬性
 
   // Subscribe to stats updates
   useEffect(() => {

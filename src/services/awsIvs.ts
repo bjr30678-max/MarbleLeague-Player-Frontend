@@ -69,6 +69,14 @@ export class ViewerService {
    * @returns Token response with stage information
    */
   async join(stageArn?: string): Promise<IVSTokenResponse> {
+    // 調試：追蹤 API 調用次數
+    if (isDevelopment) {
+      const callCount = ((window as any).__viewerApiCallCount || 0) + 1;
+      (window as any).__viewerApiCallCount = callCount
+      console.warn(`🔍 [DEBUG] Viewer API call #${callCount} - /api/token/viewer`)
+      console.trace('調用堆棧：')
+    }
+
     try {
       const response = await liveApi.post<IVSTokenResponse>('/api/token/viewer', {
         userId: this.userId,
