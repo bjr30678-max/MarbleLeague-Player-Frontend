@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>彈珠聯賽</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* 載入畫面 */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #FF6B6B;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .app {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            display: none;
+            position: relative;
+            padding-bottom: 120px;
+            /* 為底部提交區域預留空間 */
+        }
+
+        .header {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+        }
+
+        .balance-display {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-size: 18px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-tab.active {
+            color: #FF6B6B;
+            font-weight: bold;
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #FF6B6B;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 倒數計時區域改進 */
+        .countdown {
+            background: #FFE5E5;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #roundInfo {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .countdown-timer {
+            font-size: 36px;
+            font-weight: bold;
+            color: #FF6B6B;
+            margin: 10px 0;
+            transition: font-size 0.3s ease;
+        }
+
+        #countdownLabel {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 投注金額選擇器 */
+        .bet-amount-selector {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .amount-selector-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .amount-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .amount-btn {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            flex: 1;
+            min-width: 60px;
+        }
+
+        .amount-btn:hover {
+            border-color: #FF6B6B;
+            transform: scale(1.05);
+        }
+
+        .amount-btn.active {
+            background: #FF6B6B;
+            color: white;
+            border-color: #FF6B6B;
+        }
+
+        .current-amount {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* 賠率顯示樣式 */
+        .odds-display {
+            font-size: 12px;
+            color: #ffc107;
+            margin-top: 5px;
+        }
+
+        .option-btn .odds-display {
+            color: #ffc107;
+        }
+
+        .option-btn.selected .odds-display {
+            color: #fff;
+        }
+
+        /* 投注類型選擇 */
+        .bet-category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding: 5px 0;
+        }
+
+        .bet-category {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .bet-category.active {
+            background: #FF6B6B;
+            color: white;
+            border-color: #FF6B6B;
+        }
+
+        /* 名次投注表格 */
+        .position-bet-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .position-header {
+            display: grid;
+            grid-template-columns: 60px repeat(10, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .position-row {
+            display: grid;
+            grid-template-columns: 60px repeat(10, 1fr);
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+
+        .position-label {
+            background: #FF6B6B;
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .position-number {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 8px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .position-number:hover:not(:disabled) {
+            border-color: #FF6B6B;
+            transform: scale(1.05);
+        }
+
+        .position-number.selected {
+            background: #FF6B6B;
+            color: white;
+            border-color: #FF6B6B;
+        }
+
+        .position-number:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 冠亞和值 */
+        .sum-value-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .sum-value-btn {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .sum-value-btn:hover:not(:disabled) {
+            border-color: #FF6B6B;
+            transform: scale(1.05);
+        }
+
+        .sum-value-btn.selected {
+            background: #FF6B6B;
+            color: white;
+            border-color: #FF6B6B;
+        }
+
+        .sum-value-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .sum-value {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .sum-odds {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .sum-value-btn.selected .sum-odds {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* 大小單雙選項 */
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            padding: 30px;
+            font-size: 20px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: #FF6B6B;
+            transform: scale(1.05);
+        }
+
+        .option-btn.selected {
+            background: #FF6B6B;
+            color: white;
+            border-color: #FF6B6B;
+        }
+
+        .option-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 龍虎投注 */
+        .dragon-tiger-grid {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .dragon-tiger-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .dragon-tiger-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #FF6B6B;
+        }
+
+        .dragon-tiger-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* 投注摘要 */
+        .bet-summary {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .bet-summary.active {
+            display: block;
+        }
+
+        .bet-summary-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .bet-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .bet-item:last-child {
+            border-bottom: none;
+        }
+
+        .bet-remove {
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* 提交按鈕 - 修正為 fixed 定位 */
+        .submit-section {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+            display: none;
+            /* 預設隱藏 */
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .bet-count {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        /* 歷史記錄 */
+        .history-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #FF6B6B;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .history-numbers {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .history-number {
+            width: 30px;
+            height: 30px;
+            background: #FF6B6B;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-win {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-lose {
+            background: #9e9e9e;
+            color: white;
+        }
+
+        /* Toast 提示 */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            z-index: 1000;
+            animation: slideUp 0.3s;
+            max-width: 80%;
+            text-align: center;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translate(-50%, 100px);
+            }
+
+            to {
+                transform: translate(-50%, 0);
+            }
+        }
+
+        /* 確認彈窗 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: scaleIn 0.3s;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        /* 個人頁面樣式調整 */
+        #profile {
+            padding-bottom: 20px;
+            /* 個人頁面不需要底部空間 */
+        }
+
+        #history {
+            padding-bottom: 20px;
+            /* 歷史頁面不需要底部空間 */
+        }
+
+        /* 直播狀態列 */
+        .live-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #2d2d2d;
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .live-dot {
+            width: 12px;
+            height: 12px;
+            background: #ff0000;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+        }
+
+        /* 播放器容器 */
+        .live-player-container {
+            background: #000;
+            border-radius: 0 0 10px 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            /* 16:9 比例 */
+            height: 0;
+            overflow: hidden;
+        }
+
+        .video-wrapper video,
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .player-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+        }
+
+        /* 播放器控制 */
+        .player-controls {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background: #1a1a1a;
+            justify-content: center;
+        }
+
+        .control-btn {
+            padding: 8px 16px;
+            background: #FF6B6B;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .control-btn:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+
+        /* 賽事資訊 */
+        .race-info-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .race-details {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .info-label {
+            color: #666;
+            font-weight: bold;
+        }
+
+        /* 快速投注按鈕 */
+        .quick-bet-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .quick-bet-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-bet-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .player-controls {
+                flex-wrap: wrap;
+            }
+
+            .control-btn {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+
+        /* 手機版自適應修復 - 解決超出/看不全問題 */
+        
+        /* 1) 名次 table：在手機改成固定佈局 + 字體與間距縮放，避免溢出 */
+        @media (max-width: 420px) {
+            /* 如果是 <table> 結構 */
+            .rank-table,
+            .rank-table table { width: 100%; table-layout: fixed; }
+            .rank-table th,
+            .rank-table td { padding: 6px; }
+            /* 第一欄（「第1名、第2名…」）給固定寬 */
+            .rank-table .pos-label { width: 64px; }
+            /* 內部數字大小隨螢幕縮放 */
+            .rank-table .pos-cell { font-size: clamp(12px, 3.4vw, 14px); }
+
+            /* 如果你的名次盤是用按鈕/格子而不是 <table>，用 grid 兩行 1~10： */
+            .rank-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+            .rank-grid .num { aspect-ratio: 1/1; display: grid; place-items: center; }
+        }
+
+        /* 2) 玩家 ID 文字太長 → 允許斷行或省略 */
+        .user-card .user-id {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;   /* 想要顯示完整就改成 white-space: normal */
+            white-space: nowrap;       /* 想要自動換行就改成：white-space: normal; word-break: break-all; */
+            word-break: break-all;
+        }
+
+        /* 3) 快捷選擇籌碼 / 額度 / 類別等 chips：在手機允許換行，不要橫向捲動才看得到 */
+        @media (max-width: 420px) {
+            .chip-list, .quick-select, .bet-amounts, .bet-types {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            /* 10 個 1~10 的按鈕在手機上自動排成兩行 */
+            .chip-list .chip.num { flex: 1 1 calc(20% - 8px); }   /* 五個一列 → 兩列剛好 10 個 */
+            /* 額度按鈕平均分佈，必要時自動換行 */
+            .bet-amounts button { flex: 1 1 calc(33.33% - 8px); min-width: 92px; }
+            /* 小一點的 padding/字體，避免被底部「確認投注」遮住 */
+            .chip, .bet-amounts button { padding: 10px 12px; font-size: clamp(12px, 3.6vw, 16px); }
+        }
+
+        /* 4) 容器邊距與安全區，避免內容卡到 iPhone 底部手勢條 */
+        @supports (padding: max(0px)) {
+            .page,
+            .tab-content { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+        }
+
+        /* 5) 萬一還是有水平捲動，先全域保險關掉 */
+        html, body { overflow-x: hidden; }
+
+        /* 針對現有的名次投注表格進行手機優化 */
+        @media (max-width: 420px) {
+            .position-bet-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .position-header,
+            .position-row {
+                min-width: 320px; /* 確保最小寬度 */
+                grid-template-columns: 50px repeat(10, 1fr); /* 縮小第一欄寬度 */
+                gap: 3px; /* 縮小間距 */
+            }
+            
+            .position-label,
+            .position-number {
+                padding: 6px 4px; /* 縮小內邊距 */
+                font-size: clamp(10px, 3vw, 12px); /* 響應式字體大小 */
+            }
+        }
+
+        /* 針對投注類型選擇標籤進行手機優化 */
+        @media (max-width: 420px) {
+            .bet-category-tabs {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 5px 0;
+            }
+            
+            .bet-category {
+                flex: 1 1 calc(50% - 4px); /* 兩個一行 */
+                min-width: 0; /* 允許縮小 */
+                padding: 8px 12px;
+                font-size: clamp(12px, 3.5vw, 14px);
+                text-align: center;
+            }
+        }
+
+        /* 針對金額選擇按鈕進行手機優化 */
+        @media (max-width: 420px) {
+            .amount-buttons {
+                gap: 6px;
+            }
+            
+            .amount-btn {
+                flex: 1 1 calc(33.33% - 4px); /* 三個一行 */
+                min-width: 0;
+                padding: 8px 12px;
+                font-size: clamp(11px, 3.2vw, 13px);
+            }
+        }
+
+        /* 針對用戶資訊區域進行手機優化 */
+        @media (max-width: 420px) {
+            .user-info {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .user-info span {
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                word-break: break-all;
+            }
+        }
+
+        /* 針對個人頁面的 user ID 顯示進行優化 */
+        #profileId {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            word-break: break-all;
+            display: inline-block;
+        }
+
+        /* 手機端 user ID 美化顯示 */
+        @media (max-width: 420px) {
+            /* ID 段落改為橫向布局 - 平行對齊 */
+            #profile .profile-info-container p:last-child {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                margin-bottom: 8px;
+                gap: 8px;
+            }
+
+            #profileId {
+                background: #f0f2f5;
+                padding: 8px 12px;
+                border-radius: 8px;
+                font-family: 'Courier New', monospace;
+                font-size: 12px;
+                line-height: 1.4;
+                white-space: normal;
+                word-break: break-all;
+                overflow-wrap: break-word;
+                max-width: 100%;
+                display: block;
+                margin-top: 5px;
+                border: 1px solid #d9d9d9;
+                color: #666;
+                width: fit-content;
+            }
+
+            /* 確保個人資訊容器在手機端有適當的響應式布局 */
+            #profile .profile-info-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            #profile .profile-info-container > div {
+                width: 100%;
+            }
+
+            /* 優化其他段落顯示 */
+            #profile .profile-info-container p {
+                margin-bottom: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 載入畫面 -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">正在連接系統...</div>
+    </div>
+
+    <!-- 主應用程式 -->
+    <div class="app" id="app">
+        <div class="header">
+            <h1>彈珠聯賽</h1>
+            <div class="user-info" id="userInfo">
+                <img id="userAvatar" class="user-avatar" src="" alt="avatar">
+                <span id="userName"></span>
+            </div>
+            <div class="balance-display">
+                積分：<span id="userBalance">0</span>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('gaming')">遊戲</button>
+            <button class="nav-tab" onclick="switchTab('live')">直播</button>
+            <button class="nav-tab" onclick="switchTab('history')">記錄</button>
+            <button class="nav-tab" onclick="switchTab('profile')">個人</button>
+        </div>
+
+        <div class="content">
+            <!-- 遊戲頁面 -->
+            <div id="gaming" class="page active">
+                <div class="countdown">
+                    <div id="roundInfo">-第- <span id="raceNumber">等待開始</span> -回合-</div>
+                    <div class="countdown-timer" id="countdown">--:--</div>
+                    <div id="countdownLabel">距離封盤</div>
+                </div>
+
+                <!-- 上期結果區域會動態插入這裡 -->
+
+                <!-- 投注類型選擇 -->
+                <div class="bet-category-tabs">
+                    <div class="bet-category active" onclick="selectBetCategory('position')">名次</div>
+                    <div class="bet-category" onclick="selectBetCategory('sum')">冠亞和</div>
+                    <div class="bet-category" onclick="selectBetCategory('bigSmall')">大小</div>
+                    <div class="bet-category" onclick="selectBetCategory('oddEven')">單雙</div>
+                    <div class="bet-category" onclick="selectBetCategory('dragonTiger')">龍虎</div>
+                </div>
+
+                <!-- 投注區域 -->
+                <div id="bettingArea">
+                    <!-- 動態內容 -->
+                </div>
+
+                <!-- 投注摘要 -->
+                <div class="bet-summary" id="betSummary">
+                    <div class="bet-summary-title">已選投注</div>
+                    <div id="betList"></div>
+                </div>
+            </div>
+
+            <!-- 直播頁面 -->
+            <div id="live" class="page">
+                <!-- 直播狀態指示 -->
+                <div class="live-status-bar">
+                    <div class="live-indicator">
+                        <span class="live-dot"></span>
+                        <span id="liveStatusText">直播中</span>
+                    </div>
+                    
+                </div>
+
+                <!-- 直播播放器容器 -->
+                <div class="live-player-container">
+                    <div id="livePlayer" class="video-wrapper">
+                        <!-- 預設顯示載入畫面 -->
+                        <div class="player-loading">
+                            <div class="loading-spinner"></div>
+                            <p>正在連接直播...</p>
+                        </div>
+                    </div>
+
+                    <!-- 播放器控制按鈕 -->
+                    <div class="player-controls">
+                        <button class="control-btn" onclick="togglePlay()">
+                            <span id="playIcon">▶️</span> 播放
+                        </button>
+                        <button class="control-btn" onclick="refreshStream()">
+                            🔄 重新整理
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 賽事資訊區 -->
+                <div class="race-info-section">
+                    <h3>當前賽事資訊</h3>
+                    <div class="race-details">
+                        <div class="info-item">
+                            <span class="info-label">賽事編號：</span>
+                            <span id="liveRaceNumber">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">賽事狀態：</span>
+                            <span id="liveRaceStatus">等待開始</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">預計開始：</span>
+                            <span id="liveRaceStartTime">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 歷史記錄頁面 -->
+            <div id="history" class="page">
+                <div id="historyList">
+                    <!-- 動態生成 -->
+                </div>
+            </div>
+
+            <!-- 個人頁面 -->
+            <div id="profile" class="page">
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                    <h2>個人資訊</h2>
+                    <div style="margin-top: 20px;">
+                        <div class="profile-info-container" style="display: flex; align-items: center; margin-bottom: 20px;">
+                            <img id="profileAvatar" src=""
+                                style="width: 80px; height: 80px; border-radius: 50%; margin-right: 20px;">
+                            <div>
+                                <p style="font-size: 20px; font-weight: bold; margin-bottom: 5px;">
+                                    <span id="profileName"></span>
+                                </p>
+                                <p style="color: #666;">ID: <span id="profileId"></span></p>
+                            </div>
+                        </div>
+
+                        <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                            <div style="text-align: center;">
+                                <p style="color: #666; margin-bottom: 10px;">當前積分</p>
+                                <p style="font-size: 36px; font-weight: bold; color: #FF6B6B;">
+                                    <span id="profileBalance"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提交區域 - 移到 app 外面 -->
+    <div class="submit-section" id="submitSection">
+        <div class="bet-count">已選擇 <span id="betCount">0</span> 個投注</div>
+        <button class="submit-btn" onclick="submitAllBets()" disabled id="submitBtn">確認投注</button>
+    </div>
+
+    <!-- 確認彈窗 -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>確認投注</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div id="modalBody"></div>
+            <button class="submit-btn" onclick="confirmAllBets()">確認全部投注</button>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div id="toast" class="toast" style="display: none;"></div>
+
+    <script src="app.js?v=20250918-01"></script>
+    <script src="app_auth_fixes.js?v=20250918-01"></script>
+    <script src="game-integration.js?v=20250918-01"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ovenplayer/dist/ovenplayer.min.js"></script>
+    <script src="live-player.js?v=20250918-01"></script>
+
+</body>
+
+</html>
+

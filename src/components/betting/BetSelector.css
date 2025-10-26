@@ -1,0 +1,541 @@
+.bet-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Category Selection */
+.bet-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.5rem;
+}
+
+.category-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.category-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.category-btn.active {
+  background: rgba(102, 126, 234, 0.2);
+  border-color: #667eea;
+  color: #fff;
+}
+
+.category-icon {
+  font-size: 1.5rem;
+}
+
+.category-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Amount Selection - Chip Style */
+.amount-selector h3 {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: #e2e8f0;
+}
+
+.chip-container {
+  display: flex;
+  flex-wrap: nowrap; /* 固定在一列不換行 */
+  gap: 1rem;
+  padding: 0.5rem;
+  overflow-x: auto; /* 允許橫向滾動 */
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(102, 126, 234, 0.5) rgba(255, 255, 255, 0.1);
+}
+
+/* 自定義滾動條樣式 */
+.chip-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.chip-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.chip-container::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.5);
+  border-radius: 4px;
+}
+
+.chip-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.7);
+}
+
+/* 籌碼樣式 */
+.chip {
+  width: 80px;
+  height: 80px;
+  min-width: 80px; /* 防止籌碼被壓縮 */
+  min-height: 80px;
+  border-radius: 50%;
+  background: var(--chip-color, #94a3b8);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+              inset 0 2px 4px rgba(255, 255, 255, 0.3),
+              inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.chip::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 3px dashed rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+}
+
+.chip::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+}
+
+.chip:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4),
+              inset 0 2px 4px rgba(255, 255, 255, 0.3),
+              inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.chip:active {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.chip.active {
+  transform: translateY(-4px) scale(1.1);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5),
+              0 0 20px var(--chip-color),
+              inset 0 2px 4px rgba(255, 255, 255, 0.4),
+              inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.chip-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chip-amount,
+.chip-label {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* 自訂籌碼 */
+.chip.custom-chip {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 新增自訂籌碼按鈕 */
+.chip.add-custom {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+  border: 2px dashed rgba(102, 126, 234, 0.5);
+}
+
+.chip.add-custom .chip-label {
+  font-size: 2rem;
+  font-weight: 300;
+}
+
+.chip.add-custom:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.5) 0%, rgba(118, 75, 162, 0.5) 100%);
+  border-color: rgba(102, 126, 234, 0.8);
+}
+
+/* 刪除籌碼按鈕 */
+.remove-chip-btn {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ef4444;
+  color: #fff;
+  border: 2px solid #1e293b;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 2;
+  padding: 0;
+  font-weight: bold;
+}
+
+.remove-chip-btn:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+/* 自訂金額輸入 */
+.custom-amount-input {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-amount-input input {
+  flex: 1;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+}
+
+.custom-amount-input input:focus {
+  border-color: #667eea;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.custom-amount-input input::placeholder {
+  color: #94a3b8;
+}
+
+.custom-amount-input .confirm-btn,
+.custom-amount-input .cancel-btn {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.custom-amount-input .confirm-btn {
+  background: #10b981;
+  color: #fff;
+}
+
+.custom-amount-input .confirm-btn:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.custom-amount-input .confirm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.custom-amount-input .cancel-btn {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.custom-amount-input .cancel-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Betting Options */
+.betting-options h3 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  color: #e2e8f0;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.5rem;
+}
+
+.option-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.option-btn:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.option-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.option-label {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.option-odds {
+  font-size: 0.75rem;
+  color: #fbbf24;
+}
+
+.no-options {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+}
+
+/* Position Betting Grid */
+.position-betting {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.odds-info {
+  font-size: 0.875rem;
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+.position-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow: hidden; /* 防止滾動條出現 */
+}
+
+.position-header,
+.position-row {
+  display: grid;
+  grid-template-columns: 60px repeat(10, minmax(0, 1fr)); /* 使用 minmax(0, 1fr) 防止溢出 */
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.position-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.position-cell {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 0; /* 防止內容撐開 */
+  box-sizing: border-box; /* 確保 padding 和 border 包含在寬度內 */
+}
+
+.position-cell:hover {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: #3b82f6;
+  transform: scale(1.05);
+}
+
+.position-cell.selected {
+  background: rgba(16, 185, 129, 0.3);
+  border-color: #10b981;
+}
+
+/* Sum Betting */
+.sum-betting {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sum-values h4,
+.sum-options h4 {
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  margin-bottom: 0.75rem;
+}
+
+.sum-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 0.5rem;
+}
+
+.sum-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sum-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.sum-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.sum-odds {
+  font-size: 0.75rem;
+  color: #fbbf24;
+}
+
+/* Position-Based Betting (Big/Small, Odd/Even) */
+.position-based-betting {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.position-option-group {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.position-title {
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+/* 大小單雙選項網格（固定2列並排顯示） */
+.option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+/* Dragon Tiger Betting */
+.dragon-tiger-betting {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dragon-tiger-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dragon-tiger-item {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dragon-tiger-title {
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.dragon-tiger-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .bet-categories {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .category-btn {
+    padding: 0.75rem 0.25rem;
+  }
+
+  .category-icon {
+    font-size: 1.25rem;
+  }
+
+  .category-label {
+    font-size: 0.75rem;
+  }
+
+  .amount-buttons {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .options-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+}
