@@ -122,11 +122,25 @@ export const LivePlayer: React.FC = () => {
       stage.on(StageEvents.STAGE_PARTICIPANT_STREAMS_ADDED, (participant: any, streams: any[]) => {
         if (isDevelopment) {
           console.log('👤 Participant streams added:', participant.userId, streams.length)
+          console.log('📹 Streams details:', streams.map(s => ({
+            streamType: s.streamType,
+            kind: s.mediaStreamTrack?.kind,
+            id: s.mediaStreamTrack?.id
+          })))
         }
 
         // Display publisher video/audio
-        streams.forEach((stream) => {
-          if (stream.streamType === 'VIDEO' && playerRef.current) {
+        streams.forEach((stream, index) => {
+          if (isDevelopment) {
+            console.log(`Processing stream ${index}:`, stream.streamType, stream.mediaStreamTrack?.kind)
+          }
+
+          // Check for video stream (IVS uses numeric enum or string)
+          const isVideo = stream.streamType === 'VIDEO' ||
+                         stream.streamType === 0 ||
+                         stream.mediaStreamTrack?.kind === 'video'
+
+          if (isVideo && playerRef.current) {
             const mediaStream = new MediaStream([stream.mediaStreamTrack])
 
             // Create or update video element
@@ -136,13 +150,30 @@ export const LivePlayer: React.FC = () => {
               videoElement.autoplay = true
               videoElement.playsInline = true
               videoElement.controls = true
+              videoElement.muted = false // Ensure not muted
               videoElement.className = 'ivs-video'
+              videoElement.style.width = '100%'
+              videoElement.style.maxWidth = '1280px'
               playerRef.current.appendChild(videoElement)
+
+              if (isDevelopment) {
+                console.log('✅ Video element created and appended')
+              }
             }
 
             videoElement.srcObject = mediaStream
-            videoElement.play().catch(err => {
-              console.error('Failed to play video:', err)
+
+            if (isDevelopment) {
+              console.log('📺 Setting video srcObject:', mediaStream)
+            }
+
+            videoElement.play().then(() => {
+              if (isDevelopment) {
+                console.log('✅ Video playing successfully')
+              }
+              setIsPlaying(true)
+            }).catch(err => {
+              console.error('❌ Failed to play video:', err)
               toast.warning('請點擊播放按鈕以開始觀看')
             })
           }
