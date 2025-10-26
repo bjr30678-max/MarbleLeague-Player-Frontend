@@ -452,10 +452,59 @@
   color: #fbbf24;
 }
 
-/* Simple Options (Big/Small, Odd/Even, Dragon/Tiger) */
-.simple-options .option-btn.large {
-  min-height: 100px;
-  font-size: 1.5rem;
+/* Position-Based Betting (Big/Small, Odd/Even) */
+.position-based-betting {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.position-option-group {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.position-title {
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+/* Dragon Tiger Betting */
+.dragon-tiger-betting {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dragon-tiger-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dragon-tiger-item {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dragon-tiger-title {
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.dragon-tiger-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
 }
 
 @media (max-width: 640px) {

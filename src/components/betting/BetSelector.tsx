@@ -132,47 +132,145 @@ export const BetSelector: React.FC = () => {
     )
   }
 
-  // 渲染簡單選項 (BigSmall, OddEven, DragonTiger)
-  const renderSimpleOptions = () => {
-    let options: Array<{ id: string; label: string; odds: number }> = []
+  // 渲染大小投注 (BigSmall) - 每個名次都可以下注
+  const renderBigSmallOptions = () => {
+    const bigSmallOdds = betOptionsData?.positionOptions?.[0]?.bigSmall?.odds || 1.98
 
-    switch (selectedCategory) {
-      case 'bigsmall':
-        options = [
-          { id: 'big', label: '大 (≥12)', odds: 1.98 },
-          { id: 'small', label: '小 (≤11)', odds: 1.98 },
-        ]
-        break
-      case 'oddeven':
-        options = [
-          { id: 'odd', label: '單', odds: 1.98 },
-          { id: 'even', label: '雙', odds: 1.98 },
-        ]
-        break
-      case 'dragontiger':
-        options = [
-          { id: 'dragon', label: '龍', odds: 1.98 },
-          { id: 'tiger', label: '虎', odds: 1.98 },
-        ]
-        break
+    return (
+      <div className="position-based-betting">
+        <div className="odds-info">賠率 1:{bigSmallOdds}</div>
+
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((pos) => (
+          <div key={pos} className="position-option-group">
+            <h4 className="position-title">第{pos}名</h4>
+            <div className="option-grid">
+              <button
+                className="option-btn"
+                onClick={() => placeBet(
+                  `big_small_${pos}_big`,
+                  `第${pos}名: 大`,
+                  bigSmallOdds,
+                  'big_small',
+                  pos,
+                  ['big']
+                )}
+              >
+                大 (6-10)
+              </button>
+              <button
+                className="option-btn"
+                onClick={() => placeBet(
+                  `big_small_${pos}_small`,
+                  `第${pos}名: 小`,
+                  bigSmallOdds,
+                  'big_small',
+                  pos,
+                  ['small']
+                )}
+              >
+                小 (1-5)
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  // 渲染單雙投注 (OddEven) - 每個名次都可以下注
+  const renderOddEvenOptions = () => {
+    const oddEvenOdds = betOptionsData?.positionOptions?.[0]?.oddEven?.odds || 1.98
+
+    return (
+      <div className="position-based-betting">
+        <div className="odds-info">賠率 1:{oddEvenOdds}</div>
+
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((pos) => (
+          <div key={pos} className="position-option-group">
+            <h4 className="position-title">第{pos}名</h4>
+            <div className="option-grid">
+              <button
+                className="option-btn"
+                onClick={() => placeBet(
+                  `odd_even_${pos}_odd`,
+                  `第${pos}名: 單`,
+                  oddEvenOdds,
+                  'odd_even',
+                  pos,
+                  ['odd']
+                )}
+              >
+                單數
+              </button>
+              <button
+                className="option-btn"
+                onClick={() => placeBet(
+                  `odd_even_${pos}_even`,
+                  `第${pos}名: 雙`,
+                  oddEvenOdds,
+                  'odd_even',
+                  pos,
+                  ['even']
+                )}
+              >
+                雙數
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  // 渲染龍虎投注 (DragonTiger) - 根據 betOptions.dragonTiger 配對
+  const renderDragonTigerOptions = () => {
+    const dragonTigerOdds = betOptionsData?.dragonTiger?.[0]?.odds || 1.98
+
+    if (!betOptionsData?.dragonTiger || betOptionsData.dragonTiger.length === 0) {
+      return (
+        <div className="no-options">
+          <p>暫無龍虎投注選項</p>
+        </div>
+      )
     }
 
     return (
-      <div className="simple-options">
-        <div className="options-grid">
-          {options.map((option) => (
-            <button
-              key={option.id}
-              className="option-btn large"
-              onClick={() => placeBet(
-                `${selectedCategory}-${option.id}`,
-                option.label,
-                option.odds
-              )}
-            >
-              <div className="option-label">{option.label}</div>
-              <div className="option-odds">賠率: {option.odds}</div>
-            </button>
+      <div className="dragon-tiger-betting">
+        <div className="odds-info">賠率 1:{dragonTigerOdds}</div>
+
+        <div className="dragon-tiger-grid">
+          {betOptionsData.dragonTiger.map((pair) => (
+            <div key={pair.position} className="dragon-tiger-item">
+              <div className="dragon-tiger-title">{pair.name}</div>
+              <div className="dragon-tiger-options">
+                <button
+                  className="option-btn"
+                  onClick={() => placeBet(
+                    `dragon_tiger_${pair.position}_dragon`,
+                    `${pair.name}: 龍`,
+                    pair.odds,
+                    'dragon_tiger',
+                    pair.position,
+                    ['dragon']
+                  )}
+                >
+                  {pair.dragon} 龍
+                </button>
+                <button
+                  className="option-btn"
+                  onClick={() => placeBet(
+                    `dragon_tiger_${pair.position}_tiger`,
+                    `${pair.name}: 虎`,
+                    pair.odds,
+                    'dragon_tiger',
+                    pair.position,
+                    ['tiger']
+                  )}
+                >
+                  {pair.tiger} 虎
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -284,9 +382,9 @@ export const BetSelector: React.FC = () => {
         <h3>{BETTING_CATEGORIES[selectedCategory].label}</h3>
         {selectedCategory === 'position' && renderPositionBetting()}
         {selectedCategory === 'sum' && renderSumBetting()}
-        {(selectedCategory === 'bigsmall' ||
-          selectedCategory === 'oddeven' ||
-          selectedCategory === 'dragontiger') && renderSimpleOptions()}
+        {selectedCategory === 'bigsmall' && renderBigSmallOptions()}
+        {selectedCategory === 'oddeven' && renderOddEvenOptions()}
+        {selectedCategory === 'dragontiger' && renderDragonTigerOptions()}
       </div>
     </div>
   )

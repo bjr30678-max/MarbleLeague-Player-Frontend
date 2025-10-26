@@ -18,7 +18,14 @@ interface BettingState {
   setBettingLimits: (limits: BettingLimits) => void
   setSelectedCategory: (category: BetCategory) => void
   setSelectedAmount: (amount: number) => void
-  addBet: (optionId: string, label: string, odds: number) => void
+  addBet: (
+    optionId: string,
+    label: string,
+    odds: number,
+    betType?: string,
+    position?: number,
+    content?: string[]
+  ) => void
   removeBet: (id: string) => void
   clearBets: () => void
   updateBetAmount: (id: string, amount: number) => void
@@ -44,7 +51,7 @@ export const useBettingStore = create<BettingState>((set, get) => ({
 
   setSelectedAmount: (amount) => set({ selectedAmount: amount }),
 
-  addBet: (optionId, label, odds) => {
+  addBet: (optionId, label, odds, betType, position, content) => {
     const { selectedCategory, selectedAmount, currentBets } = get()
 
     // Check if bet already exists for this option
@@ -74,6 +81,9 @@ export const useBettingStore = create<BettingState>((set, get) => ({
       amount: selectedAmount,
       odds,
       potentialWin: selectedAmount * odds,
+      type: betType,
+      position,
+      content,
     }
 
     set({ currentBets: [...currentBets, newBet] })
@@ -127,11 +137,23 @@ export const useBettingStore = create<BettingState>((set, get) => ({
     try {
       const response = await api.submitBets({
         roundId: currentGame.roundId,
-        bets: currentBets.map((bet) => ({
-          category: bet.category,
-          optionId: bet.optionId,
-          amount: bet.amount,
-        })),
+        bets: currentBets.map((bet) => {
+          // For position-based bets (bigsmall, oddeven, dragontiger), use type/position/content
+          if (bet.type && bet.position && bet.content) {
+            return {
+              type: bet.type,
+              position: bet.position,
+              content: bet.content,
+              betAmount: bet.amount,
+            }
+          }
+          // For other bets, use category/optionId
+          return {
+            category: bet.category,
+            optionId: bet.optionId,
+            amount: bet.amount,
+          }
+        }),
       })
 
       if (response.success && response.data) {

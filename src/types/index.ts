@@ -27,6 +27,18 @@ export interface BetOptionsData {
     type: string
     options: Array<{ name: string; value: string; odds: number }>
   }>
+  positionOptions?: Array<{
+    position: number
+    bigSmall?: { odds: number }
+    oddEven?: { odds: number }
+  }>
+  dragonTiger?: Array<{
+    position: number
+    name: string
+    dragon: string
+    tiger: string
+    odds: number
+  }>
   [key: string]: any // Allow other categories
 }
 
@@ -38,6 +50,10 @@ export interface Bet {
   amount: number
   odds: number
   potentialWin: number
+  // Additional fields for position-based bets (bigsmall, oddeven, dragontiger)
+  position?: number
+  content?: string[]
+  type?: string  // Backend bet type (e.g., 'big_small', 'odd_even', 'dragon_tiger')
 }
 
 // Backend betting limits format
@@ -158,13 +174,24 @@ export interface BalanceResponse {
   balance: number
 }
 
+// Position-based bet (for bigsmall, oddeven, dragontiger)
+interface PositionBasedBet {
+  type: string  // 'big_small', 'odd_even', 'dragon_tiger'
+  position: number
+  content: string[]
+  betAmount: number
+}
+
+// Category-based bet (for position, sum)
+interface CategoryBasedBet {
+  category: BetCategory
+  optionId: string
+  amount: number
+}
+
 export interface BetSubmitRequest {
   roundId: string
-  bets: {
-    category: BetCategory
-    optionId: string
-    amount: number
-  }[]
+  bets: (PositionBasedBet | CategoryBasedBet)[]
 }
 
 export interface BetSubmitResponse {

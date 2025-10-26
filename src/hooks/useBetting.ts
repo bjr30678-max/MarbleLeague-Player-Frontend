@@ -34,7 +34,14 @@ export const useBetting = () => {
     return true
   }
 
-  const placeBet = (optionId: string, label: string, odds: number) => {
+  const placeBet = (
+    optionId: string,
+    label: string,
+    odds: number,
+    betType?: string,
+    position?: number,
+    content?: string[]
+  ) => {
     if (!canBet()) {
       return false
     }
@@ -71,7 +78,7 @@ export const useBetting = () => {
       }
     }
 
-    bettingStore.addBet(optionId, label, odds)
+    bettingStore.addBet(optionId, label, odds, betType, position, content)
     toast.success(`已添加投注: ${label}`)
     return true
   }
