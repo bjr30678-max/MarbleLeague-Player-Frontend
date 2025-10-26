@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { websocket } from '@/services/websocket'
 import { ivsStatsService } from '@/services/awsIvs'
 import { useGameStore } from '@/stores/useGameStore'
@@ -12,6 +12,7 @@ import type { IVSStatsUpdate } from '@/services/awsIvs'
 export const useWebSocket = () => {
   const isInitialized = useRef(false)
   const { isAuthenticated } = useUserStore()
+  const [isConnected, setIsConnected] = useState(false)
 
   useEffect(() => {
     // Only connect after authentication is complete
@@ -170,12 +171,20 @@ export const useWebSocket = () => {
 
     // Wait for connection then subscribe to stats channel
     const connectHandler = () => {
+      setIsConnected(true)
       websocket.subscribeToIVSStats()
     }
     websocket.on('connect', connectHandler)
 
-    // If already connected, subscribe immediately
+    // Handle disconnect event
+    const disconnectHandler = () => {
+      setIsConnected(false)
+    }
+    websocket.on('disconnect', disconnectHandler)
+
+    // If already connected, subscribe immediately and update state
     if (websocket.isConnected()) {
+      setIsConnected(true)
       websocket.subscribeToIVSStats()
     }
 
@@ -185,13 +194,14 @@ export const useWebSocket = () => {
       websocket.offIVSStatsUpdate()
       websocket.unsubscribeFromIVSStats()
       websocket.off('connect', connectHandler)
+      websocket.off('disconnect', disconnectHandler)
       websocket.disconnect()
       isInitialized.current = false // Reset for potential re-authentication
     }
   }, [isAuthenticated]) // Depend on authentication status
 
   return {
-    isConnected: websocket.isConnected(),
+    isConnected, // Use local state that updates with events
     reconnect: () => websocket.reconnect(),
   }
 }

@@ -40,6 +40,14 @@ export const GameStatus: React.FC = () => {
           timerClass: 'medium', // 24px
           timerColor: '#667eea',
         }
+      case 'playing':
+        // 遊戲進行中：顯示等待結果
+        return {
+          label: '遊戲進行中',
+          timer: '等待結果',
+          timerClass: 'medium', // 24px
+          timerColor: '#667eea',
+        }
       case 'finished':
         // 已開獎
         return {

@@ -74,7 +74,7 @@ export interface BettingLimits {
 }
 
 // Game Types
-export type GameStatus = 'waiting' | 'betting' | 'closed' | 'finished'
+export type GameStatus = 'waiting' | 'betting' | 'closed' | 'playing' | 'finished'
 
 export interface GameState {
   roundId: string

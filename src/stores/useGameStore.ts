@@ -66,8 +66,8 @@ export const useGameStore = create<GameStoreState>((set) => ({
           return
         }
 
-        // 檢查狀態是否有效（只處理 betting, closed, finished）
-        if (!['betting', 'closed', 'finished'].includes(data.status)) {
+        // 檢查狀態是否有效（只處理 betting, closed, playing, finished）
+        if (!['betting', 'closed', 'playing', 'finished'].includes(data.status)) {
           console.warn('Unknown game status:', data.status)
           // 未知狀態也清空
           set({
