@@ -16,6 +16,7 @@ export const BetSelector: React.FC = () => {
 
   const [showCustomAmount, setShowCustomAmount] = useState(false)
   const [customAmount, setCustomAmount] = useState('')
+  const [customChips, setCustomChips] = useState<number[]>([])
 
   // 籌碼顏色配置
   const chipColors: Record<number, string> = {
@@ -23,15 +24,24 @@ export const BetSelector: React.FC = () => {
     50: '#3B82F6',    // 藍色
     100: '#10B981',   // 綠色
     500: '#8B5CF6',   // 紫色
-    1000: '#F59E0B',  // 橙色
+    1000: '#F59E0F',  // 橙色
   }
 
   const handleCustomAmountSubmit = () => {
     const amount = parseInt(customAmount)
-    if (amount && amount > 0) {
+    const isDefaultAmount = CONSTANTS.BET_AMOUNTS.some(a => a === amount)
+    if (amount && amount > 0 && !customChips.includes(amount) && !isDefaultAmount) {
+      setCustomChips([...customChips, amount])
       setSelectedAmount(amount)
       setShowCustomAmount(false)
       setCustomAmount('')
+    }
+  }
+
+  const removeCustomChip = (amount: number) => {
+    setCustomChips(customChips.filter(chip => chip !== amount))
+    if (selectedAmount === amount) {
+      setSelectedAmount(CONSTANTS.BET_AMOUNTS[0])
     }
   }
 
@@ -189,6 +199,7 @@ export const BetSelector: React.FC = () => {
       <div className="amount-selector">
         <h3>選擇籌碼</h3>
         <div className="chip-container">
+          {/* 預設籌碼 */}
           {CONSTANTS.BET_AMOUNTS.map((amount) => (
             <button
               key={amount}
@@ -204,25 +215,47 @@ export const BetSelector: React.FC = () => {
             </button>
           ))}
 
-          {/* 自訂籌碼 */}
+          {/* 自訂籌碼列表 */}
+          {customChips.map((amount) => (
+            <button
+              key={`custom-${amount}`}
+              className={`chip custom-chip ${selectedAmount === amount ? 'active' : ''}`}
+              onClick={() => setSelectedAmount(amount)}
+            >
+              <div className="chip-inner">
+                <div className="chip-amount">{amount}</div>
+              </div>
+              <button
+                className="remove-chip-btn"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  removeCustomChip(amount)
+                }}
+              >
+                ×
+              </button>
+            </button>
+          ))}
+
+          {/* 新增自訂籌碼按鈕 */}
           <button
-            className={`chip custom ${showCustomAmount ? 'active' : ''}`}
+            className={`chip add-custom ${showCustomAmount ? 'active' : ''}`}
             onClick={() => setShowCustomAmount(!showCustomAmount)}
           >
             <div className="chip-inner">
-              <div className="chip-label">自訂</div>
+              <div className="chip-label">+</div>
             </div>
           </button>
         </div>
 
-        {/* 自訂金額輸入 */}
+        {/* 新增自訂金額輸入 */}
         {showCustomAmount && (
           <div className="custom-amount-input">
             <input
               type="number"
               value={customAmount}
               onChange={(e) => setCustomAmount(e.target.value)}
-              placeholder="輸入金額"
+              placeholder="輸入自訂金額"
               min="1"
               autoFocus
             />
@@ -231,7 +264,7 @@ export const BetSelector: React.FC = () => {
               onClick={handleCustomAmountSubmit}
               disabled={!customAmount || parseInt(customAmount) <= 0}
             >
-              確認
+              新增
             </button>
             <button
               className="cancel-btn"
