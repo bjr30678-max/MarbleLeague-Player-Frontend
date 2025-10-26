@@ -76,10 +76,14 @@ export const LivePlayer: React.FC = () => {
       const tokenResponse = await viewerServiceRef.current.join()
 
       if (isDevelopment) {
-        console.log('✅ IVS Token received:', {
-          stageArn: tokenResponse.stageArn,
-          currentViewers: tokenResponse.currentViewers
-        })
+        console.log('✅ IVS Token response:', tokenResponse)
+        console.log('Token value:', tokenResponse.token)
+        console.log('Token type:', typeof tokenResponse.token)
+      }
+
+      // Validate token
+      if (!tokenResponse.token || typeof tokenResponse.token !== 'string') {
+        throw new Error('Invalid token received from server')
       }
 
       // Create IVS Stage

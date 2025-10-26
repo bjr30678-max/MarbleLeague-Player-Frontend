@@ -69,6 +69,20 @@ class LiveApiService {
       }
 
       const data = await response.json()
+
+      // Debug logging in development
+      if (isDevelopment) {
+        console.log('🔍 [LiveAPI] Response from', endpoint, ':', data)
+      }
+
+      // Check if backend already returns { success, data } format
+      // If so, return it as-is; otherwise wrap it
+      if (typeof data === 'object' && 'success' in data && 'data' in data) {
+        // Backend already returned ApiResponse format
+        return data as ApiResponse<T>
+      }
+
+      // Backend returned raw data, wrap it in ApiResponse format
       return {
         success: true,
         data,
