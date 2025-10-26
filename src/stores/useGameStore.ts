@@ -56,25 +56,38 @@ export const useGameStore = create<GameStoreState>((set) => ({
       if (response.success && response.data) {
         const data = response.data
 
-        if (data.status === 'waiting') {
-          // No active round
+        // 檢查狀態是否為等待中（matching original logic）
+        if (data.status === 'waiting' || !data.roundId) {
+          // No active round - 清空遊戲狀態
           set({
             currentGame: null,
             countdown: 0,
           })
-        } else if (data.roundId) {
-          // Active round
-          set({
-            currentGame: {
-              roundId: data.roundId,
-              period: data.period || 0,
-              status: data.status,
-              countdown: data.timeLeft || 0,
-              timestamp: Date.now(),
-            },
-            countdown: data.timeLeft || 0,
-          })
+          return
         }
+
+        // 檢查狀態是否有效（只處理 betting, closed, finished）
+        if (!['betting', 'closed', 'finished'].includes(data.status)) {
+          console.warn('Unknown game status:', data.status)
+          // 未知狀態也清空
+          set({
+            currentGame: null,
+            countdown: 0,
+          })
+          return
+        }
+
+        // 有效的活動回合
+        set({
+          currentGame: {
+            roundId: data.roundId,
+            period: data.period || parseInt(data.roundId) || 0,
+            status: data.status,
+            countdown: data.timeLeft || 0,
+            timestamp: Date.now(),
+          },
+          countdown: data.timeLeft || 0,
+        })
       }
     } catch (error) {
       console.error('Failed to fetch current game:', error)

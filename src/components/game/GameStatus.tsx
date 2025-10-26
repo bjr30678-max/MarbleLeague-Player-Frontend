@@ -8,7 +8,8 @@ export const GameStatus: React.FC = () => {
   const { formattedCountdown } = useCountdown()
 
   // 等待狀態顯示（matching original updateWaitingDisplay）
-  if (!currentGame) {
+  // 包括：沒有遊戲或狀態為 waiting
+  if (!currentGame || currentGame.status === 'waiting') {
     return (
       <div className="countdown">
         <div id="roundInfo">
