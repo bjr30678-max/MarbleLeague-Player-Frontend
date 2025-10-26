@@ -87,21 +87,25 @@ export const LivePlayer: React.FC = () => {
       }
 
       // Create IVS Stage
-      const { Stage, StageEvents, SubscribeType } = (window as any).IVSBroadcastClient
+      const { Stage, StageEvents, SubscribeType, StageStrategy } = (window as any).IVSBroadcastClient
 
-      // For viewers, we need to provide a strategy to subscribe to publisher's streams
-      const stage = new Stage(tokenResponse.token, {
-        stageStrategy: {
-          participantId: tokenResponse.participantId,
-          shouldSubscribeToParticipant: (participant: any) => {
-            // Subscribe to all participants (mainly the publisher)
-            if (isDevelopment) {
-              console.log('👤 Participant joined, subscribing:', participant.userId)
-            }
-            return SubscribeType.AUDIO_VIDEO
+      // Create a strategy instance (not just a config object)
+      class ViewerStrategy extends StageStrategy {
+        shouldSubscribeToParticipant(participant: any) {
+          if (isDevelopment) {
+            console.log('👤 Participant joined, subscribing:', participant.userId)
           }
+          return SubscribeType.AUDIO_VIDEO
         }
-      })
+
+        stageStreamsToPublish() {
+          // Viewer doesn't publish
+          return []
+        }
+      }
+
+      // For viewers, we provide a strategy instance
+      const stage = new Stage(tokenResponse.token, new ViewerStrategy())
 
       // Handle stage events
       stage.on(StageEvents.STAGE_CONNECTION_STATE_CHANGED, (state: string) => {
