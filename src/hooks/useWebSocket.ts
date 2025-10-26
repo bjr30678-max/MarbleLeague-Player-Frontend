@@ -127,6 +127,16 @@ export const useWebSocket = () => {
       // Add result to recent results
       useGameStore.getState().addResult(gameResult)
 
+      // Immediately update current game status to 'finished' or clear it
+      const currentGame = useGameStore.getState().currentGame
+      if (currentGame && currentGame.roundId === data.roundId) {
+        // Update status to finished to show "等待下一期數"
+        useGameStore.getState().setCurrentGame({
+          ...currentGame,
+          status: 'finished',
+        })
+      }
+
       // Show toast
       toast.success('開獎結果已公布')
 
@@ -139,11 +149,11 @@ export const useWebSocket = () => {
       // Reload recent results (matching original)
       useGameStore.getState().fetchRecentResults()
 
-      // After 5 seconds, check if we should show waiting state
+      // After 5 seconds, reset to waiting state if no new round started
       setTimeout(() => {
         const currentGame = useGameStore.getState().currentGame
-        if (!currentGame || currentGame.roundId === data.roundId) {
-          // Set to waiting state
+        if (currentGame && currentGame.status === 'finished' && currentGame.roundId === data.roundId) {
+          // Set to waiting state only if still showing the finished round
           useGameStore.getState().resetGame()
         }
       }, 5000)
