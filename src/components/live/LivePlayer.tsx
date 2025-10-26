@@ -342,43 +342,44 @@ export const LivePlayer: React.FC = () => {
 
   // ==================== Effects ====================
 
-  // Initialize player based on mode
+  // Initialize IVS player
   useEffect(() => {
-    if (playerMode === 'ivs') {
+    if (playerMode === 'ivs' && user) {
       // Auto-join IVS stream if user is authenticated
-      if (user) {
-        loadIVSSDK()
-          .then(() => {
-            // Auto-start after a short delay
-            setTimeout(() => initIVSViewer(), 1000)
-          })
-          .catch(err => {
-            console.error('Failed to load IVS SDK:', err)
-            toast.error('無法載入直播 SDK')
-          })
-      }
+      loadIVSSDK()
+        .then(() => {
+          // Auto-start after a short delay
+          setTimeout(() => initIVSViewer(), 1000)
+        })
+        .catch(err => {
+          console.error('Failed to load IVS SDK:', err)
+          toast.error('無法載入直播 SDK')
+        })
 
       // Cleanup on unmount
       return () => {
         cleanupIVS()
       }
-    } else if (playerMode === 'ovenplayer') {
-      // Load OvenPlayer for legacy mode
-      if (streamConfig.host && streamConfig.stream) {
-        loadOvenPlayerSDK()
-          .then(() => {
-            setTimeout(initOvenPlayer, 500)
-          })
-          .catch(err => {
-            console.error('Failed to load OvenPlayer:', err)
-          })
+    }
+  }, [playerMode, user]) // 移除 streamConfig 依賴，因為 IVS 模式不需要
 
-        return () => {
-          cleanupOvenPlayer()
-        }
+  // Initialize OvenPlayer
+  useEffect(() => {
+    if (playerMode === 'ovenplayer' && streamConfig.host && streamConfig.stream) {
+      // Load OvenPlayer for legacy mode
+      loadOvenPlayerSDK()
+        .then(() => {
+          setTimeout(initOvenPlayer, 500)
+        })
+        .catch(err => {
+          console.error('Failed to load OvenPlayer:', err)
+        })
+
+      return () => {
+        cleanupOvenPlayer()
       }
     }
-  }, [playerMode, streamConfig, user])
+  }, [playerMode, streamConfig.host, streamConfig.stream]) // 只依賴需要的具體屬性
 
   // Subscribe to stats updates
   useEffect(() => {
