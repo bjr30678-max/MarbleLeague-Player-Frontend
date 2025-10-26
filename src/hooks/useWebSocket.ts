@@ -5,18 +5,36 @@ import { useGameStore } from '@/stores/useGameStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useBettingStore } from '@/stores/useBettingStore'
 import { toast } from '@/stores/useToastStore'
+import { storage } from '@/services/storage'
 import type { GameState, GameResult } from '@/types'
 import type { IVSStatsUpdate } from '@/services/awsIvs'
 
 export const useWebSocket = () => {
   const isInitialized = useRef(false)
+  const { isAuthenticated } = useUserStore()
 
   useEffect(() => {
+    // Only connect after authentication is complete
+    if (!isAuthenticated) {
+      console.log('⏳ WebSocket: 等待認證完成...')
+      return
+    }
+
     // Prevent duplicate initialization in StrictMode
     if (isInitialized.current) {
       return
     }
     isInitialized.current = true
+
+    // Verify token exists before connecting
+    const token = storage.getToken()
+    if (!token) {
+      console.error('❌ WebSocket: Token 不存在，無法連接')
+      toast.error('認證失敗，請重新登入')
+      return
+    }
+
+    console.log('✅ WebSocket: 認證完成，準備連接...')
 
     // Initialize game connection (matching original initializeGame)
     const initializeGame = async () => {
@@ -130,8 +148,9 @@ export const useWebSocket = () => {
       websocket.unsubscribeFromIVSStats()
       websocket.off('connect', connectHandler)
       websocket.disconnect()
+      isInitialized.current = false // Reset for potential re-authentication
     }
-  }, []) // Empty dependency array - only run once
+  }, [isAuthenticated]) // Depend on authentication status
 
   return {
     isConnected: websocket.isConnected(),

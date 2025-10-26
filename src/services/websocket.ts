@@ -32,14 +32,27 @@ class WebSocketService {
     }
 
     try {
-      // 使用與原始代碼相同的簡單配置
+      // Socket.IO 配置（匹配原版並增強）
       this.socket = io(this.wsUrl, {
         auth: {
           token
-        }
+        },
+        // 傳輸方式：先嘗試 websocket，失敗則降級為 polling
+        transports: ['websocket', 'polling'],
+        // 重連配置
+        reconnection: true,
+        reconnectionAttempts: this.maxReconnectAttempts,
+        reconnectionDelay: this.reconnectDelay,
+        reconnectionDelayMax: 5000,
+        // 超時配置
+        timeout: 20000,
       })
 
       this.setupEventListeners()
+
+      if (isDevelopment) {
+        console.log('🔌 WebSocket 初始化完成，等待連線...')
+      }
     } catch (error) {
       console.error('WebSocket connection failed:', error)
       toast.error('WebSocket 連線失敗')
@@ -76,18 +89,25 @@ class WebSocketService {
     this.socket.on('connect_error', (error) => {
       this.reconnectAttempts++
 
-      if (!this.connectionWarningShown) {
-        console.error('WebSocket 連線失敗:', {
-          url: this.wsUrl,
-          error: error.message || error,
-          attempts: this.reconnectAttempts
-        })
+      // 詳細的錯誤日誌
+      console.error('❌ WebSocket 連線失敗:', {
+        url: this.wsUrl,
+        error: error.message || error,
+        errorType: error.constructor.name,
+        attempts: this.reconnectAttempts,
+        maxAttempts: this.maxReconnectAttempts,
+        stack: isDevelopment ? error.stack : undefined
+      })
+
+      if (!this.connectionWarningShown && this.reconnectAttempts === 1) {
+        // 只在第一次失敗時顯示提示
+        toast.warning('正在嘗試連接遊戲伺服器...')
         this.connectionWarningShown = true
       }
 
       if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-        console.warn(`WebSocket 已達最大重連次數 (${this.maxReconnectAttempts})，應用將以離線模式運行`)
-        toast.warning('無法連接到遊戲伺服器，部分功能可能無法使用')
+        console.warn(`⚠️ WebSocket 已達最大重連次數 (${this.maxReconnectAttempts})`)
+        toast.error('無法連接到遊戲伺服器，請檢查網路連線')
       }
     })
 
