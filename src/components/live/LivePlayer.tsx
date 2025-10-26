@@ -87,9 +87,14 @@ export const LivePlayer: React.FC = () => {
       }
 
       // Create IVS Stage
-      const { Stage, StageEvents } = (window as any).IVSBroadcastClient
+      const { Stage, StageEvents, SubscribeType } = (window as any).IVSBroadcastClient
+
+      // For viewers, we need to provide a strategy to subscribe to publisher's streams
       const stage = new Stage(tokenResponse.token, {
-        stageStreamsToPublish: () => []
+        strategy: {
+          shouldSubscribeToParticipant: () => SubscribeType.AUDIO_VIDEO,
+          stageStreamsToPublish: () => [], // Viewer doesn't publish, return empty array
+        }
       })
 
       // Handle stage events
