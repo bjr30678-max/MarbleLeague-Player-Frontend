@@ -15,7 +15,20 @@ export default defineConfig({
     host: true,
     // Proxy configuration for development to bypass CORS
     proxy: {
+      '/api/token': {
+        // Live API endpoints (AWS IVS) - proxy to localhost in development
+        target: process.env.VITE_LIVE_API_URL || 'http://localhost:3005',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/api/viewer': {
+        // Live API endpoints (AWS IVS) - proxy to localhost in development
+        target: process.env.VITE_LIVE_API_URL || 'http://localhost:3005',
+        changeOrigin: true,
+        secure: false,
+      },
       '/api': {
+        // Main API - default proxy
         target: 'https://api.bjr8888.com',
         changeOrigin: true,
         secure: false,

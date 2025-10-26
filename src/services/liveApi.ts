@@ -1,5 +1,5 @@
 import type { ApiResponse } from '@/types'
-import { config } from '@/config'
+import { config, isDevelopment } from '@/config'
 import { storage } from './storage'
 import { validateToken } from '@/utils/validation'
 import { toast } from '@/stores/useToastStore'
@@ -13,7 +13,15 @@ class LiveApiService {
   private baseUrl: string
 
   constructor() {
-    this.baseUrl = config.liveApiUrl
+    // In development mode, use Vite proxy (relative path)
+    // In production, use the full liveApiUrl
+    if (isDevelopment && config.liveApiUrl.includes('localhost')) {
+      // Use Vite proxy for localhost to avoid CSP and CORS issues
+      this.baseUrl = window.location.origin
+      console.warn('🔧 開發模式: 直播 API 使用 Vite proxy (localhost:3000 → localhost:3005)')
+    } else {
+      this.baseUrl = config.liveApiUrl
+    }
   }
 
   /**
