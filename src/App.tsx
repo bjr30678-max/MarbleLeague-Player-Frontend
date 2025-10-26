@@ -116,14 +116,10 @@ const GameTab: React.FC = () => {
   return (
     <div className="tab-content game-tab">
       <GameStatus />
-      <div className="game-layout">
-        <div className="betting-section">
-          <BetSelector />
-          <BetList />
-        </div>
-        <div className="results-section">
-          <RecentResults />
-        </div>
+      <RecentResults />
+      <div className="betting-section">
+        <BetSelector />
+        <BetList />
       </div>
     </div>
   )
