@@ -5,8 +5,8 @@
 ### 1. 環境變數保護 ✅
 
 **問題**: 敏感資訊 hardcoded 在原始碼中
-- LIFF ID: `2008123093-KR57QjDP`
-- API URL: `https://api.bjr8888.com`
+- LIFF ID: ``
+- API URL: ``
 
 **解決方案**:
 - 使用 `.env` 文件管理配置
