@@ -54,8 +54,18 @@ body {
 }
 
 .app-logo {
-  font-size: 2.5rem;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   filter: drop-shadow(0 2px 8px rgba(102, 126, 234, 0.5));
+}
+
+.app-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .header-text {
@@ -379,7 +389,8 @@ body {
   }
 
   .app-logo {
-    font-size: 2rem;
+    width: 55px;
+    height: 55px;
   }
 
   .app-title {

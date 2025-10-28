@@ -129,12 +129,13 @@ export const CONSTANTS = {
 } as const
 
 // Betting categories configuration
+// Icons are now imported as React components in BetSelector.tsx
 export const BETTING_CATEGORIES = {
-  position: { label: '名次', icon: '🏆' },
-  sum: { label: '冠亞和', icon: '➕' },
-  bigsmall: { label: '大小', icon: '📊' },
-  oddeven: { label: '單雙', icon: '🎲' },
-  dragontiger: { label: '龍虎', icon: '🐉' },
+  position: { label: '名次' },
+  sum: { label: '冠亞和' },
+  bigsmall: { label: '大小' },
+  oddeven: { label: '單雙' },
+  dragontiger: { label: '龍虎' },
 } as const
 
 // Export types

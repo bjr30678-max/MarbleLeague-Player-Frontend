@@ -9,6 +9,7 @@ import { useUserStore } from './stores/useUserStore'
 import { useGameStore } from './stores/useGameStore'
 import { useBettingStore } from './stores/useBettingStore'
 import { formatCurrency } from './utils/validation'
+import { FaGamepad, FaTv, FaClipboardList, FaUser } from 'react-icons/fa'
 import './App.css'
 
 type Tab = 'game' | 'live' | 'history' | 'profile'
@@ -50,9 +51,11 @@ const App: React.FC = () => {
       <header className="app-header">
         <div className="header-content">
           <div className="header-left">
-            <div className="app-logo">🎯</div>
+            <div className="app-logo">
+              <img src="/Logo-1.png" alt="紅海彈珠聯賽" />
+            </div>
             <div className="header-text">
-              <h1 className="app-title">彈珠聯賽</h1>
+              <h1 className="app-title">紅海彈珠聯賽</h1>
               <div className="connection-status">
                 <span className={`status-dot ${isConnected ? 'connected' : 'disconnected'}`} />
                 <span className="status-text">{isConnected ? '已連線' : '未連線'}</span>
@@ -82,28 +85,28 @@ const App: React.FC = () => {
           className={`nav-btn ${activeTab === 'game' ? 'active' : ''}`}
           onClick={() => setActiveTab('game')}
         >
-          <span className="nav-icon">🎮</span>
+          <span className="nav-icon"><FaGamepad /></span>
           <span className="nav-label">遊戲</span>
         </button>
         <button
           className={`nav-btn ${activeTab === 'live' ? 'active' : ''}`}
           onClick={() => setActiveTab('live')}
         >
-          <span className="nav-icon">📺</span>
+          <span className="nav-icon"><FaTv /></span>
           <span className="nav-label">直播</span>
         </button>
         <button
           className={`nav-btn ${activeTab === 'history' ? 'active' : ''}`}
           onClick={() => setActiveTab('history')}
         >
-          <span className="nav-icon">📋</span>
+          <span className="nav-icon"><FaClipboardList /></span>
           <span className="nav-label">記錄</span>
         </button>
         <button
           className={`nav-btn ${activeTab === 'profile' ? 'active' : ''}`}
           onClick={() => setActiveTab('profile')}
         >
-          <span className="nav-icon">👤</span>
+          <span className="nav-icon"><FaUser /></span>
           <span className="nav-label">個人</span>
         </button>
       </nav>

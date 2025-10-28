@@ -2,6 +2,17 @@ import React, { useState } from 'react'
 import { useBetting } from '@/hooks/useBetting'
 import { CONSTANTS, BETTING_CATEGORIES } from '@/config'
 import type { BetCategory } from '@/types'
+import { 
+  FaTrophy,        // 名次
+  FaCalculator,    // 冠亞和
+  FaChartBar,      // 大小
+  FaDice,          // 單雙
+  FaFire,          // 龍虎 (使用 Fire 作為替代)
+  FaChevronUp,     // 大
+  FaChevronDown,   // 小
+  FaCircle,        // 單
+  FaCircleNotch    // 雙
+} from 'react-icons/fa'
 import './BetSelector.css'
 
 export const BetSelector: React.FC = () => {
@@ -17,6 +28,15 @@ export const BetSelector: React.FC = () => {
   const [showCustomAmount, setShowCustomAmount] = useState(false)
   const [customAmount, setCustomAmount] = useState('')
   const [customChips, setCustomChips] = useState<number[]>([])
+
+  // 圖標映射
+  const categoryIcons: Record<BetCategory, React.ReactNode> = {
+    position: <FaTrophy />,
+    sum: <FaCalculator />,
+    bigsmall: <FaChartBar />,
+    oddeven: <FaDice />,
+    dragontiger: <FaFire />
+  }
 
   // 籌碼顏色配置
   const chipColors: Record<number, string> = {
@@ -155,7 +175,7 @@ export const BetSelector: React.FC = () => {
                   ['big']
                 )}
               >
-                大 (6-10)
+                <FaChevronUp /> 大 (6-10)
               </button>
               <button
                 className="option-btn"
@@ -168,7 +188,7 @@ export const BetSelector: React.FC = () => {
                   ['small']
                 )}
               >
-                小 (1-5)
+                <FaChevronDown /> 小 (1-5)
               </button>
             </div>
           </div>
@@ -200,7 +220,7 @@ export const BetSelector: React.FC = () => {
                   ['odd']
                 )}
               >
-                單數
+                <FaCircle /> 單數
               </button>
               <button
                 className="option-btn"
@@ -213,7 +233,7 @@ export const BetSelector: React.FC = () => {
                   ['even']
                 )}
               >
-                雙數
+                <FaCircleNotch /> 雙數
               </button>
             </div>
           </div>
@@ -287,7 +307,7 @@ export const BetSelector: React.FC = () => {
             className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
             onClick={() => setSelectedCategory(category)}
           >
-            <span className="category-icon">{BETTING_CATEGORIES[category].icon}</span>
+            <span className="category-icon">{categoryIcons[category]}</span>
             <span className="category-label">{BETTING_CATEGORIES[category].label}</span>
           </button>
         ))}

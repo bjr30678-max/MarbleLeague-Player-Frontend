@@ -38,6 +38,14 @@
 
 .category-icon {
   font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .category-label {
@@ -300,6 +308,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.25rem;
   padding: 1rem 0.5rem;
   background: rgba(255, 255, 255, 0.05);
@@ -308,6 +317,15 @@
   color: #fff;
   cursor: pointer;
   transition: all 0.2s;
+}
+
+/* 當按鈕內有圖標時的樣式 */
+.option-btn svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.25rem;
 }
 
 .option-btn:hover:not(:disabled) {
