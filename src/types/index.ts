@@ -51,8 +51,8 @@ export interface Bet {
   odds: number
   potentialWin: number
   // Additional fields for position-based bets (bigsmall, oddeven, dragontiger)
-  position?: number
-  content?: string[]
+  position?: number | null
+  content?: (string | number)[]
   type?: string  // Backend bet type (e.g., 'big_small', 'odd_even', 'dragon_tiger')
 }
 

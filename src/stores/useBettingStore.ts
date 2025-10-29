@@ -23,8 +23,8 @@ interface BettingState {
     label: string,
     odds: number,
     betType?: string,
-    position?: number,
-    content?: string[]
+    position?: number | null,
+    content?: (string | number)[]
   ) => void
   removeBet: (id: string) => void
   clearBets: () => void
