@@ -5,7 +5,7 @@ import { toast } from '@/stores/useToastStore'
 
 export const useAuth = () => {
   const [isInitializing, setIsInitializing] = useState(true)
-  const { user, setUser, isAuthenticated } = useUserStore()
+  const { user, setUser, isAuthenticated, fetchBalance } = useUserStore()
   const initializeRef = useRef(false) // Prevent duplicate initialization in StrictMode
 
   useEffect(() => {
@@ -36,6 +36,9 @@ export const useAuth = () => {
         }
 
         setUser(userProfile)
+
+        // Fetch user balance after successful authentication
+        await fetchBalance()
       } catch (error) {
         console.error('Auth initialization error:', error)
         toast.error('認證失敗，請重新登入')
@@ -45,7 +48,7 @@ export const useAuth = () => {
     }
 
     initialize()
-  }, [setUser])
+  }, [setUser, fetchBalance])
 
   const logout = () => {
     liff.logout()
