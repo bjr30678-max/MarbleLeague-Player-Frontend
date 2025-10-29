@@ -73,19 +73,10 @@
 }
 
 .player-controls {
-  position: absolute;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 0.5rem;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.player-container:hover .player-controls {
-  opacity: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  width: 100%;
 }
 
 .no-stream {
@@ -208,8 +199,7 @@
 
 @media (max-width: 640px) {
   .player-controls {
-    opacity: 1;
-    bottom: 0.5rem;
+    gap: 0.75rem;
   }
 
   .no-stream {
@@ -217,6 +207,10 @@
   }
 
   .no-stream-icon {
+    font-size: 3rem;
+  }
+
+  .placeholder-icon {
     font-size: 3rem;
   }
 }

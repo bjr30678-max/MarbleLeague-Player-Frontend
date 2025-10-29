@@ -219,16 +219,16 @@
 /* 記錄中的10顆球 */
 .record-numbers {
   display: grid;
-  grid-template-columns: repeat(5, 32px);
-  column-gap: 8px;
-  row-gap: 8px;
+  grid-template-columns: repeat(5, 42px);
+  column-gap: 16px;
+  row-gap: 12px;
   justify-content: center;
   margin-bottom: 12px;
 }
 
 .record-number {
-  width: 32px;
-  height: 32px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.6) 0%, rgba(118, 75, 162, 0.6) 100%);
   border: 1px solid rgba(102, 126, 234, 0.4);
@@ -237,7 +237,7 @@
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 /* 統計資訊 */
@@ -281,6 +281,65 @@
   background: rgba(139, 92, 246, 0.2);
   color: #c4b5fd;
   border-color: rgba(139, 92, 246, 0.3);
+}
+
+/* 分頁控制 */
+.history-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+.pagination-btn {
+  padding: 8px 20px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 80px;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+  border-color: rgba(102, 126, 234, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.pagination-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.page-info {
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* 載入中提示 */
+.loading-indicator {
+  text-align: center;
+  padding: 30px;
+  color: #94a3b8;
+  font-size: 14px;
 }
 
 /* 滾動條樣式 */
