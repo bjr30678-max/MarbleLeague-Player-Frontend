@@ -10,6 +10,10 @@ interface GameStoreState {
   historyTotalPages: number
   isLoading: boolean
   countdown: number
+  currentResultsPage: number
+  isLoadingResults: boolean
+  currentHistoryPage: number
+  isLoadingHistory: boolean
 
   // Actions
   setCurrentGame: (game: GameState) => void
@@ -18,11 +22,13 @@ interface GameStoreState {
   setRecentResults: (results: GameResult[]) => void
   fetchCurrentGame: () => Promise<void>
   fetchRecentResults: () => Promise<void>
+  loadResultsPage: (page: number) => Promise<void>
   fetchHistory: (page?: number) => Promise<void>
+  loadHistoryPage: (page: number) => Promise<boolean | undefined>
   resetGame: () => void
 }
 
-export const useGameStore = create<GameStoreState>((set) => ({
+export const useGameStore = create<GameStoreState>((set, get) => ({
   currentGame: null,
   recentResults: [],
   history: [],
@@ -30,6 +36,10 @@ export const useGameStore = create<GameStoreState>((set) => ({
   historyTotalPages: 1,
   isLoading: false,
   countdown: 0,
+  currentResultsPage: 1,
+  isLoadingResults: false,
+  currentHistoryPage: 1,
+  isLoadingHistory: false,
 
   setCurrentGame: (game) => {
     set({ currentGame: game, countdown: game.countdown })
@@ -96,8 +106,9 @@ export const useGameStore = create<GameStoreState>((set) => ({
 
   fetchRecentResults: async () => {
     // Load recent results from API (原始: /api/game/results?limit=10)
+    // 初始載入時重置到第一頁
     try {
-      const response = await api.getRecentResults(10)
+      const response = await api.getRecentResults(10, 0)
       if (response.success && response.data && Array.isArray(response.data)) {
         // Convert RecentResult[] to GameResult[]
         const results = response.data.map((item) => {
@@ -113,28 +124,118 @@ export const useGameStore = create<GameStoreState>((set) => ({
             timestamp: new Date(item.resultTime).getTime(),
           } as GameResult
         })
-        set({ recentResults: results })
+        set({
+          recentResults: results,
+          currentResultsPage: 1,
+        })
       }
     } catch (error) {
       console.error('Failed to fetch recent results:', error)
     }
   },
 
+  loadResultsPage: async (page: number) => {
+    if (page < 1) return
+
+    const pageSize = 10
+    set({ isLoadingResults: true })
+
+    try {
+      // 載入 pageSize + 1 筆來判斷是否還有下一頁
+      const offset = (page - 1) * pageSize
+      const response = await api.getRecentResults(pageSize + 1, offset)
+
+      if (response.success && response.data && Array.isArray(response.data)) {
+        const hasNextPage = response.data.length > pageSize
+        const currentPageData = response.data.slice(0, pageSize)
+
+        // 如果當前頁沒有資料且不是第一頁，回到上一頁
+        if (currentPageData.length === 0 && page > 1) {
+          get().loadResultsPage(page - 1)
+          return
+        }
+
+        // Convert RecentResult[] to GameResult[]
+        const results = currentPageData.map((item) => {
+          const sum = item.result.slice(0, 2).reduce((a, b) => a + b, 0)
+          return {
+            roundId: item.roundId,
+            period: parseInt(item.roundId) || 0,
+            positions: item.result,
+            sum,
+            bigsmall: sum > 11 ? 'big' : 'small',
+            oddeven: sum % 2 === 0 ? 'even' : 'odd',
+            dragontiger: {},
+            timestamp: new Date(item.resultTime).getTime(),
+          } as GameResult
+        })
+
+        set({
+          recentResults: results,
+          currentResultsPage: page,
+        })
+
+        // 返回是否有下一頁的資訊 (透過在組件中檢查)
+        return hasNextPage
+      }
+    } catch (error) {
+      console.error('Failed to load results page:', error)
+    } finally {
+      set({ isLoadingResults: false })
+    }
+  },
+
   fetchHistory: async (limit = 20) => {
     set({ isLoading: true })
     try {
-      const response = await api.getGameHistory(limit)
+      const response = await api.getGameHistory(limit, 0)
       if (response.success && response.data?.games) {
         set({
           history: response.data.games,
           historyPage: 1,
           historyTotalPages: 1,
+          currentHistoryPage: 1,
         })
       }
     } catch (error) {
       console.error('Failed to fetch history:', error)
     } finally {
       set({ isLoading: false })
+    }
+  },
+
+  loadHistoryPage: async (page: number) => {
+    if (page < 1) return
+
+    const pageSize = 20
+    set({ isLoadingHistory: true })
+
+    try {
+      // 載入 pageSize + 1 筆來判斷是否還有下一頁
+      const offset = (page - 1) * pageSize
+      const response = await api.getGameHistory(pageSize + 1, offset)
+
+      if (response.success && response.data?.games) {
+        const hasNextPage = response.data.games.length > pageSize
+        const currentPageData = response.data.games.slice(0, pageSize)
+
+        // 如果當前頁沒有資料且不是第一頁，回到上一頁
+        if (currentPageData.length === 0 && page > 1) {
+          get().loadHistoryPage(page - 1)
+          return
+        }
+
+        set({
+          history: currentPageData,
+          currentHistoryPage: page,
+        })
+
+        return hasNextPage
+      }
+    } catch (error) {
+      console.error('Failed to load history page:', error)
+    } finally {
+      set({ isLoadingHistory: false })
     }
   },
 

@@ -38,13 +38,13 @@ export const BetSelector: React.FC = () => {
     dragontiger: <FaFire />
   }
 
-  // 籌碼顏色配置
+  // 籌碼顏色配置 - 深色奢華系
   const chipColors: Record<number, string> = {
-    10: '#EF4444',    // 紅色
-    50: '#3B82F6',    // 藍色
-    100: '#10B981',   // 綠色
-    500: '#8B5CF6',   // 紫色
-    1000: '#F59E0F',  // 橙色
+    10: '#7f1d1d',    // 深酒紅
+    50: '#1e3a8a',    // 深藍
+    100: '#065f46',   // 深綠
+    500: '#581c87',   // 深紫
+    1000: '#92400e',  // 深棕金
   }
 
   const handleCustomAmountSubmit = () => {

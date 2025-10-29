@@ -164,12 +164,12 @@ class ApiService {
   }
 
   /**
-   * Get game history (原始路徑: /api/game/history)
+   * Get game history (原始路徑: /api/game/history?limit=N&offset=N)
    * Returns { games: GameHistoryRecord[] }
    */
-  async getGameHistory(limit: number = 20): Promise<ApiResponse<GameHistoryResponse>> {
+  async getGameHistory(limit: number = 20, offset: number = 0): Promise<ApiResponse<GameHistoryResponse>> {
     return this.request<GameHistoryResponse>(
-      `${API_ENDPOINTS.GAME.HISTORY}?limit=${limit}`,
+      `${API_ENDPOINTS.GAME.HISTORY}?limit=${limit}&offset=${offset}`,
       {
         method: 'GET',
       }
@@ -187,15 +187,37 @@ class ApiService {
   }
 
   /**
-   * Get recent results (原始路徑: /api/game/results?limit=N)
+   * Get recent results (原始路徑: /api/game/results?limit=N&offset=N)
    * Returns array of recent game results
    */
-  async getRecentResults(limit: number = 10): Promise<ApiResponse<RecentResultsResponse>> {
+  async getRecentResults(limit: number = 10, offset: number = 0): Promise<ApiResponse<RecentResultsResponse>> {
     return this.request<RecentResultsResponse>(
-      `${API_ENDPOINTS.GAME.RESULTS}?limit=${limit}`,
+      `${API_ENDPOINTS.GAME.RESULTS}?limit=${limit}&offset=${offset}`,
       {
         method: 'GET',
       }
+    )
+  }
+
+  /**
+   * Get current round betting statistics (用於熱門投注)
+   * Returns total bets, total amount, and type summary
+   */
+  async getBetStats(): Promise<ApiResponse<{
+    roundId: string
+    totalBets: number
+    totalAmount: number
+    typeSummary: Array<{
+      betType: string
+      position: number | null
+      betTypeName: string
+      count: number
+      amount: number
+    }>
+  }>> {
+    return this.request(
+      `${API_ENDPOINTS.GAME.BASE}/bet-stats`,
+      { method: 'GET' }
     )
   }
 

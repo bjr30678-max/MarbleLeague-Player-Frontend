@@ -4,6 +4,7 @@ import { ivsStatsService } from '@/services/awsIvs'
 import { useGameStore } from '@/stores/useGameStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useBettingStore } from '@/stores/useBettingStore'
+import { useHotBetsStore } from '@/stores/useHotBetsStore'
 import { toast } from '@/stores/useToastStore'
 import { storage } from '@/services/storage'
 import type { GameState, GameResult } from '@/types'
@@ -82,6 +83,31 @@ export const useWebSocket = () => {
 
       // Clear previous bets (matching original)
       useBettingStore.getState().clearBets()
+
+      // Clear hot bets for new round
+      useHotBetsStore.getState().clearStats()
+
+      // Load initial bet stats for new round (after a short delay to allow bets to come in)
+      setTimeout(async () => {
+        try {
+          const response = await api.getBetStats()
+          if (response.data && response.data.totalBets > 0) {
+            const { totalBets, totalAmount, typeSummary } = response.data
+            const sortedBets = [...typeSummary]
+              .sort((a, b) => b.count - a.count)
+              .slice(0, 4)
+            const hotBets = sortedBets.map(bet => ({
+              option: bet.betTypeName,
+              count: bet.count,
+              amount: bet.amount,
+              percentage: totalBets > 0 ? Math.round((bet.count / totalBets) * 100) : 0
+            }))
+            useHotBetsStore.getState().updateBetStats({ totalBets, totalAmount, hotBets })
+          }
+        } catch (error) {
+          console.error('Failed to load initial bet stats:', error)
+        }
+      }, 2000)
 
       // Show toast notification
       toast.info(`新回合開始: 第 ${data.roundId} 期`)
@@ -170,11 +196,51 @@ export const useWebSocket = () => {
       ivsStatsService.handleStatsUpdate(data)
     }
 
+    // Track new bets for 熱門投注 feature
+    // Load betting statistics from API when a new bet is placed
+    const handleNewBet = async (data: any) => {
+      console.log('💰 [WebSocket] New bet:', data)
+
+      try {
+        // Fetch latest betting statistics from API
+        const response = await api.getBetStats()
+
+        if (response.data) {
+          const { totalBets, totalAmount, typeSummary } = response.data
+
+          // Sort by count and take top 4
+          const sortedBets = [...typeSummary]
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 4)
+
+          // Calculate percentages
+          const hotBets = sortedBets.map(bet => ({
+            option: bet.betTypeName,
+            count: bet.count,
+            amount: bet.amount,
+            percentage: totalBets > 0
+              ? Math.round((bet.count / totalBets) * 100)
+              : 0
+          }))
+
+          // Update hot bets store
+          useHotBetsStore.getState().updateBetStats({
+            totalBets,
+            totalAmount,
+            hotBets
+          })
+        }
+      } catch (error) {
+        console.error('Failed to fetch bet stats:', error)
+      }
+    }
+
     // Subscribe to events
     websocket.onRoundStarted(handleRoundStarted)
     websocket.onBettingClosed(handleBettingClosed)
     websocket.onResultConfirmed(handleResultConfirmed)
     websocket.onBalanceUpdated(handleBalanceUpdated)
+    websocket.onNewBet(handleNewBet)
 
     // Subscribe to AWS IVS stats
     websocket.onIVSStatsUpdate(handleIVSStatsUpdate)

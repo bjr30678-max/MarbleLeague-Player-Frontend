@@ -76,12 +76,37 @@ body {
 
 .app-title {
   font-size: 1.5rem;
-  font-weight: bold;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: 0.5px;
+  font-weight: 800;
+  color: #e8e8e8;
+  letter-spacing: 1px;
+  position: relative;
+  /* 柔和灰白文字 + 紫色發光背景 */
+  text-shadow:
+    /* 深色輪廓 */
+    0 1px 2px rgba(0, 0, 0, 0.6),
+    /* 紫色光暈層 */
+    0 0 12px rgba(139, 92, 246, 0.6),
+    0 0 20px rgba(139, 92, 246, 0.4),
+    0 0 30px rgba(139, 92, 246, 0.3);
+  animation: titleGlow 3s ease-in-out infinite;
+}
+
+/* 紫色光暈呼吸動畫 */
+@keyframes titleGlow {
+  0%, 100% {
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.6),
+      0 0 12px rgba(139, 92, 246, 0.6),
+      0 0 20px rgba(139, 92, 246, 0.4),
+      0 0 30px rgba(139, 92, 246, 0.3);
+  }
+  50% {
+    text-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.7),
+      0 0 16px rgba(139, 92, 246, 0.8),
+      0 0 28px rgba(139, 92, 246, 0.6),
+      0 0 40px rgba(139, 92, 246, 0.4);
+  }
 }
 
 .connection-status {
@@ -118,33 +143,30 @@ body {
 }
 
 .user-balance {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-  border: 1px solid rgba(102, 126, 234, 0.4);
-  padding: 0.75rem 1.25rem;
-  border-radius: 12px;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.25rem;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .balance-label {
-  font-size: 0.7rem;
+  font-size: 0.875rem;
   color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .balance-amount {
-  font-size: 1.25rem;
-  font-weight: bold;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    0 0 12px rgba(139, 92, 246, 0.8),
+    0 0 24px rgba(139, 92, 246, 0.5);
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 @keyframes pulse {
@@ -320,6 +342,65 @@ body {
 .load-more-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* 分頁控制 */
+.history-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+.pagination-btn {
+  padding: 0.5rem 1.25rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 80px;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+  border-color: rgba(102, 126, 234, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.pagination-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.page-info {
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* 載入中提示 */
+.loading-indicator {
+  text-align: center;
+  padding: 2rem;
+  color: #94a3b8;
+  font-size: 14px;
 }
 
 .empty-message {
