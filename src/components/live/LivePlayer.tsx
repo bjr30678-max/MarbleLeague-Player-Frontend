@@ -495,12 +495,6 @@ export const LivePlayer: React.FC = () => {
 
   return (
     <div className="live-player">
-      <div className="player-mode-indicator">
-        <span className="mode-label">模式:</span>
-        <span className="mode-value">
-          {playerMode === 'ivs' ? 'AWS IVS' : 'OvenPlayer'}
-        </span>
-      </div>
       {playerMode === 'ivs' ? renderIVSPlayer() : renderOvenPlayer()}
     </div>
   )

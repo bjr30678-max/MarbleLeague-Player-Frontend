@@ -130,10 +130,10 @@ const GameTab: React.FC = () => {
 
 const LiveTab: React.FC = () => {
   return (
-    <div className="tab-content">
+    <div className="tab-content live-tab">
+      <GameStatus />
       <LivePlayer />
       <HotBets />
-      <GameStatus />
     </div>
   )
 }
