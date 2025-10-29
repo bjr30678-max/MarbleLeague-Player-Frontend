@@ -22,7 +22,7 @@ interface GameStoreState {
   setRecentResults: (results: GameResult[]) => void
   fetchCurrentGame: () => Promise<void>
   fetchRecentResults: () => Promise<void>
-  loadResultsPage: (page: number) => Promise<void>
+  loadResultsPage: (page: number) => Promise<boolean | undefined>
   fetchHistory: (page?: number) => Promise<void>
   loadHistoryPage: (page: number) => Promise<boolean | undefined>
   resetGame: () => void
