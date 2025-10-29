@@ -65,7 +65,7 @@ const App: React.FC = () => {
           <div className="header-right">
             <div className="user-balance">
               <div className="balance-label">積分</div>
-              <div className="balance-amount">{formatCurrency(user.balance)}</div>
+              <div className="balance-amount">{formatCurrency(user?.balance ?? 0)}</div>
             </div>
           </div>
         </div>

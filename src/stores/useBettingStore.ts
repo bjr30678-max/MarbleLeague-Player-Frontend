@@ -23,8 +23,8 @@ interface BettingState {
     label: string,
     odds: number,
     betType?: string,
-    position?: number,
-    content?: string[]
+    position?: number | null,
+    content?: (string | number)[]
   ) => void
   removeBet: (id: string) => void
   clearBets: () => void
@@ -135,30 +135,76 @@ export const useBettingStore = create<BettingState>((set, get) => ({
     set({ isSubmitting: true })
 
     try {
+      // Convert bets to backend format (matching old app.js)
+      const betsData = currentBets.map((bet) => {
+        // Extract betType from either bet.type or bet.category
+        let betType = bet.type || bet.category
+
+        // Convert category names to backend format if needed
+        const categoryMap: Record<string, string> = {
+          'position': 'position',
+          'sum': 'sum_value',
+          'bigsmall': 'big_small',
+          'oddeven': 'odd_even',
+          'dragontiger': 'dragon_tiger'
+        }
+
+        if (!bet.type && bet.category) {
+          betType = categoryMap[bet.category] || bet.category
+        }
+
+        // Build betContent
+        let betContent = bet.content || []
+
+        // If content is not provided, try to extract from optionId
+        if (!betContent || betContent.length === 0) {
+          // For position bets: optionId might be "position-1-5" -> content should be ["5"]
+          // For sum bets: optionId might be "sum-15" -> content should be [15]
+          const parts = bet.optionId.split('-')
+          if (parts.length >= 2) {
+            betContent = [parts[parts.length - 1]]
+          }
+        }
+
+        // Build the bet item
+        const betItem: any = {
+          betType: betType,
+          betContent: betContent,
+          betAmount: bet.amount,
+        }
+
+        // Only include position if it's not null/undefined
+        // For sum bets, position should be omitted or null
+        if (bet.position !== undefined && bet.position !== null) {
+          betItem.position = bet.position
+        } else {
+          betItem.position = null
+        }
+
+        return betItem
+      })
+
       const response = await api.submitBets({
-        roundId: currentGame.roundId,
-        bets: currentBets.map((bet) => {
-          // For position-based bets (bigsmall, oddeven, dragontiger), use type/position/content
-          if (bet.type && bet.position && bet.content) {
-            return {
-              type: bet.type,
-              position: bet.position,
-              content: bet.content,
-              betAmount: bet.amount,
-            }
-          }
-          // For other bets, use category/optionId
-          return {
-            category: bet.category,
-            optionId: bet.optionId,
-            amount: bet.amount,
-          }
-        }),
+        bets: betsData,
       })
 
       if (response.success && response.data) {
+        // Try different possible balance field names from backend
+        const newBalance = response.data.newBalance
+                        || response.data.balance
+                        || response.data.remainingBalance
+                        || response.data.updatedBalance
+
         // Update balance
-        useUserStore.getState().updateBalance(response.data.newBalance)
+        if (newBalance !== undefined && newBalance !== null) {
+          useUserStore.getState().updateBalance(newBalance)
+        } else {
+          // Fallback: fetch balance if not returned
+          await useUserStore.getState().fetchBalance()
+        }
+
+        // Reload game history to show new bet immediately
+        useGameStore.getState().fetchHistory()
 
         // Clear bets
         get().clearBets()

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { websocket } from '@/services/websocket'
 import { ivsStatsService } from '@/services/awsIvs'
-import { api } from '@/services/api'
 import { useGameStore } from '@/stores/useGameStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useBettingStore } from '@/stores/useBettingStore'
@@ -88,27 +87,8 @@ export const useWebSocket = () => {
       // Clear hot bets for new round
       useHotBetsStore.getState().clearStats()
 
-      // Load initial bet stats for new round (after a short delay to allow bets to come in)
-      setTimeout(async () => {
-        try {
-          const response = await api.getBetStats()
-          if (response.data && response.data.totalBets > 0) {
-            const { totalBets, totalAmount, typeSummary } = response.data
-            const sortedBets = [...typeSummary]
-              .sort((a, b) => b.count - a.count)
-              .slice(0, 4)
-            const hotBets = sortedBets.map(bet => ({
-              option: bet.betTypeName,
-              count: bet.count,
-              amount: bet.amount,
-              percentage: totalBets > 0 ? Math.round((bet.count / totalBets) * 100) : 0
-            }))
-            useHotBetsStore.getState().updateBetStats({ totalBets, totalAmount, hotBets })
-          }
-        } catch (error) {
-          console.error('Failed to load initial bet stats:', error)
-        }
-      }, 2000)
+      // Note: bet-stats API removed as it doesn't exist in backend
+      // Hot bets will be updated via WebSocket 'new-bet' events instead
 
       // Show toast notification
       toast.info(`新回合開始: 第 ${data.roundId} 期`)
@@ -198,42 +178,13 @@ export const useWebSocket = () => {
     }
 
     // Track new bets for 熱門投注 feature
-    // Load betting statistics from API when a new bet is placed
+    // Note: bet-stats API doesn't exist, so we'll just log the new bet event
+    // Backend should send aggregated stats via WebSocket if needed
     const handleNewBet = async (data: any) => {
       console.log('💰 [WebSocket] New bet:', data)
 
-      try {
-        // Fetch latest betting statistics from API
-        const response = await api.getBetStats()
-
-        if (response.data) {
-          const { totalBets, totalAmount, typeSummary } = response.data
-
-          // Sort by count and take top 4
-          const sortedBets = [...typeSummary]
-            .sort((a, b) => b.count - a.count)
-            .slice(0, 4)
-
-          // Calculate percentages
-          const hotBets = sortedBets.map(bet => ({
-            option: bet.betTypeName,
-            count: bet.count,
-            amount: bet.amount,
-            percentage: totalBets > 0
-              ? Math.round((bet.count / totalBets) * 100)
-              : 0
-          }))
-
-          // Update hot bets store
-          useHotBetsStore.getState().updateBetStats({
-            totalBets,
-            totalAmount,
-            hotBets
-          })
-        }
-      } catch (error) {
-        console.error('Failed to fetch bet stats:', error)
-      }
+      // If backend sends aggregated stats in the new-bet event, update store here
+      // For now, just log the event
     }
 
     // Subscribe to events

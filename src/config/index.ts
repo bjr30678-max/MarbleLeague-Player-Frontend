@@ -116,7 +116,7 @@ export const CONSTANTS = {
   TOAST_DURATION: 3000,
   TOKEN_KEY: 'auth_token',
   USER_KEY: 'user_profile',
-  CONFIG_VERSION: '2.0.0',
+  CONFIG_VERSION: '1.0.2',
   // AWS IVS Configuration
   IVS: {
     VIEWER_TOKEN_EXPIRY: 3600, // 1 hour in seconds

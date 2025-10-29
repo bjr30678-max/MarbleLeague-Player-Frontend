@@ -39,8 +39,8 @@ export const useBetting = () => {
     label: string,
     odds: number,
     betType?: string,
-    position?: number,
-    content?: string[]
+    position?: number | null,
+    content?: (string | number)[]
   ) => {
     if (!canBet()) {
       return false
