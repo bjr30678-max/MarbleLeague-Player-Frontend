@@ -9,7 +9,7 @@ import { useUserStore } from './stores/useUserStore'
 import { useGameStore } from './stores/useGameStore'
 import { useBettingStore } from './stores/useBettingStore'
 import { formatCurrency } from './utils/validation'
-import { FaGamepad, FaTv, FaClipboardList, FaUser } from 'react-icons/fa'
+import { FaGamepad, FaTv, FaClipboardList, FaUser, FaTrophy, FaTimesCircle, FaClock } from 'react-icons/fa'
 import './App.css'
 
 type Tab = 'game' | 'live' | 'history' | 'profile'
@@ -173,36 +173,62 @@ const HistoryTab: React.FC = () => {
         <>
           <div className="history-list">
             {history.map((record, idx) => {
-              const statusClass = record.status === 'win' ? 'status-win' :
-                                  record.status === 'lose' ? 'status-lose' : ''
-              const statusText = record.status === 'win' ? '獲勝' :
-                                record.status === 'lose' ? '未中' : '等待結果'
+              const isWin = record.status === 'win'
+              const isLose = record.status === 'lose'
+              const isPending = record.status === 'pending'
 
               return (
-                <div key={record.roundId + '-' + idx} className="history-record">
-                  <div className="record-header">
-                    <div>
-                      <div style={{ fontWeight: 'bold' }}>第 {record.roundId} 回合</div>
-                      <div style={{ fontSize: '12px', color: '#666' }}>
-                        {new Date(record.createdAt).toLocaleString('zh-TW')}
-                      </div>
+                <div key={record.roundId + '-' + idx} className={`history-record ${record.status}`}>
+                  {/* 狀態指示條 */}
+                  <div className={`status-indicator ${record.status}`} />
+
+                  {/* 頂部：回合 + 狀態徽章 */}
+                  <div className="record-top">
+                    <div className="round-info">
+                      <span className="round-label">第 {record.roundId} 期</span>
+                      <span className="bet-time">
+                        {new Date(record.createdAt).toLocaleString('zh-TW', {
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
                     </div>
-                    <div className={`status-badge ${statusClass}`}>{statusText}</div>
+                    <div className={`status-badge ${record.status}`}>
+                      {isWin && <><FaTrophy /> 獲勝</>}
+                      {isLose && <><FaTimesCircle /> 未中</>}
+                      {isPending && <><FaClock /> 等待</>}
+                    </div>
                   </div>
-                  <div style={{ marginBottom: '10px' }}>
-                    <span style={{ color: '#666' }}>{record.betTypeName || record.betType}</span>
-                    {' '}
-                    <span style={{ fontWeight: 'bold' }}>
+
+                  {/* 中間：投注內容 */}
+                  <div className="bet-content">
+                    <div className="bet-type-label">{record.betTypeName || record.betType}</div>
+                    <div className="bet-details">
                       {record.betContentDisplay || JSON.stringify(record.betContent)}
-                    </span>
-                    {' '}
-                    <span style={{ color: '#FF6B6B' }}>- {record.betAmount} 積分</span>
-                  </div>
-                  {record.status === 'win' && record.winAmount && (
-                    <div className="win-amount" style={{ color: '#00D9FF', fontWeight: 'bold' }}>
-                      獲得: {formatCurrency(record.winAmount)}
                     </div>
-                  )}
+                  </div>
+
+                  {/* 底部：金額資訊 */}
+                  <div className="bet-amounts">
+                    <div className="bet-cost">
+                      <span className="amount-label">投注</span>
+                      <span className="amount-value cost">-{formatCurrency(record.betAmount)}</span>
+                    </div>
+                    {isWin && record.winAmount && (
+                      <div className="bet-win">
+                        <span className="amount-label">獲得</span>
+                        <span className="amount-value win">+{formatCurrency(record.winAmount)}</span>
+                      </div>
+                    )}
+                    {record.odds && (
+                      <div className="bet-odds">
+                        <span className="odds-label">賠率</span>
+                        <span className="odds-value">{record.odds}x</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )
             })}
