@@ -203,6 +203,9 @@ export const useBettingStore = create<BettingState>((set, get) => ({
           await useUserStore.getState().fetchBalance()
         }
 
+        // Reload game history to show new bet immediately
+        useGameStore.getState().fetchHistory()
+
         // Clear bets
         get().clearBets()
 
