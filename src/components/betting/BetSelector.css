@@ -226,9 +226,9 @@
   line-height: 1;
 }
 
-/* 自訂籌碼 */
+/* 自訂籌碼 - 顏色由 inline style 設定 */
 .chip.custom-chip {
-  --chip-color: #667eea;
+  /* 顏色由 JavaScript 動態設定 */
 }
 
 /* 新增自訂籌碼按鈕 */
@@ -241,6 +241,9 @@
 .chip.add-custom .chip-amount {
   font-size: 2.5rem;
   font-weight: 300;
+  letter-spacing: 0;
+  line-height: 0.7;
+  transform: translateY(-4px);
 }
 
 .chip.add-custom:hover {

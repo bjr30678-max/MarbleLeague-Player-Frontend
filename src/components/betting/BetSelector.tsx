@@ -38,13 +38,19 @@ export const BetSelector: React.FC = () => {
     dragontiger: <FaFire />
   }
 
-  // 籌碼顏色配置 - 深色奢華系
+  // 籌碼顏色配置 - 鮮豔賭場風格
   const chipColors: Record<number, string> = {
-    10: '#7f1d1d',    // 深酒紅
-    50: '#1e3a8a',    // 深藍
-    100: '#065f46',   // 深綠
-    500: '#581c87',   // 深紫
-    1000: '#92400e',  // 深棕金
+    10: '#dc2626',    // 紅色
+    50: '#2563eb',    // 藍色
+    100: '#059669',   // 綠色
+    500: '#7c3aed',   // 紫色
+    1000: '#ea580c',  // 橙色
+  }
+
+  // 為自訂籌碼生成顏色
+  const customChipColors = ['#0891b2', '#be185d', '#65a30d', '#ca8a04', '#e11d48']
+  const getCustomChipColor = (index: number) => {
+    return customChipColors[index % customChipColors.length]
   }
 
   const handleCustomAmountSubmit = () => {
@@ -351,10 +357,13 @@ export const BetSelector: React.FC = () => {
           ))}
 
           {/* 自訂籌碼列表 */}
-          {customChips.map((amount) => (
+          {customChips.map((amount, index) => (
             <button
               key={`custom-${amount}`}
               className={`chip custom-chip ${selectedAmount === amount ? 'active' : ''}`}
+              style={{
+                '--chip-color': getCustomChipColor(index)
+              } as React.CSSProperties}
               onClick={() => setSelectedAmount(amount)}
             >
               <div className="chip-inner">
