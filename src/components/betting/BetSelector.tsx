@@ -38,13 +38,19 @@ export const BetSelector: React.FC = () => {
     dragontiger: <FaFire />
   }
 
-  // 籌碼顏色配置 - 深色奢華系
+  // 籌碼顏色配置 - 鮮豔賭場風格
   const chipColors: Record<number, string> = {
-    10: '#7f1d1d',    // 深酒紅
-    50: '#1e3a8a',    // 深藍
-    100: '#065f46',   // 深綠
-    500: '#581c87',   // 深紫
-    1000: '#92400e',  // 深棕金
+    10: '#dc2626',    // 紅色
+    50: '#2563eb',    // 藍色
+    100: '#059669',   // 綠色
+    500: '#7c3aed',   // 紫色
+    1000: '#ea580c',  // 橙色
+  }
+
+  // 為自訂籌碼生成顏色
+  const customChipColors = ['#0891b2', '#be185d', '#65a30d', '#ca8a04', '#e11d48']
+  const getCustomChipColor = (index: number) => {
+    return customChipColors[index % customChipColors.length]
   }
 
   const handleCustomAmountSubmit = () => {
@@ -334,53 +340,68 @@ export const BetSelector: React.FC = () => {
       <div className="amount-selector">
         <h3>選擇籌碼</h3>
         <div className="chip-container">
-          {/* 預設籌碼 */}
-          {CONSTANTS.BET_AMOUNTS.map((amount) => (
-            <button
-              key={amount}
-              className={`chip ${selectedAmount === amount ? 'active' : ''}`}
-              style={{
-                '--chip-color': chipColors[amount] || '#94a3b8'
-              } as React.CSSProperties}
-              onClick={() => setSelectedAmount(amount)}
-            >
-              <div className="chip-inner">
-                <div className="chip-amount">{amount}</div>
-              </div>
-            </button>
-          ))}
-
-          {/* 自訂籌碼列表 */}
-          {customChips.map((amount) => (
-            <button
-              key={`custom-${amount}`}
-              className={`chip custom-chip ${selectedAmount === amount ? 'active' : ''}`}
-              onClick={() => setSelectedAmount(amount)}
-            >
-              <div className="chip-inner">
-                <div className="chip-amount">{amount}</div>
-              </div>
+          <div className="chip-scroll-wrapper">
+            {/* 預設籌碼 */}
+            {CONSTANTS.BET_AMOUNTS.map((amount) => (
               <button
-                className="remove-chip-btn"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  removeCustomChip(amount)
-                }}
+                key={amount}
+                className={`chip ${selectedAmount === amount ? 'active' : ''}`}
+                style={{
+                  '--chip-color': chipColors[amount] || '#94a3b8'
+                } as React.CSSProperties}
+                onClick={() => setSelectedAmount(amount)}
               >
-                ×
+                <div className="chip-inner">
+                  <div className={`chip-amount ${
+                    amount >= 100000 ? 'size-6' :
+                    amount >= 10000 ? 'size-5' :
+                    amount >= 1000 ? 'size-4' :
+                    amount >= 100 ? 'size-3' : ''
+                  }`}>{amount}</div>
+                </div>
               </button>
-            </button>
-          ))}
+            ))}
 
-          {/* 新增自訂籌碼按鈕 */}
-          <button
-            className={`chip add-custom ${showCustomAmount ? 'active' : ''}`}
-            onClick={() => setShowCustomAmount(!showCustomAmount)}
-          >
-            <div className="chip-inner">
-              <div className="chip-label">+</div>
-            </div>
-          </button>
+            {/* 自訂籌碼列表 */}
+            {customChips.map((amount, index) => (
+              <button
+                key={`custom-${amount}`}
+                className={`chip custom-chip ${selectedAmount === amount ? 'active' : ''}`}
+                style={{
+                  '--chip-color': getCustomChipColor(index)
+                } as React.CSSProperties}
+                onClick={() => setSelectedAmount(amount)}
+              >
+                <div className="chip-inner">
+                  <div className={`chip-amount ${
+                    amount >= 100000 ? 'size-6' :
+                    amount >= 10000 ? 'size-5' :
+                    amount >= 1000 ? 'size-4' :
+                    amount >= 100 ? 'size-3' : ''
+                  }`}>{amount}</div>
+                </div>
+                <button
+                  className="remove-chip-btn"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    removeCustomChip(amount)
+                  }}
+                >
+                  ×
+                </button>
+              </button>
+            ))}
+
+            {/* 新增自訂籌碼按鈕 */}
+            <button
+              className={`chip add-custom ${showCustomAmount ? 'active' : ''}`}
+              onClick={() => setShowCustomAmount(!showCustomAmount)}
+            >
+              <div className="chip-inner">
+                <div className="chip-amount">+</div>
+              </div>
+            </button>
+          </div>
         </div>
 
         {/* 新增自訂金額輸入 */}

@@ -9,7 +9,7 @@ import { useUserStore } from './stores/useUserStore'
 import { useGameStore } from './stores/useGameStore'
 import { useBettingStore } from './stores/useBettingStore'
 import { formatCurrency } from './utils/validation'
-import { FaGamepad, FaTv, FaClipboardList, FaUser } from 'react-icons/fa'
+import { FaGamepad, FaTv, FaClipboardList, FaUser, FaTrophy, FaTimesCircle, FaClock } from 'react-icons/fa'
 import './App.css'
 
 type Tab = 'game' | 'live' | 'history' | 'profile'
@@ -130,19 +130,24 @@ const GameTab: React.FC = () => {
 
 const LiveTab: React.FC = () => {
   return (
-    <div className="tab-content">
+    <div className="tab-content live-tab">
+      <GameStatus />
       <LivePlayer />
       <HotBets />
-      <GameStatus />
     </div>
   )
 }
 
 const HistoryTab: React.FC = () => {
-  const { history, loadHistoryPage, currentHistoryPage, isLoadingHistory } = useGameStore()
-  const [hasNextPage, setHasNextPage] = useState(true)
-  const [maxPageSeen, setMaxPageSeen] = useState(1)
+  const history = useGameStore((state) => state.history)
+  const loadHistoryPage = useGameStore((state) => state.loadHistoryPage)
+  const currentHistoryPage = useGameStore((state) => state.currentHistoryPage)
+  const historyTotalPages = useGameStore((state) => state.historyTotalPages)
+  const isLoadingHistory = useGameStore((state) => state.isLoadingHistory)
   const historyFetchedRef = useRef(false)
+
+  // 根據當前頁和總頁數計算是否有下一頁
+  const hasNextPage = currentHistoryPage < historyTotalPages
 
   useEffect(() => {
     if (history.length === 0 && !historyFetchedRef.current) {
@@ -152,30 +157,14 @@ const HistoryTab: React.FC = () => {
   }, [])
 
   const handlePageChange = async (page: number) => {
-    if (page < 1) return
+    if (page < 1 || (historyTotalPages > 0 && page > historyTotalPages)) return
 
     try {
-      const hasNext = await loadHistoryPage(page)
-      const hasNextValue = hasNext ?? false
-      setHasNextPage(hasNextValue)
-
-      // 更新已知的最大頁數
-      if (page > maxPageSeen) {
-        setMaxPageSeen(page)
-      }
-
-      // 如果沒有下一頁,則總頁數就是當前頁數
-      if (!hasNextValue && page >= maxPageSeen) {
-        setMaxPageSeen(page)
-      }
+      await loadHistoryPage(page)
     } catch (error) {
       console.error('Failed to change page:', error)
-      setHasNextPage(false)
     }
   }
-
-  // 計算總頁數顯示: 如果有下一頁,顯示當前頁+1, 否則顯示確切頁數
-  const totalPagesDisplay = hasNextPage ? currentHistoryPage + 1 : maxPageSeen
 
   return (
     <div className="tab-content">
@@ -184,36 +173,62 @@ const HistoryTab: React.FC = () => {
         <>
           <div className="history-list">
             {history.map((record, idx) => {
-              const statusClass = record.status === 'win' ? 'status-win' :
-                                  record.status === 'lose' ? 'status-lose' : ''
-              const statusText = record.status === 'win' ? '獲勝' :
-                                record.status === 'lose' ? '未中' : '等待結果'
+              const isWin = record.status === 'win'
+              const isLose = record.status === 'lose'
+              const isPending = record.status === 'pending'
 
               return (
-                <div key={record.roundId + '-' + idx} className="history-record">
-                  <div className="record-header">
-                    <div>
-                      <div style={{ fontWeight: 'bold' }}>第 {record.roundId} 回合</div>
-                      <div style={{ fontSize: '12px', color: '#666' }}>
-                        {new Date(record.createdAt).toLocaleString('zh-TW')}
-                      </div>
+                <div key={record.roundId + '-' + idx} className={`history-record ${record.status}`}>
+                  {/* 狀態指示條 */}
+                  <div className={`status-indicator ${record.status}`} />
+
+                  {/* 頂部：回合 + 狀態徽章 */}
+                  <div className="record-top">
+                    <div className="round-info">
+                      <span className="round-label">第 {record.roundId} 期</span>
+                      <span className="bet-time">
+                        {new Date(record.createdAt).toLocaleString('zh-TW', {
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
                     </div>
-                    <div className={`status-badge ${statusClass}`}>{statusText}</div>
+                    <div className={`status-badge ${record.status}`}>
+                      {isWin && <><FaTrophy /> 獲勝</>}
+                      {isLose && <><FaTimesCircle /> 未中</>}
+                      {isPending && <><FaClock /> 等待</>}
+                    </div>
                   </div>
-                  <div style={{ marginBottom: '10px' }}>
-                    <span style={{ color: '#666' }}>{record.betTypeName || record.betType}</span>
-                    {' '}
-                    <span style={{ fontWeight: 'bold' }}>
+
+                  {/* 中間：投注內容 */}
+                  <div className="bet-content">
+                    <div className="bet-type-label">{record.betTypeName || record.betType}</div>
+                    <div className="bet-details">
                       {record.betContentDisplay || JSON.stringify(record.betContent)}
-                    </span>
-                    {' '}
-                    <span style={{ color: '#FF6B6B' }}>- {record.betAmount} 積分</span>
-                  </div>
-                  {record.status === 'win' && record.winAmount && (
-                    <div className="win-amount" style={{ color: '#00D9FF', fontWeight: 'bold' }}>
-                      獲得: {formatCurrency(record.winAmount)}
                     </div>
-                  )}
+                  </div>
+
+                  {/* 底部：金額資訊 */}
+                  <div className="bet-amounts">
+                    <div className="bet-cost">
+                      <span className="amount-label">投注</span>
+                      <span className="amount-value cost">-{formatCurrency(record.betAmount)}</span>
+                    </div>
+                    {isWin && record.winAmount && (
+                      <div className="bet-win">
+                        <span className="amount-label">獲得</span>
+                        <span className="amount-value win">+{formatCurrency(record.winAmount)}</span>
+                      </div>
+                    )}
+                    {record.odds && (
+                      <div className="bet-odds">
+                        <span className="odds-label">賠率</span>
+                        <span className="odds-value">{record.odds}x</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )
             })}
@@ -230,7 +245,7 @@ const HistoryTab: React.FC = () => {
                 上一頁
               </button>
               <span className="page-info">
-                {currentHistoryPage} / {totalPagesDisplay}
+                {currentHistoryPage} / {historyTotalPages}
               </span>
               <button
                 className="pagination-btn"

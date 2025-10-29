@@ -3,6 +3,8 @@
   flex-direction: column;
   gap: 1.5rem;
   overflow: visible; /* 確保光暈效果不被裁切 */
+  position: relative;
+  z-index: 1; /* 創建堆疊上下文 */
 }
 
 /* Category Selection */
@@ -54,9 +56,10 @@
   font-weight: 600;
 }
 
-/* Amount Selection - Chip Style */
 .amount-selector {
-  overflow: visible; /* 確保光暈不被裁切 */
+  overflow: visible !important;
+  position: relative;
+  z-index: 100;
 }
 
 .amount-selector h3 {
@@ -66,140 +69,165 @@
 }
 
 .chip-container {
-  display: flex;
-  flex-wrap: nowrap; /* 固定在一列不換行 */
-  gap: 1rem;
-  padding: 1.5rem 0.5rem; /* 增加上下 padding 避免光暈被裁切 */
-  overflow-x: auto; /* 允許橫向滾動 */
-  overflow-y: visible; /* 允許光暈向外發散 */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(102, 126, 234, 0.5) rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 100;
+  overflow: visible;
+  padding: 0;
+  margin: 0;
 }
 
-/* 自定義滾動條樣式 */
-.chip-container::-webkit-scrollbar {
+.chip-scroll-wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  padding: 1.5rem 0.5rem;
+  margin: -0.8rem 0;
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(102, 126, 234, 0.5) rgba(255, 255, 255, 0.1);
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.chip-scroll-wrapper::-webkit-scrollbar {
   height: 8px;
 }
 
-.chip-container::-webkit-scrollbar-track {
+.chip-scroll-wrapper::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
 }
 
-.chip-container::-webkit-scrollbar-thumb {
+.chip-scroll-wrapper::-webkit-scrollbar-thumb {
   background: rgba(102, 126, 234, 0.5);
   border-radius: 4px;
 }
 
-.chip-container::-webkit-scrollbar-thumb:hover {
+.chip-scroll-wrapper::-webkit-scrollbar-thumb:hover {
   background: rgba(102, 126, 234, 0.7);
 }
 
-/* 籌碼樣式 - 奢華金屬質感（深色系） */
+/* 籌碼樣式 - 真實賭場籌碼風格 */
 .chip {
   width: 80px;
   height: 80px;
-  min-width: 80px; /* 防止籌碼被壓縮 */
+  min-width: 80px;
   min-height: 80px;
   border-radius: 50%;
   background:
-    /* 金屬反光層 */
-    linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%, rgba(0, 0, 0, 0.2) 100%),
-    /* 外圈扇形裝飾 */
+    /* 頂部高光 */
+    radial-gradient(ellipse 60% 30% at 50% 20%, rgba(255, 255, 255, 0.4), transparent),
+    /* 外圈扇形裝飾（賭場經典圖案） - 加寬白色區塊 */
     conic-gradient(
       from 0deg,
-      var(--chip-color, #94a3b8) 0deg 42deg,
-      color-mix(in srgb, var(--chip-color, #94a3b8) 70%, white) 42deg 45deg,
-      var(--chip-color, #94a3b8) 45deg 87deg,
-      color-mix(in srgb, var(--chip-color, #94a3b8) 70%, white) 87deg 90deg,
-      var(--chip-color, #94a3b8) 90deg 132deg,
-      color-mix(in srgb, var(--chip-color, #94a3b8) 70%, white) 132deg 135deg,
-      var(--chip-color, #94a3b8) 135deg 177deg,
-      color-mix(in srgb, var(--chip-color, #94a3b8) 70%, white) 177deg 180deg,
-      var(--chip-color, #94a3b8) 180deg 222deg,
-      color-mix(in srgb, var(--chip-color, #94a3b8) 70%, white) 222deg 225deg,
-      var(--chip-color, #94a3b8) 225deg 267deg,
-      color-mix(in srgb, var(--chip-color, #94a3b8) 70%, white) 267deg 270deg,
-      var(--chip-color, #94a3b8) 270deg 312deg,
-      color-mix(in srgb, var(--chip-color, #94a3b8) 70%, white) 312deg 315deg,
-      var(--chip-color, #94a3b8) 315deg 357deg,
-      color-mix(in srgb, var(--chip-color, #94a3b8) 70%, white) 357deg 360deg
+      var(--chip-color, #94a3b8) 0deg 35deg,
+      #ffffff 35deg 50deg,
+      var(--chip-color, #94a3b8) 50deg 80deg,
+      #ffffff 80deg 95deg,
+      var(--chip-color, #94a3b8) 95deg 125deg,
+      #ffffff 125deg 140deg,
+      var(--chip-color, #94a3b8) 140deg 170deg,
+      #ffffff 170deg 185deg,
+      var(--chip-color, #94a3b8) 185deg 215deg,
+      #ffffff 215deg 230deg,
+      var(--chip-color, #94a3b8) 230deg 260deg,
+      #ffffff 260deg 275deg,
+      var(--chip-color, #94a3b8) 275deg 305deg,
+      #ffffff 305deg 320deg,
+      var(--chip-color, #94a3b8) 320deg 350deg,
+      #ffffff 350deg 360deg
     );
-  border: 3px solid color-mix(in srgb, var(--chip-color, #94a3b8) 60%, rgba(255, 255, 255, 0.4));
+  border: 4px solid var(--chip-color, #94a3b8);
   cursor: pointer;
   position: relative;
+  z-index: 1;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow:
-    0 6px 18px rgba(0, 0, 0, 0.6),
-    0 2px 6px rgba(0, 0, 0, 0.4),
-    inset 0 2px 4px rgba(255, 255, 255, 0.2),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.4);
+    0 8px 20px rgba(0, 0, 0, 0.7),
+    0 3px 8px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+
+  transform: translateZ(0);
+  will-change: transform;
 }
 
-/* 中心實心圓（顯示金額的區域） - 更柔和的灰白底 */
+/* 中心圓環（顯示金額的區域） - 白色底 */
 .chip::before {
   content: '';
   position: absolute;
   inset: 12px;
   border-radius: 50%;
   background:
+    /* 細微的漸變增加立體感 */
     radial-gradient(
-      circle at 35% 35%,
-      #d8d8d8 0%,
-      #c8c8c8 40%,
-      #b8b8b8 100%
+      circle at 40% 40%,
+      #ffffff 0%,
+      #f8f8f8 50%,
+      #eeeeee 100%
     );
-  border: 1.5px solid rgba(0, 0, 0, 0.25);
+  border: 2.5px solid var(--chip-color, #94a3b8);
   box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    inset 0 1px 2px rgba(255, 255, 255, 0.5),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.2);
+    0 2px 6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1);
   pointer-events: none;
 }
 
-/* 移除波浪裝飾 */
+/* 外圈裝飾環 */
 .chip::after {
-  display: none;
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .chip:hover {
-  transform: translateY(-4px) scale(1.04);
-  border-color: color-mix(in srgb, var(--chip-color, #94a3b8) 50%, rgba(255, 255, 255, 0.6));
+  transform: translateY(-4px) scale(1.05);
+  z-index: 10;
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.65),
-    0 4px 12px rgba(0, 0, 0, 0.5),
-    0 0 6px color-mix(in srgb, var(--chip-color, #94a3b8) 70%, white),
-    inset 0 2px 4px rgba(255, 255, 255, 0.3),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.4);
+    0 12px 28px rgba(0, 0, 0, 0.75),
+    0 6px 14px rgba(0, 0, 0, 0.55),
+    0 0 8px var(--chip-color, #94a3b8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6);
 }
 
 .chip:active {
   transform: translateY(-2px) scale(1.02);
+  z-index: 10;
   box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.5),
-    inset 0 2px 4px rgba(255, 255, 255, 0.25),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.4);
+    0 6px 14px rgba(0, 0, 0, 0.6),
+    0 3px 7px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
 }
 
 .chip.active {
-  transform: translateY(-5px) scale(1.06);
-  border-color: color-mix(in srgb, var(--chip-color, #94a3b8) 60%, rgba(255, 255, 255, 0.7));
+  transform: translateY(-5px) scale(1.08) rotate(5deg);
+  z-index: 20;
   box-shadow:
-    0 10px 32px rgba(0, 0, 0, 0.7),
-    0 5px 16px rgba(0, 0, 0, 0.5),
-    0 0 8px color-mix(in srgb, var(--chip-color, #94a3b8) 70%, white),
-    0 0 14px color-mix(in srgb, var(--chip-color, #94a3b8) 50%, white),
-    inset 0 2px 4px rgba(255, 255, 255, 0.4),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.4);
-  animation: metalShine 2s ease-in-out infinite;
+    0 16px 36px rgba(0, 0, 0, 0.8),
+    0 8px 18px rgba(0, 0, 0, 0.6),
+    0 0 10px var(--chip-color, #94a3b8),
+    0 0 18px var(--chip-color, #94a3b8),
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.7);
+  animation: chipPulse 1.5s ease-in-out infinite;
 }
 
-@keyframes metalShine {
+@keyframes chipPulse {
   0%, 100% {
-    filter: brightness(1);
+    filter: brightness(1) saturate(1);
   }
   50% {
-    filter: brightness(1.15);
+    filter: brightness(1.2) saturate(1.3);
   }
 }
 
@@ -215,36 +243,69 @@
 
 .chip-amount,
 .chip-label {
-  font-size: 1.375rem;
-  font-weight: 800;
-  color: #1a1a1a;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--chip-color, #1a1a1a);
   text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.5),
-    0 1px 2px rgba(0, 0, 0, 0.1);
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.2);
   letter-spacing: -0.5px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: 'Arial Black', 'Impact', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1;
+  -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.3);
 }
 
-/* 自訂籌碼 */
+/* 3位數 (100-999) */
+.chip-amount.size-3 {
+  font-size: 1.25rem;
+  letter-spacing: -0.8px;
+}
+
+/* 4位數 (1000-9999) */
+.chip-amount.size-4 {
+  font-size: 1rem;
+  letter-spacing: -1px;
+  font-weight: 800;
+}
+
+/* 5位數 (10000-99999) */
+.chip-amount.size-5 {
+  font-size: 0.85rem;
+  letter-spacing: -1.2px;
+  font-weight: 800;
+}
+
+/* 6位數 (100000+) */
+.chip-amount.size-6 {
+  font-size: 0.7rem;
+  letter-spacing: -1.5px;
+  font-weight: 800;
+}
+
+/* 自訂籌碼 - 顏色由 inline style 設定 */
 .chip.custom-chip {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* 顏色由 JavaScript 動態設定 */
 }
 
 /* 新增自訂籌碼按鈕 */
 .chip.add-custom {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
-  border: 2px dashed rgba(102, 126, 234, 0.5);
+  --chip-color: #94a3b8;
+  border-style: dashed;
+  opacity: 0.7;
 }
 
-.chip.add-custom .chip-label {
-  font-size: 2rem;
+.chip.add-custom .chip-amount {
+  font-size: 2.5rem;
   font-weight: 300;
+  letter-spacing: 0;
+  line-height: 0.7;
+  transform: translateY(-4px);
 }
 
 .chip.add-custom:hover {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.5) 0%, rgba(118, 75, 162, 0.5) 100%);
-  border-color: rgba(102, 126, 234, 0.8);
+  opacity: 1;
+  border-style: dashed;
 }
 
 /* 刪除籌碼按鈕 */
@@ -355,11 +416,36 @@
   transform: translateY(-1px);
 }
 
-/* Betting Options */
+.betting-options {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 16px;
+  padding: 1.25rem;
+  padding-top: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+}
+
+.betting-options::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px 16px 0 0;
+}
+
 .betting-options h3 {
   font-size: 1rem;
   margin-bottom: 0.75rem;
+  margin-top: 0.5rem;
   color: #e2e8f0;
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }
 
 .options-grid {
@@ -375,12 +461,13 @@
   justify-content: center;
   gap: 0.25rem;
   padding: 1rem 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
   color: #fff;
   cursor: pointer;
   transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* 當按鈕內有圖標時的樣式 */
@@ -393,9 +480,10 @@
 }
 
 .option-btn:hover:not(:disabled) {
-  background: rgba(59, 130, 246, 0.2);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.2) 100%);
   border-color: #3b82f6;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
 }
 
 .option-btn:disabled {
@@ -406,11 +494,14 @@
 .option-label {
   font-size: 1rem;
   font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .option-odds {
   font-size: 0.75rem;
   color: #fbbf24;
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
 }
 
 .no-options {
@@ -436,7 +527,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  overflow: hidden; /* 防止滾動條出現 */
+  overflow: visible;
 }
 
 .position-header,

@@ -1,13 +1,29 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useUserStore } from '@/stores/useUserStore'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/common'
 import { formatCurrency } from '@/utils/validation'
+import { toast } from '@/stores/useToastStore'
+import { FaCopy, FaCheck } from 'react-icons/fa'
 import './UserProfile.css'
 
 export const UserProfile: React.FC = () => {
   const { user, bettingBan } = useUserStore()
   const { logout } = useAuth()
+  const [copied, setCopied] = useState(false)
+
+  const handleCopyUserId = async () => {
+    if (!user?.userId) return
+
+    try {
+      await navigator.clipboard.writeText(user.userId)
+      setCopied(true)
+      toast.success('用戶 ID 已複製')
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      toast.error('複製失敗')
+    }
+  }
 
   if (!user) {
     return (
@@ -32,10 +48,15 @@ export const UserProfile: React.FC = () => {
         <div className="info-list">
           <div className="info-row">
             <span className="info-label">用戶 ID</span>
-            <span className="info-value">{user.userId}</span>
+            <div className="info-value-with-copy">
+              <span className="info-value user-id">{user.userId}</span>
+              <button className="copy-btn" onClick={handleCopyUserId} title="複製用戶 ID">
+                {copied ? <FaCheck className="icon-success" /> : <FaCopy />}
+              </button>
+            </div>
           </div>
           <div className="info-row highlight">
-            <span className="info-label">當前餘額</span>
+            <span className="info-label">當前積分</span>
             <span className="info-value balance">{formatCurrency(user?.balance ?? 0)}</span>
           </div>
         </div>
@@ -63,24 +84,6 @@ export const UserProfile: React.FC = () => {
         <Button variant="danger" fullWidth onClick={logout}>
           登出
         </Button>
-      </div>
-
-      <div className="app-info">
-        <h3>應用程式資訊</h3>
-        <div className="info-list">
-          <div className="info-row">
-            <span className="info-label">版本</span>
-            <span className="info-value">2.0.0</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">框架</span>
-            <span className="info-value">React + TypeScript</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">建構工具</span>
-            <span className="info-value">Vite</span>
-          </div>
-        </div>
       </div>
     </div>
   )

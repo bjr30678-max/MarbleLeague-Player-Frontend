@@ -3,33 +3,26 @@ import { useGameStore } from '@/stores/useGameStore'
 import './RecentResults.css'
 
 export const RecentResults: React.FC = () => {
-  const { recentResults, loadResultsPage, currentResultsPage, isLoadingResults } = useGameStore()
+  const recentResults = useGameStore((state) => state.recentResults)
+  const allRecentResults = useGameStore((state) => state.allRecentResults)
+  const loadResultsPage = useGameStore((state) => state.loadResultsPage)
+  const currentResultsPage = useGameStore((state) => state.currentResultsPage)
+  const isLoadingResults = useGameStore((state) => state.isLoadingResults)
   const [showHistoryModal, setShowHistoryModal] = useState(false)
-  const [hasNextPage, setHasNextPage] = useState(true)
-  const [maxPageSeen, setMaxPageSeen] = useState(1)
+
+  // 使用實際資料計算總頁數(與 loadResultsPage 邏輯一致)
+  const pageSize = 10
+  const totalPages = Math.max(1, Math.ceil(allRecentResults.length / pageSize))
+  const hasNextPage = currentResultsPage < totalPages
 
   // 處理分頁切換
   const handlePageChange = async (page: number) => {
-    if (page < 1) return
+    if (page < 1 || page > totalPages) return
 
     try {
-      // loadResultsPage 會返回是否有下一頁
-      const hasNext = await loadResultsPage(page)
-      const hasNextValue = hasNext ?? false
-      setHasNextPage(hasNextValue)
-
-      // 更新已知的最大頁數
-      if (page > maxPageSeen) {
-        setMaxPageSeen(page)
-      }
-
-      // 如果沒有下一頁,則總頁數就是當前頁數
-      if (!hasNextValue && page >= maxPageSeen) {
-        setMaxPageSeen(page)
-      }
+      await loadResultsPage(page)
     } catch (error) {
       console.error('Failed to change page:', error)
-      setHasNextPage(false)
     }
   }
 
@@ -39,9 +32,6 @@ export const RecentResults: React.FC = () => {
       handlePageChange(currentResultsPage)
     }
   }, [showHistoryModal])
-
-  // 計算總頁數顯示: 如果有下一頁,顯示當前頁+1, 否則顯示確切頁數
-  const totalPagesDisplay = hasNextPage ? currentResultsPage + 1 : maxPageSeen
 
   // 取最新一期作為上期結果
   const lastResult = recentResults[0]
@@ -137,7 +127,7 @@ export const RecentResults: React.FC = () => {
                     上一頁
                   </button>
                   <span className="page-info">
-                    {currentResultsPage} / {totalPagesDisplay}
+                    {currentResultsPage} / {totalPages}
                   </span>
                   <button
                     className="pagination-btn"
