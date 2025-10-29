@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Loading, ToastContainer } from './components/common'
 import { BetSelector, BetList } from './components/betting'
-import { GameStatus, RecentResults } from './components/game'
+import { GameStatus, RecentResults, HotBets } from './components/game'
 import { LivePlayer } from './components/live'
 import { UserProfile } from './components/profile'
 import { useAuth, useWebSocket } from './hooks'
@@ -132,30 +132,50 @@ const LiveTab: React.FC = () => {
   return (
     <div className="tab-content">
       <LivePlayer />
-      <div className="live-game-info">
-        <GameStatus />
-        <RecentResults />
-      </div>
+      <HotBets />
+      <GameStatus />
     </div>
   )
 }
 
 const HistoryTab: React.FC = () => {
-  const { history, fetchHistory, historyPage, historyTotalPages, isLoading } = useGameStore()
+  const { history, loadHistoryPage, currentHistoryPage, isLoadingHistory } = useGameStore()
+  const [hasNextPage, setHasNextPage] = useState(true)
+  const [maxPageSeen, setMaxPageSeen] = useState(1)
   const historyFetchedRef = useRef(false)
 
   useEffect(() => {
     if (history.length === 0 && !historyFetchedRef.current) {
       historyFetchedRef.current = true
-      fetchHistory(1)
+      handlePageChange(1)
     }
   }, [])
 
-  const handleLoadMore = () => {
-    if (historyPage < historyTotalPages && !isLoading) {
-      fetchHistory(historyPage + 1)
+  const handlePageChange = async (page: number) => {
+    if (page < 1) return
+
+    try {
+      const hasNext = await loadHistoryPage(page)
+      const hasNextValue = hasNext ?? false
+      setHasNextPage(hasNextValue)
+
+      // 更新已知的最大頁數
+      if (page > maxPageSeen) {
+        setMaxPageSeen(page)
+      }
+
+      // 如果沒有下一頁,則總頁數就是當前頁數
+      if (!hasNextValue && page >= maxPageSeen) {
+        setMaxPageSeen(page)
+      }
+    } catch (error) {
+      console.error('Failed to change page:', error)
+      setHasNextPage(false)
     }
   }
+
+  // 計算總頁數顯示: 如果有下一頁,顯示當前頁+1, 否則顯示確切頁數
+  const totalPagesDisplay = hasNextPage ? currentHistoryPage + 1 : maxPageSeen
 
   return (
     <div className="tab-content">
@@ -198,14 +218,35 @@ const HistoryTab: React.FC = () => {
               )
             })}
           </div>
-          {historyPage < historyTotalPages && (
-            <button
-              className="load-more-btn"
-              onClick={handleLoadMore}
-              disabled={isLoading}
-            >
-              {isLoading ? '載入中...' : '載入更多'}
-            </button>
+
+          {/* 分頁控制 */}
+          {!isLoadingHistory && history.length > 0 && (
+            <div className="history-pagination">
+              <button
+                className="pagination-btn"
+                onClick={() => handlePageChange(currentHistoryPage - 1)}
+                disabled={currentHistoryPage === 1}
+              >
+                上一頁
+              </button>
+              <span className="page-info">
+                {currentHistoryPage} / {totalPagesDisplay}
+              </span>
+              <button
+                className="pagination-btn"
+                onClick={() => handlePageChange(currentHistoryPage + 1)}
+                disabled={!hasNextPage}
+              >
+                下一頁
+              </button>
+            </div>
+          )}
+
+          {/* 載入中提示 */}
+          {isLoadingHistory && (
+            <div className="loading-indicator">
+              <div>載入中...</div>
+            </div>
           )}
         </>
       ) : (

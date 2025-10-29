@@ -412,19 +412,21 @@ export const LivePlayer: React.FC = () => {
 
   const renderIVSPlayer = () => (
     <>
-      <div ref={playerRef} className="player-element ivs-player">
-        {!isPlaying && (
-          <div className="player-placeholder">
-            <div className="placeholder-icon">📺</div>
-            <p>點擊下方按鈕開始觀看直播</p>
-          </div>
-        )}
+      <div className="player-container">
+        <div ref={playerRef} className="player-element ivs-player">
+          {!isPlaying && (
+            <div className="player-placeholder">
+              <div className="placeholder-icon">📺</div>
+              <p>點擊下方按鈕開始觀看直播</p>
+            </div>
+          )}
+        </div>
       </div>
       <div className="player-controls">
-        <Button variant="primary" onClick={handlePlay} disabled={isPlaying}>
+        <Button variant="primary" onClick={handlePlay} disabled={isPlaying} size="medium" fullWidth>
           {isPlaying ? '播放中' : '開始觀看'}
         </Button>
-        <Button variant="secondary" onClick={handleRefresh} disabled={!isPlaying}>
+        <Button variant="secondary" onClick={handleRefresh} disabled={!isPlaying} size="medium" fullWidth>
           重新載入
         </Button>
       </div>
@@ -450,12 +452,14 @@ export const LivePlayer: React.FC = () => {
     <>
       {streamConfig.host && streamConfig.stream ? (
         <>
-          <div ref={playerRef} className="player-element" />
+          <div className="player-container">
+            <div ref={playerRef} className="player-element" />
+          </div>
           <div className="player-controls">
-            <Button variant="primary" onClick={handlePlay} disabled={isPlaying}>
+            <Button variant="primary" onClick={handlePlay} disabled={isPlaying} size="medium" fullWidth>
               {isPlaying ? '播放中' : '開始播放'}
             </Button>
-            <Button variant="secondary" onClick={handleRefresh}>
+            <Button variant="secondary" onClick={handleRefresh} size="medium" fullWidth>
               重新載入
             </Button>
           </div>
@@ -478,10 +482,12 @@ export const LivePlayer: React.FC = () => {
           </div>
         </>
       ) : (
-        <div className="no-stream">
-          <div className="no-stream-icon">📺</div>
-          <p>暫無直播串流</p>
-          <p className="hint">請在 URL 中提供直播參數</p>
+        <div className="player-container">
+          <div className="no-stream">
+            <div className="no-stream-icon">📺</div>
+            <p>暫無直播串流</p>
+            <p className="hint">請在 URL 中提供直播參數</p>
+          </div>
         </div>
       )}
     </>
@@ -495,9 +501,7 @@ export const LivePlayer: React.FC = () => {
           {playerMode === 'ivs' ? 'AWS IVS' : 'OvenPlayer'}
         </span>
       </div>
-      <div className="player-container">
-        {playerMode === 'ivs' ? renderIVSPlayer() : renderOvenPlayer()}
-      </div>
+      {playerMode === 'ivs' ? renderIVSPlayer() : renderOvenPlayer()}
     </div>
   )
 }
