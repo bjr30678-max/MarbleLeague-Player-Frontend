@@ -14,6 +14,7 @@
   position: relative;
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 1;
 }
 
 .countdown::before {
