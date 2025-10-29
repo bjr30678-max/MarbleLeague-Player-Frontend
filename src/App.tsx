@@ -139,10 +139,15 @@ const LiveTab: React.FC = () => {
 }
 
 const HistoryTab: React.FC = () => {
-  const { history, loadHistoryPage, currentHistoryPage, isLoadingHistory } = useGameStore()
-  const [hasNextPage, setHasNextPage] = useState(true)
-  const [maxPageSeen, setMaxPageSeen] = useState(1)
+  const history = useGameStore((state) => state.history)
+  const loadHistoryPage = useGameStore((state) => state.loadHistoryPage)
+  const currentHistoryPage = useGameStore((state) => state.currentHistoryPage)
+  const historyTotalPages = useGameStore((state) => state.historyTotalPages)
+  const isLoadingHistory = useGameStore((state) => state.isLoadingHistory)
   const historyFetchedRef = useRef(false)
+
+  // 根據當前頁和總頁數計算是否有下一頁
+  const hasNextPage = currentHistoryPage < historyTotalPages
 
   useEffect(() => {
     if (history.length === 0 && !historyFetchedRef.current) {
@@ -152,30 +157,14 @@ const HistoryTab: React.FC = () => {
   }, [])
 
   const handlePageChange = async (page: number) => {
-    if (page < 1) return
+    if (page < 1 || (historyTotalPages > 0 && page > historyTotalPages)) return
 
     try {
-      const hasNext = await loadHistoryPage(page)
-      const hasNextValue = hasNext ?? false
-      setHasNextPage(hasNextValue)
-
-      // 更新已知的最大頁數
-      if (page > maxPageSeen) {
-        setMaxPageSeen(page)
-      }
-
-      // 如果沒有下一頁,則總頁數就是當前頁數
-      if (!hasNextValue && page >= maxPageSeen) {
-        setMaxPageSeen(page)
-      }
+      await loadHistoryPage(page)
     } catch (error) {
       console.error('Failed to change page:', error)
-      setHasNextPage(false)
     }
   }
-
-  // 計算總頁數顯示: 如果有下一頁,顯示當前頁+1, 否則顯示確切頁數
-  const totalPagesDisplay = hasNextPage ? currentHistoryPage + 1 : maxPageSeen
 
   return (
     <div className="tab-content">
@@ -230,7 +219,7 @@ const HistoryTab: React.FC = () => {
                 上一頁
               </button>
               <span className="page-info">
-                {currentHistoryPage} / {totalPagesDisplay}
+                {currentHistoryPage} / {historyTotalPages}
               </span>
               <button
                 className="pagination-btn"

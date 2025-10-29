@@ -3,7 +3,10 @@ import { useGameStore } from '@/stores/useGameStore'
 import './RecentResults.css'
 
 export const RecentResults: React.FC = () => {
-  const { recentResults, loadResultsPage, currentResultsPage, isLoadingResults } = useGameStore()
+  const recentResults = useGameStore((state) => state.recentResults)
+  const loadResultsPage = useGameStore((state) => state.loadResultsPage)
+  const currentResultsPage = useGameStore((state) => state.currentResultsPage)
+  const isLoadingResults = useGameStore((state) => state.isLoadingResults)
   const [showHistoryModal, setShowHistoryModal] = useState(false)
   const [hasNextPage, setHasNextPage] = useState(true)
   const [maxPageSeen, setMaxPageSeen] = useState(1)
