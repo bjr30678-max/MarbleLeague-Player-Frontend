@@ -215,6 +215,7 @@ export interface AppConfig {
   apiUrl: string
   liveApiUrl: string
   env: 'development' | 'production'
+  awsIvsApiKey: string
 }
 
 // Stream Types
