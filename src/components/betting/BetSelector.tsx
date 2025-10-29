@@ -378,7 +378,7 @@ export const BetSelector: React.FC = () => {
             onClick={() => setShowCustomAmount(!showCustomAmount)}
           >
             <div className="chip-inner">
-              <div className="chip-label">+</div>
+              <div className="chip-amount">+</div>
             </div>
           </button>
         </div>

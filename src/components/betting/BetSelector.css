@@ -228,23 +228,24 @@
 
 /* 自訂籌碼 */
 .chip.custom-chip {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --chip-color: #667eea;
 }
 
 /* 新增自訂籌碼按鈕 */
 .chip.add-custom {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
-  border: 2px dashed rgba(102, 126, 234, 0.5);
+  --chip-color: #94a3b8;
+  border-style: dashed;
+  opacity: 0.7;
 }
 
-.chip.add-custom .chip-label {
-  font-size: 2rem;
+.chip.add-custom .chip-amount {
+  font-size: 2.5rem;
   font-weight: 300;
 }
 
 .chip.add-custom:hover {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.5) 0%, rgba(118, 75, 162, 0.5) 100%);
-  border-color: rgba(102, 126, 234, 0.8);
+  opacity: 1;
+  border-style: dashed;
 }
 
 /* 刪除籌碼按鈕 */
@@ -356,10 +357,34 @@
 }
 
 /* Betting Options */
+.betting-options {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 16px;
+  padding: 1.25rem;
+  padding-top: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.betting-options::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px 16px 0 0;
+}
+
 .betting-options h3 {
   font-size: 1rem;
   margin-bottom: 0.75rem;
+  margin-top: 0.5rem;
   color: #e2e8f0;
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }
 
 .options-grid {
@@ -375,12 +400,13 @@
   justify-content: center;
   gap: 0.25rem;
   padding: 1rem 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
   color: #fff;
   cursor: pointer;
   transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* 當按鈕內有圖標時的樣式 */
@@ -393,9 +419,10 @@
 }
 
 .option-btn:hover:not(:disabled) {
-  background: rgba(59, 130, 246, 0.2);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.2) 100%);
   border-color: #3b82f6;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
 }
 
 .option-btn:disabled {
@@ -406,11 +433,14 @@
 .option-label {
   font-size: 1rem;
   font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .option-odds {
   font-size: 0.75rem;
   color: #fbbf24;
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
 }
 
 .no-options {
@@ -436,7 +466,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  overflow: hidden; /* 防止滾動條出現 */
+  overflow: visible;
 }
 
 .position-header,

@@ -1,11 +1,30 @@
 /* 熱門投注容器 - 簡約風格 */
 .hot-bets-container {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 16px;
   padding: 1.25rem;
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.hot-bets-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%);
+}
+
+.hot-bets-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 /* 標題區域 */
@@ -14,6 +33,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 .hot-bets-title {
@@ -21,17 +41,25 @@
   font-size: 1rem;
   font-weight: 600;
   color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hot-bets-title::before {
+  font-size: 1.125rem;
 }
 
 .hot-bets-summary {
   font-size: 0.875rem;
   color: #94a3b8;
+  font-weight: 500;
 }
 
 /* 分隔線 */
 .hot-bets-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.3) 50%, transparent 100%);
   margin-bottom: 1rem;
 }
 
@@ -49,43 +77,56 @@
   align-items: center;
   gap: 0.75rem;
   font-size: 0.875rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.hot-bet-row:hover {
+  background: rgba(139, 92, 246, 0.1);
 }
 
 .bet-option {
   font-weight: 600;
   color: #e2e8f0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* 進度條容器 */
 .bar-container {
-  height: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
   overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .bar-fill {
   height: 100%;
   background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%);
-  border-radius: 4px;
+  border-radius: 5px;
   transition: width 0.5s ease;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
 }
 
 .bet-percentage {
   font-weight: 600;
   color: #a78bfa;
   text-align: right;
+  text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
 }
 
 .bet-count {
   color: #94a3b8;
   text-align: right;
+  font-weight: 500;
 }
 
 .bet-amount {
   color: #fbbf24;
   font-weight: 600;
   text-align: right;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
 }
 
 /* 空狀態 */
