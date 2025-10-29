@@ -377,7 +377,7 @@ export const LivePlayer: React.FC = () => {
         cleanupIVS()
       }
     }
-  }, [playerMode, user]) // 移除 streamConfig 依賴，因為 IVS 模式不需要
+  }, [playerMode, user?.userId]) // Only depend on userId, not entire user object (balance changes shouldn't trigger re-init)
 
   // Initialize OvenPlayer
   useEffect(() => {
