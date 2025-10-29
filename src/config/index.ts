@@ -13,6 +13,7 @@ const getConfig = (): AppConfig => {
   let apiUrl = apiFromUrl || import.meta.env.VITE_API_URL
   let liveApiUrl = liveApiFromUrl || import.meta.env.VITE_LIVE_API_URL || ''
   const env = (import.meta.env.VITE_ENV as 'development' | 'production') || 'production'
+  const awsIvsApiKey = import.meta.env.VITE_AWS_IVS_API_KEY || ''
 
   // In development mode, if API URL is empty, use current origin for Vite proxy
   if (!apiUrl && (env === 'development' || import.meta.env.DEV)) {
@@ -41,6 +42,7 @@ const getConfig = (): AppConfig => {
     apiUrl,
     liveApiUrl,
     env,
+    awsIvsApiKey,
   }
 }
 

@@ -43,6 +43,11 @@ class LiveApiService {
         headers['Authorization'] = `Bearer ${token}`
       }
 
+      // Add AWS IVS API Key if configured
+      if (config.awsIvsApiKey) {
+        headers['X-API-Key'] = config.awsIvsApiKey
+      }
+
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         ...options,
         headers,
