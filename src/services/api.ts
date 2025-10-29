@@ -216,7 +216,7 @@ class ApiService {
     }>
   }>> {
     return this.request(
-      `${API_ENDPOINTS.GAME.BASE}/bet-stats`,
+      '/api/game/bet-stats',
       { method: 'GET' }
     )
   }

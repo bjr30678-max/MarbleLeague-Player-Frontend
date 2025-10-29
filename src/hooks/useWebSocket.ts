@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { websocket } from '@/services/websocket'
 import { ivsStatsService } from '@/services/awsIvs'
+import { api } from '@/services/api'
 import { useGameStore } from '@/stores/useGameStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useBettingStore } from '@/stores/useBettingStore'
