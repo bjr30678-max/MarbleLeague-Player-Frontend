@@ -188,8 +188,17 @@ export interface BetSubmitRequest {
 
 export interface BetSubmitResponse {
   success: boolean
-  betIds: string[]
-  newBalance: number
+  betIds?: string[]
+  bets?: any[]
+  betCount?: number
+  roundId?: string
+  totalAmount?: number
+  transactionId?: string
+  // Different possible balance field names from backend
+  newBalance?: number
+  balance?: number
+  remainingBalance?: number
+  updatedBalance?: number
   message?: string
 }
 

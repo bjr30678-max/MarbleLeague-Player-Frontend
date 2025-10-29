@@ -184,15 +184,24 @@ export const useBettingStore = create<BettingState>((set, get) => ({
         return betItem
       })
 
-      console.log('提交的投注資料:', betsData) // Debug log
-
       const response = await api.submitBets({
         bets: betsData,
       })
 
       if (response.success && response.data) {
+        // Try different possible balance field names from backend
+        const newBalance = response.data.newBalance
+                        || response.data.balance
+                        || response.data.remainingBalance
+                        || response.data.updatedBalance
+
         // Update balance
-        useUserStore.getState().updateBalance(response.data.newBalance)
+        if (newBalance !== undefined && newBalance !== null) {
+          useUserStore.getState().updateBalance(newBalance)
+        } else {
+          // Fallback: fetch balance if not returned
+          await useUserStore.getState().fetchBalance()
+        }
 
         // Clear bets
         get().clearBets()
