@@ -50,9 +50,15 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     set({ isLoading: true })
     try {
+      console.log('💰 Fetching balance for user:', user.userId)
       const response = await api.getUserBalance(user.userId)
+      console.log('💰 Balance API response:', response)
+
       if (response.success && response.data) {
+        console.log('💰 Updating balance to:', response.data.balance)
         get().updateBalance(response.data.balance)
+      } else {
+        console.error('💰 Balance fetch failed:', response.error)
       }
     } catch (error) {
       console.error('Failed to fetch balance:', error)

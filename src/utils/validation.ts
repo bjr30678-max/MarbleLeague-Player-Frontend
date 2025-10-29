@@ -112,7 +112,12 @@ export const validatePeriod = (period: number): boolean => {
 /**
  * Format currency display
  */
-export const formatCurrency = (amount: number): string => {
+export const formatCurrency = (amount: number | undefined): string => {
+  // Handle undefined or null values
+  if (amount === undefined || amount === null || isNaN(amount)) {
+    return '0'
+  }
+
   return amount.toLocaleString('zh-TW', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,

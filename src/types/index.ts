@@ -174,24 +174,16 @@ export interface BalanceResponse {
   balance: number
 }
 
-// Position-based bet (for bigsmall, oddeven, dragontiger)
-interface PositionBasedBet {
-  type: string  // 'big_small', 'odd_even', 'dragon_tiger'
-  position: number
-  content: string[]
+// Bet format matching backend API (based on old app.js)
+export interface BetItem {
+  betType: string        // e.g. 'position', 'sum', 'big_small', 'odd_even', 'dragon_tiger'
+  betContent: any        // Can be string[] or number[] depending on betType
+  position?: number | null      // For position-based bets (1-10), null for sum bets
   betAmount: number
 }
 
-// Category-based bet (for position, sum)
-interface CategoryBasedBet {
-  category: BetCategory
-  optionId: string
-  amount: number
-}
-
 export interface BetSubmitRequest {
-  roundId: string
-  bets: (PositionBasedBet | CategoryBasedBet)[]
+  bets: BetItem[]  // Note: No roundId needed, backend tracks current round
 }
 
 export interface BetSubmitResponse {

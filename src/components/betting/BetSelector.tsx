@@ -89,7 +89,14 @@ export const BetSelector: React.FC = () => {
                 <button
                   key={`${pos}-${num}`}
                   className="position-cell"
-                  onClick={() => placeBet(`position-${pos}-${num}`, `第${pos}名: ${num}號`, positionOdds)}
+                  onClick={() => placeBet(
+                    `position-${pos}-${num}`,
+                    `第${pos}名: ${num}號`,
+                    positionOdds,
+                    'position',      // betType
+                    pos,             // position
+                    [num]            // content (number, not string!)
+                  )}
                 >
                   {num}
                 </button>
@@ -114,7 +121,14 @@ export const BetSelector: React.FC = () => {
                 <button
                   key={item.value}
                   className="sum-btn"
-                  onClick={() => placeBet(`sum-${item.value}`, `和值${item.value}`, item.odds)}
+                  onClick={() => placeBet(
+                    `sum-${item.value}`,
+                    `和值${item.value}`,
+                    item.odds,
+                    'sum_value',           // betType
+                    null,                  // position (null for sum bets)
+                    [item.value]           // content (number, not string!)
+                  )}
                 >
                   <div className="sum-value">{item.value}</div>
                   <div className="sum-odds">1:{item.odds}</div>
@@ -137,7 +151,10 @@ export const BetSelector: React.FC = () => {
                     onClick={() => placeBet(
                       `${option.type}-${opt.value}`,
                       opt.name,
-                      opt.odds
+                      opt.odds,
+                      option.type,        // betType (e.g., 'sum_big_small', 'sum_odd_even')
+                      null,               // position (null for sum bets)
+                      [opt.value]         // content
                     )}
                   >
                     <div className="option-label">{opt.name}</div>

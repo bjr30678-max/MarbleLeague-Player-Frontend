@@ -36,7 +36,7 @@ export const UserProfile: React.FC = () => {
           </div>
           <div className="info-row highlight">
             <span className="info-label">當前餘額</span>
-            <span className="info-value balance">{formatCurrency(user.balance)}</span>
+            <span className="info-value balance">{formatCurrency(user?.balance ?? 0)}</span>
           </div>
         </div>
       </div>
