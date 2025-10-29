@@ -149,7 +149,9 @@
   max-width: 600px;
   width: 100%;
   max-height: 85vh;
-  overflow: hidden;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   animation: slideUp 0.3s ease-out;
 }
@@ -173,6 +175,8 @@
   justify-content: space-between;
   align-items: center;
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-radius: 16px 16px 0 0;
+  flex-shrink: 0;
 }
 
 .history-header h3 {
@@ -206,8 +210,10 @@
 /* 模態窗口內容 */
 .history-body {
   padding: 20px;
-  max-height: calc(85vh - 80px);
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overflow-x: visible;
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -215,16 +221,33 @@
 
 /* 歷史記錄項目 */
 .history-record {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.2);
   border-radius: 12px;
   padding: 15px;
+  padding-top: 18px;
   transition: all 0.2s;
+  overflow: visible;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.history-record::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px 12px 0 0;
 }
 
 .history-record:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
   border-color: rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.2);
 }
 
 .record-header {
@@ -248,25 +271,43 @@
 /* 記錄中的10顆球 */
 .record-numbers {
   display: grid;
-  grid-template-columns: repeat(5, 42px);
-  column-gap: 16px;
-  row-gap: 12px;
+  grid-template-columns: repeat(5, 1fr);
+  column-gap: 10px;
+  row-gap: 10px;
   justify-content: center;
   margin-bottom: 12px;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .record-number {
-  width: 42px;
-  height: 42px;
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 48px;
+  max-height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.6) 0%, rgba(118, 75, 162, 0.6) 100%);
-  border: 1px solid rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
   font-size: 16px;
+  box-shadow:
+    0 4px 12px rgba(102, 126, 234, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+  margin: 0 auto;
+}
+
+.record-number:hover {
+  transform: scale(1.1);
+  box-shadow:
+    0 6px 16px rgba(102, 126, 234, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* 統計資訊 */
@@ -274,42 +315,50 @@
   display: flex;
   gap: 8px;
   justify-content: center;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid rgba(102, 126, 234, 0.2);
 }
 
 .stat-badge {
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.05);
-  color: #cbd5e1;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.stat-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .stat-badge.big {
-  background: rgba(239, 68, 68, 0.2);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(220, 38, 38, 0.25) 100%);
   color: #fca5a5;
-  border-color: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.4);
 }
 
 .stat-badge.small {
-  background: rgba(59, 130, 246, 0.2);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.25) 100%);
   color: #93c5fd;
-  border-color: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.4);
 }
 
 .stat-badge.odd {
-  background: rgba(16, 185, 129, 0.2);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.25) 100%);
   color: #6ee7b7;
-  border-color: rgba(16, 185, 129, 0.3);
+  border-color: rgba(16, 185, 129, 0.4);
 }
 
 .stat-badge.even {
-  background: rgba(139, 92, 246, 0.2);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(124, 58, 237, 0.25) 100%);
   color: #c4b5fd;
-  border-color: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.4);
 }
 
 /* 分頁控制 */
@@ -426,14 +475,20 @@
   }
 
   .record-numbers {
-    grid-template-columns: repeat(5, 28px);
+    grid-template-columns: repeat(5, 1fr);
     column-gap: 6px;
     row-gap: 6px;
+    max-width: 200px;
   }
 
   .record-number {
-    width: 28px;
-    height: 28px;
-    font-size: 12px;
+    max-width: 36px;
+    max-height: 36px;
+    font-size: 13px;
+  }
+
+  .stat-badge {
+    padding: 5px 10px;
+    font-size: 11px;
   }
 }

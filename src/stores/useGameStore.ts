@@ -5,6 +5,7 @@ import { api } from '@/services/api'
 interface GameStoreState {
   currentGame: GameState | null
   recentResults: GameResult[]
+  allRecentResults: GameResult[] // 儲存所有開獎記錄(前端分頁用)
   history: GameHistoryRecord[]
   allHistory: GameHistoryRecord[] // 儲存所有歷史記錄
   historyPage: number
@@ -32,8 +33,9 @@ interface GameStoreState {
 export const useGameStore = create<GameStoreState>((set, get) => ({
   currentGame: null,
   recentResults: [],
+  allRecentResults: [],
   history: [],
-  allHistory: [], // 初始化為空陣列
+  allHistory: [],
   historyPage: 1,
   historyTotalPages: 1,
   isLoading: false,
@@ -139,46 +141,65 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   loadResultsPage: async (page: number) => {
     if (page < 1) return
 
+    const { allRecentResults } = get()
     const pageSize = 10
+
+    // 如果還沒載入所有資料，先載入
+    if (allRecentResults.length === 0) {
+      set({ isLoadingResults: true })
+      try {
+        // 一次載入 200 筆資料
+        const response = await api.getRecentResults(200, 0)
+
+        if (response.success && response.data && Array.isArray(response.data)) {
+          // Convert RecentResult[] to GameResult[]
+          const allResults = response.data.map((item) => {
+            const sum = item.result.slice(0, 2).reduce((a, b) => a + b, 0)
+            return {
+              roundId: item.roundId,
+              period: parseInt(item.roundId) || 0,
+              positions: item.result,
+              sum,
+              bigsmall: sum > 11 ? 'big' : 'small',
+              oddeven: sum % 2 === 0 ? 'even' : 'odd',
+              dragontiger: {},
+              timestamp: new Date(item.resultTime).getTime(),
+            } as GameResult
+          })
+
+          set({
+            allRecentResults: allResults,
+            recentResults: allResults.slice(0, pageSize),
+            currentResultsPage: 1,
+          })
+        }
+      } catch (error) {
+        console.error('Failed to load results:', error)
+      } finally {
+        set({ isLoadingResults: false })
+      }
+      return
+    }
+
+    // 前端分頁：從 allRecentResults 切片
     set({ isLoadingResults: true })
 
     try {
-      // 載入 pageSize + 1 筆來判斷是否還有下一頁
-      const offset = (page - 1) * pageSize
-      const response = await api.getRecentResults(pageSize + 1, offset)
+      const startIndex = (page - 1) * pageSize
+      const endIndex = startIndex + pageSize
+      const currentPageData = allRecentResults.slice(startIndex, endIndex)
+      const hasNextPage = endIndex < allRecentResults.length
 
-      if (response.success && response.data && Array.isArray(response.data)) {
-        const hasNextPage = response.data.length > pageSize
-        const currentPageData = response.data.slice(0, pageSize)
-
-        // 如果當前頁沒有資料且不是第一頁，回到上一頁
-        if (currentPageData.length === 0 && page > 1) {
-          return await get().loadResultsPage(page - 1)
-        }
-
-        // Convert RecentResult[] to GameResult[]
-        const results = currentPageData.map((item) => {
-          const sum = item.result.slice(0, 2).reduce((a, b) => a + b, 0)
-          return {
-            roundId: item.roundId,
-            period: parseInt(item.roundId) || 0,
-            positions: item.result,
-            sum,
-            bigsmall: sum > 11 ? 'big' : 'small',
-            oddeven: sum % 2 === 0 ? 'even' : 'odd',
-            dragontiger: {},
-            timestamp: new Date(item.resultTime).getTime(),
-          } as GameResult
-        })
-
-        set({
-          recentResults: results,
-          currentResultsPage: page,
-        })
-
-        // 返回是否有下一頁的資訊 (透過在組件中檢查)
-        return hasNextPage
+      if (currentPageData.length === 0 && page > 1) {
+        return await get().loadResultsPage(page - 1)
       }
+
+      set({
+        recentResults: currentPageData,
+        currentResultsPage: page,
+      })
+
+      return hasNextPage
     } catch (error) {
       console.error('Failed to load results page:', error)
     } finally {

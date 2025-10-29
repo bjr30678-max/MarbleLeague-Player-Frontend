@@ -251,7 +251,7 @@ body {
   flex-direction: column;
   gap: 0.875rem;
   transition: all 0.3s ease;
-  overflow: hidden;
+
 }
 
 .history-record:hover {
