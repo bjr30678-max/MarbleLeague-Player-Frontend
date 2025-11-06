@@ -201,26 +201,24 @@ class ApiService {
 
   /**
    * Get current round betting statistics (用於熱門投注)
-   * Note: This API endpoint doesn't exist in backend yet
-   * Hot bets should be provided via WebSocket events instead
    */
-  // async getBetStats(): Promise<ApiResponse<{
-  //   roundId: string
-  //   totalBets: number
-  //   totalAmount: number
-  //   typeSummary: Array<{
-  //     betType: string
-  //     position: number | null
-  //     betTypeName: string
-  //     count: number
-  //     amount: number
-  //   }>
-  // }>> {
-  //   return this.request(
-  //     '/api/game/bet-stats',
-  //     { method: 'GET' }
-  //   )
-  // }
+  async getBetStats(): Promise<ApiResponse<{
+    roundId: string
+    totalBets: number
+    totalAmount: number
+    typeSummary: Array<{
+      betType: string
+      position: number | null
+      betTypeName: string
+      count: number
+      amount: number
+    }>
+  }>> {
+    return this.request(
+      '/api/game/bet-stats',
+      { method: 'GET' }
+    )
+  }
 
   /**
    * Health check

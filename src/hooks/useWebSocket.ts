@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { websocket } from '@/services/websocket'
 import { ivsStatsService } from '@/services/awsIvs'
+import { api } from '@/services/api'
 import { useGameStore } from '@/stores/useGameStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useBettingStore } from '@/stores/useBettingStore'
@@ -14,6 +15,7 @@ export const useWebSocket = () => {
   const isInitialized = useRef(false)
   const { isAuthenticated } = useUserStore()
   const [isConnected, setIsConnected] = useState(false)
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     // Only connect after authentication is complete
@@ -66,6 +68,67 @@ export const useWebSocket = () => {
       roundId?: string
     }
 
+    // Helper function to fetch and update Hot Bet statistics
+    const fetchAndUpdateHotBets = async () => {
+      try {
+        const response = await api.getBetStats()
+
+        if (response.success && response.data) {
+          const { totalBets, totalAmount, typeSummary } = response.data
+
+          // Transform typeSummary to hotBets format
+          const hotBets = typeSummary.map(item => ({
+            option: item.betTypeName,
+            count: item.count,
+            amount: item.amount,
+            percentage: totalAmount > 0
+              ? Math.round((item.amount / totalAmount) * 100 * 10) / 10
+              : 0
+          }))
+
+          // Update Hot Bets store
+          useHotBetsStore.getState().updateBetStats({
+            totalBets,
+            totalAmount,
+            hotBets
+          })
+        }
+      } catch (error) {
+        // Silently fail - don't spam console with errors
+        // Only log if in development mode
+        if (import.meta.env.DEV) {
+          console.debug('Hot Bets update failed:', error)
+        }
+      }
+    }
+
+    // Helper function to start Hot Bets polling
+    const startHotBetsPolling = () => {
+      // Clear any existing interval
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current)
+      }
+
+      // Fetch immediately
+      fetchAndUpdateHotBets()
+
+      // Then poll every 5 seconds during betting period
+      pollIntervalRef.current = setInterval(() => {
+        fetchAndUpdateHotBets()
+      }, 5000)
+
+      console.log('🔄 Started Hot Bets polling (every 5s)')
+    }
+
+    // Helper function to stop Hot Bets polling
+    const stopHotBetsPolling = () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current)
+        pollIntervalRef.current = null
+        console.log('⏸️ Stopped Hot Bets polling')
+      }
+    }
+
     const handleRoundStarted = (data: RoundStartedData) => {
       console.log('🎮 [WebSocket] Round started:', data)
 
@@ -87,8 +150,8 @@ export const useWebSocket = () => {
       // Clear hot bets for new round
       useHotBetsStore.getState().clearStats()
 
-      // Note: bet-stats API removed as it doesn't exist in backend
-      // Hot bets will be updated via WebSocket 'new-bet' events instead
+      // Start polling Hot Bet statistics during betting period
+      startHotBetsPolling()
 
       // Show toast notification
       toast.info(`新回合開始: 第 ${data.roundId} 期`)
@@ -96,6 +159,9 @@ export const useWebSocket = () => {
 
     const handleBettingClosed = (data?: BettingClosedData) => {
       console.log('🔒 [WebSocket] Betting closed:', data)
+
+      // Stop polling Hot Bet statistics when betting closes
+      stopHotBetsPolling()
 
       // Update game status to closed
       const currentGame = useGameStore.getState().currentGame
@@ -178,13 +244,13 @@ export const useWebSocket = () => {
     }
 
     // Track new bets for 熱門投注 feature
-    // Note: bet-stats API doesn't exist, so we'll just log the new bet event
-    // Backend should send aggregated stats via WebSocket if needed
+    // Immediately fetch updated statistics when a bet is placed for faster updates
     const handleNewBet = async (data: any) => {
       console.log('💰 [WebSocket] New bet:', data)
 
-      // If backend sends aggregated stats in the new-bet event, update store here
-      // For now, just log the event
+      // Fetch and update Hot Bets immediately for faster response
+      // (Polling will continue in the background every 5s)
+      await fetchAndUpdateHotBets()
     }
 
     // Subscribe to events
@@ -218,6 +284,9 @@ export const useWebSocket = () => {
 
     // Cleanup on unmount
     return () => {
+      // Stop Hot Bets polling
+      stopHotBetsPolling()
+
       websocket.offAllGameEvents()
       websocket.offIVSStatsUpdate()
       websocket.unsubscribeFromIVSStats()
