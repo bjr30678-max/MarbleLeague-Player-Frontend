@@ -42,19 +42,31 @@ export const useWebSocket = () => {
 
     // Helper function to beautify bet type name
     const beautifyBetTypeName = (name: string): string => {
-      // 名次大小/單雙：第X名大/小/單/雙 → X-大/小/單/雙
+      // 名次投注：第X名Y號 → 第X名 - Y號
+      const positionNumberMatch = name.match(/第(\d+)名(\d+)號/)
+      if (positionNumberMatch) {
+        return `第${positionNumberMatch[1]}名 - ${positionNumberMatch[2]}號`
+      }
+
+      // 名次大小/單雙：第X名大/小/單/雙 → 第X名 - 大/小/單/雙
       const positionMatch = name.match(/第(\d+)名(大|小|單|雙)/)
       if (positionMatch) {
-        return `${positionMatch[1]}-${positionMatch[2]}`
+        return `第${positionMatch[1]}名 - ${positionMatch[2]}`
       }
 
-      // 龍虎：XVY 龍/虎 → XvY龍/虎
+      // 龍虎：XVY 龍/虎 → 第X名 - 龍/虎
       const dragonTigerMatch = name.match(/(\d+)V(\d+)\s*(龍|虎)/)
       if (dragonTigerMatch) {
-        return `${dragonTigerMatch[1]}v${dragonTigerMatch[2]}${dragonTigerMatch[3]}`
+        return `${dragonTigerMatch[1]}v${dragonTigerMatch[2]} - ${dragonTigerMatch[3]}`
       }
 
-      // 冠亞和：保持原樣
+      // 冠亞和值：冠亞和X → 冠亞和 - X
+      const sumValueMatch = name.match(/冠亞和(\d+)/)
+      if (sumValueMatch) {
+        return `冠亞和 - ${sumValueMatch[1]}`
+      }
+
+      // 冠亞和大小單雙：保持原樣
       // 紅藍：保持原樣
       // 其他格式直接返回
       return name
