@@ -40,32 +40,24 @@ export const useWebSocket = () => {
 
     console.log('✅ WebSocket: 認證完成，準備連接...')
 
-    // Initialize game connection (matching original initializeGame)
-    const initializeGame = async () => {
-      // 1. Connect to WebSocket
-      websocket.connect()
+    // Helper function to beautify bet type name
+    const beautifyBetTypeName = (name: string): string => {
+      // 名次大小/單雙：第X名大/小/單/雙 → X-大/小/單/雙
+      const positionMatch = name.match(/第(\d+)名(大|小|單|雙)/)
+      if (positionMatch) {
+        return `${positionMatch[1]}-${positionMatch[2]}`
+      }
 
-      // 2. Load current round info
-      await useGameStore.getState().fetchCurrentGame()
+      // 龍虎：XVY 龍/虎 → XvY龍/虎
+      const dragonTigerMatch = name.match(/(\d+)V(\d+)\s*(龍|虎)/)
+      if (dragonTigerMatch) {
+        return `${dragonTigerMatch[1]}v${dragonTigerMatch[2]}${dragonTigerMatch[3]}`
+      }
 
-      // 3. Load recent results
-      await useGameStore.getState().fetchRecentResults()
-
-      // Timer is handled by useCountdown hook
-    }
-
-    initializeGame()
-
-    // Setup event handlers with store getState to avoid dependency issues
-    // WebSocket event data types (from backend, matching original app.js)
-    interface RoundStartedData {
-      roundId: string
-      startTime?: string
-      timeLeft?: number
-    }
-
-    interface BettingClosedData {
-      roundId?: string
+      // 冠亞和：保持原樣
+      // 紅藍：保持原樣
+      // 其他格式直接返回
+      return name
     }
 
     // Helper function to fetch and update Hot Bet statistics
@@ -76,9 +68,9 @@ export const useWebSocket = () => {
         if (response.success && response.data) {
           const { totalBets, totalAmount, typeSummary } = response.data
 
-          // Transform typeSummary to hotBets format
+          // Transform typeSummary to hotBets format with beautified names
           const hotBets = typeSummary.map(item => ({
-            option: item.betTypeName,
+            option: beautifyBetTypeName(item.betTypeName),
             count: item.count,
             amount: item.amount,
             percentage: totalAmount > 0
@@ -127,6 +119,41 @@ export const useWebSocket = () => {
         pollIntervalRef.current = null
         console.log('⏸️ Stopped Hot Bets polling')
       }
+    }
+
+    // Initialize game connection (matching original initializeGame)
+    const initializeGame = async () => {
+      // 1. Connect to WebSocket
+      websocket.connect()
+
+      // 2. Load current round info
+      await useGameStore.getState().fetchCurrentGame()
+
+      // 3. Load recent results
+      await useGameStore.getState().fetchRecentResults()
+
+      // 4. Check if currently in betting period and start Hot Bets polling
+      const currentGame = useGameStore.getState().currentGame
+      if (currentGame && currentGame.status === 'betting') {
+        console.log('📊 Game is currently in betting period, starting Hot Bets polling...')
+        startHotBetsPolling()
+      }
+
+      // Timer is handled by useCountdown hook
+    }
+
+    initializeGame()
+
+    // Setup event handlers with store getState to avoid dependency issues
+    // WebSocket event data types (from backend, matching original app.js)
+    interface RoundStartedData {
+      roundId: string
+      startTime?: string
+      timeLeft?: number
+    }
+
+    interface BettingClosedData {
+      roundId?: string
     }
 
     const handleRoundStarted = (data: RoundStartedData) => {
@@ -209,6 +236,10 @@ export const useWebSocket = () => {
           status: 'finished',
         })
       }
+
+      // Clear Hot Bets immediately after result is confirmed
+      useHotBetsStore.getState().clearStats()
+      console.log('🧹 Cleared Hot Bets after result confirmation')
 
       // Show toast
       toast.success('開獎結果已公布')

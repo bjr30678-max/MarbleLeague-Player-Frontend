@@ -209,6 +209,7 @@ class ApiService {
     typeSummary: Array<{
       betType: string
       position: number | null
+      betContent: any
       betTypeName: string
       count: number
       amount: number
