@@ -55,8 +55,8 @@ export class ViewerService {
   private stageArn: string | null = null
   private participantId: string | null = null
   private token: string | null = null
-  private heartbeatInterval: number | null = null
-  private tokenRefreshTimeout: number | null = null
+  private heartbeatInterval: ReturnType<typeof setInterval> | null = null
+  private tokenRefreshTimeout: ReturnType<typeof setTimeout> | null = null
   private isActive = false
 
   constructor(userId: string) {
@@ -273,7 +273,7 @@ export class PublisherService {
   private token: string | null = null
   private participantId: string | null = null
   private stageArn: string | null = null
-  private tokenRefreshTimeout: number | null = null
+  private tokenRefreshTimeout: ReturnType<typeof setTimeout> | null = null
   private isActive = false
 
   constructor(userId: string) {
