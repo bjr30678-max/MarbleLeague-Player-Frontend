@@ -48,24 +48,16 @@ export const useBetting = () => {
 
     const { selectedAmount, bettingLimits, selectedCategory } = bettingStore
 
-    // Validate amount
-    const validation = validateBetAmount(selectedAmount)
+    // Get category limit
+    const categoryLimit = bettingLimits?.limits?.[selectedCategory]
+    const minAmount = categoryLimit?.minAmount || 10
+    const maxAmount = categoryLimit?.maxAmount || 10000
+
+    // Validate amount with correct limits
+    const validation = validateBetAmount(selectedAmount, minAmount, maxAmount)
     if (!validation.valid) {
       toast.error(validation.error || '無效的投注金額')
       return false
-    }
-
-    // Check category limit
-    if (bettingLimits?.limits?.[selectedCategory]) {
-      const limit = bettingLimits.limits[selectedCategory]
-      if (selectedAmount < limit.minAmount) {
-        toast.error(`最小投注金額為 ${limit.minAmount}`)
-        return false
-      }
-      if (selectedAmount > limit.maxAmount) {
-        toast.error(`最大投注金額為 ${limit.maxAmount}`)
-        return false
-      }
     }
 
     // Check balance
