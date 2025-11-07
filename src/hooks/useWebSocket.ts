@@ -176,7 +176,7 @@ export const useWebSocket = () => {
         roundId: data.roundId,
         period: parseInt(data.roundId) || 0,
         status: 'betting',
-        countdown: data.timeLeft || 60, // 預設60秒（matching original）
+        countdown: data.timeLeft || 90, // 預設90秒（1分30秒）
         timestamp: Date.now(),
       }
 

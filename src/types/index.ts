@@ -65,11 +65,12 @@ export interface BettingLimit {
 
 export interface BettingLimits {
   limits: {
-    position: BettingLimit
-    sum: BettingLimit
-    bigsmall: BettingLimit
-    oddeven: BettingLimit
-    dragontiger: BettingLimit
+    position?: BettingLimit
+    sum?: BettingLimit
+    bigsmall?: BettingLimit
+    oddeven?: BettingLimit
+    dragontiger?: BettingLimit
+    [key: string]: BettingLimit | undefined  // 允許動態鍵值（如 "position:", "sum_value:"）
   }
 }
 

@@ -233,6 +233,8 @@ export const useBettingStore = create<BettingState>((set, get) => ({
       }
 
       if (limitsResponse.success && limitsResponse.data) {
+        // 🔍 調試：打印後端返回的完整限額資料
+        console.log('[fetchBettingData] 後端返回的限額:', JSON.stringify(limitsResponse.data, null, 2))
         get().setBettingLimits(limitsResponse.data)
       }
     } catch (error) {
@@ -253,7 +255,18 @@ export const useBettingStore = create<BettingState>((set, get) => ({
     }
 
     const totalAmount = get().getTotalBetAmount() + amount
-    const categoryLimit = bettingLimits.limits[selectedCategory]
+
+    // 🔧 映射前端 category 到後端 betType 格式
+    const categoryToBetTypeMap: Record<string, string> = {
+      'position': 'position:',
+      'sum': 'sum_value:',
+      'bigsmall': 'big_small:',
+      'oddeven': 'odd_even:',
+      'dragontiger': 'dragon_tiger:'
+    }
+
+    const backendKey = categoryToBetTypeMap[selectedCategory] || selectedCategory
+    const categoryLimit = bettingLimits.limits[backendKey] || bettingLimits.limits[selectedCategory]
 
     if (!categoryLimit) {
       return false

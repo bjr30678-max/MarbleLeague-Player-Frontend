@@ -48,10 +48,35 @@ export const useBetting = () => {
 
     const { selectedAmount, bettingLimits, selectedCategory } = bettingStore
 
-    // Get category limit
-    const categoryLimit = bettingLimits?.limits?.[selectedCategory]
+    // 🔧 映射前端 category 到後端 betType 格式
+    const categoryToBetTypeMap: Record<string, string> = {
+      'position': 'position:',
+      'sum': 'sum_value:',
+      'bigsmall': 'big_small:',
+      'oddeven': 'odd_even:',
+      'dragontiger': 'dragon_tiger:'
+    }
+
+    const backendKey = categoryToBetTypeMap[selectedCategory] || selectedCategory
+
+    // 🔍 調試：打印所有限額鍵值
+    console.log('[useBetting] selectedCategory:', selectedCategory)
+    console.log('[useBetting] backendKey:', backendKey)
+    console.log('[useBetting] bettingLimits.limits:', bettingLimits?.limits)
+
+    // Get category limit from backend format
+    const categoryLimit = bettingLimits?.limits?.[backendKey] || bettingLimits?.limits?.[selectedCategory]
+
+    console.log('[useBetting] categoryLimit:', categoryLimit)
+
+    if (!categoryLimit) {
+      console.warn(`未找到 ${selectedCategory} 的限額設定，使用預設值`)
+    }
+
     const minAmount = categoryLimit?.minAmount || 10
     const maxAmount = categoryLimit?.maxAmount || 10000
+
+    console.log('[useBetting] Final limits - min:', minAmount, 'max:', maxAmount)
 
     // Validate amount with correct limits
     const validation = validateBetAmount(selectedAmount, minAmount, maxAmount)
