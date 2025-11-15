@@ -166,6 +166,12 @@ export const useBettingStore = create<BettingState>((set, get) => ({
           }
         }
 
+        // Extract subOption for sum_value type (冠亞和值的具體選項 3-19)
+        let subOption: string | undefined = undefined
+        if (betType === 'sum_value' && betContent && betContent.length > 0) {
+          subOption = String(betContent[0])
+        }
+
         // Build the bet item
         const betItem: any = {
           betType: betType,
@@ -179,6 +185,11 @@ export const useBettingStore = create<BettingState>((set, get) => ({
           betItem.position = bet.position
         } else {
           betItem.position = null
+        }
+
+        // Include subOption for sum_value bets
+        if (subOption !== undefined) {
+          betItem.subOption = subOption
         }
 
         return betItem

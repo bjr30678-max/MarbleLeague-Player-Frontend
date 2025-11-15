@@ -50,14 +50,26 @@ export const useBetting = () => {
 
     // 🔧 映射前端 category 到後端 betType 格式
     const categoryToBetTypeMap: Record<string, string> = {
-      'position': 'position:',
-      'sum': 'sum_value:',
-      'bigsmall': 'big_small:',
-      'oddeven': 'odd_even:',
-      'dragontiger': 'dragon_tiger:'
+      'position': 'position',
+      'sum': 'sum_value',
+      'bigsmall': 'big_small',
+      'oddeven': 'odd_even',
+      'dragontiger': 'dragon_tiger'
     }
 
-    const backendKey = categoryToBetTypeMap[selectedCategory] || selectedCategory
+    // 構建限額查詢 key
+    let backendKey: string
+    const backendBetType = categoryToBetTypeMap[selectedCategory] || selectedCategory
+
+    // 對於 sum_value 類型，需要包含子選項（3-19）
+    if (backendBetType === 'sum_value' && content && content.length > 0) {
+      // 從 content 或 optionId 提取和值選項
+      const sumValue = content[0] || optionId.split('-')[optionId.split('-').length - 1]
+      backendKey = `${backendBetType}:${sumValue}`
+    } else {
+      // 其他類型使用基礎 key（帶 : 後綴）
+      backendKey = `${backendBetType}:`
+    }
 
     // 🔍 調試：打印所有限額鍵值
     console.log('[useBetting] selectedCategory:', selectedCategory)
