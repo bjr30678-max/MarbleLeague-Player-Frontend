@@ -277,7 +277,16 @@ export const useBettingStore = create<BettingState>((set, get) => ({
     }
 
     const backendKey = categoryToBetTypeMap[selectedCategory] || selectedCategory
-    const categoryLimit = bettingLimits.limits[backendKey] || bettingLimits.limits[selectedCategory]
+    let categoryLimit = bettingLimits.limits[backendKey]
+
+    // 🔥 修復：對於 sum_value，如果找不到精確 key，使用基礎 key
+    if (!categoryLimit && selectedCategory === 'sum') {
+      categoryLimit = bettingLimits.limits['sum_value:']
+    }
+
+    if (!categoryLimit) {
+      categoryLimit = bettingLimits.limits[selectedCategory]
+    }
 
     if (!categoryLimit) {
       return false

@@ -77,7 +77,20 @@ export const useBetting = () => {
     console.log('[useBetting] bettingLimits.limits:', bettingLimits?.limits)
 
     // Get category limit from backend format
-    const categoryLimit = bettingLimits?.limits?.[backendKey] || bettingLimits?.limits?.[selectedCategory]
+    // 🔥 修復：對於 sum_value 類型，如果找不到精確的子選項 key，fallback 到基礎 key
+    let categoryLimit = bettingLimits?.limits?.[backendKey]
+
+    if (!categoryLimit && backendBetType === 'sum_value') {
+      // 嘗試使用基礎 sum_value key（不含子選項）
+      const baseSumValueKey = 'sum_value:'
+      categoryLimit = bettingLimits?.limits?.[baseSumValueKey]
+      console.log('[useBetting] 找不到精確 sum_value key，使用基礎 key:', baseSumValueKey, categoryLimit)
+    }
+
+    if (!categoryLimit) {
+      // 最後 fallback 到 selectedCategory
+      categoryLimit = bettingLimits?.limits?.[selectedCategory]
+    }
 
     console.log('[useBetting] categoryLimit:', categoryLimit)
 
@@ -86,7 +99,7 @@ export const useBetting = () => {
     }
 
     const minAmount = categoryLimit?.minAmount || 10
-    const maxAmount = categoryLimit?.maxAmount || 10000
+    const maxAmount = categoryLimit?.maxAmount || 100000
 
     console.log('[useBetting] Final limits - min:', minAmount, 'max:', maxAmount)
 
