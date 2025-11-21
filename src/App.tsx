@@ -179,17 +179,19 @@ const App: React.FC = () => {
             </div>
             <div className="header-text">
               <h1 className="app-title">紅海彈珠聯賽</h1>
-              <div className="connection-status">
-                <span className={`status-dot ${isConnected ? 'connected' : 'disconnected'}`} />
-                <span className="status-text">{isConnected ? '已連線' : '未連線'}</span>
+              <div className="connection-row">
+                <div className="connection-status">
+                  <span className={`status-dot ${isConnected ? 'connected' : 'disconnected'}`} />
+                  <span className="status-text">{isConnected ? '已連線' : '未連線'}</span>
+                </div>
+                <button className="rules-btn-header" onClick={() => setShowRulesModal(true)}>
+                  <FaQuestionCircle />
+                  <span>規則</span>
+                </button>
               </div>
             </div>
           </div>
           <div className="header-right">
-            <button className="rules-btn-header" onClick={() => setShowRulesModal(true)}>
-              <FaQuestionCircle />
-              <span>規則</span>
-            </button>
             <div className="user-balance">
               <div className="balance-label">積分</div>
               <div className="balance-amount">{formatCurrency(user?.balance ?? 0)}</div>
