@@ -109,7 +109,7 @@ export interface GameHistoryRecord {
   betContent: any
   betContentDisplay?: string
   betAmount: number
-  status: 'win' | 'lose' | 'pending'
+  status: 'win' | 'lose' | 'pending' | 'voided'
   createdAt: string
   odds: number
   winAmount?: number
