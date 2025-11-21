@@ -63,7 +63,7 @@ const App: React.FC = () => {
                 <p style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1.25rem' }}>歡迎來到紅海彈珠聯賽</p>
                 <p style={{ marginBottom: '1rem' }}>在開始遊戲前，請您仔細閱讀以下重要聲明：</p>
 
-                <h4 style={{ fontSize: '1rem', color: '#667eea', marginTop: '1.25rem', marginBottom: '0.75rem' }}>遊戲注意事項</h4>
+                <h4 className="disclaimer-section-title">遊戲注意事項</h4>
                 <ul>
                   <li>本站為真人即時影像設置，若有發生特殊情況，將依照本網站公告之辦法處理</li>
                   <li>比賽過程中如有彈珠停止在軌道上、卡住、掉落、飛出鏡頭或發生異常，該局視為無效局（已結算完成之局不受影響）</li>
@@ -71,7 +71,7 @@ const App: React.FC = () => {
                   <li>遊戲過程中，如荷官操作造成順序錯亂無法立即判別，將暫停比賽，請主管調閱回放並依正確結果判定</li>
                 </ul>
 
-                <h4 style={{ fontSize: '1rem', color: '#667eea', marginTop: '1.25rem', marginBottom: '0.75rem' }}>其他條款</h4>
+                <h4 className="disclaimer-section-title">其他條款</h4>
                 <ul>
                   <li>遊戲規則與賠率以系統公告為準</li>
                   <li>如有任何問題，請聯繫客服人員</li>
@@ -178,7 +178,13 @@ const App: React.FC = () => {
               <img src="/Logo-1.png" alt="紅海彈珠聯賽" />
             </div>
             <div className="header-text">
-              <h1 className="app-title">紅海彈珠聯賽</h1>
+              <div className="title-row">
+                <h1 className="app-title">紅海彈珠聯賽</h1>
+                <button className="rules-btn-header" onClick={() => setShowRulesModal(true)}>
+                  <FaQuestionCircle />
+                  <span>規則</span>
+                </button>
+              </div>
               <div className="connection-status">
                 <span className={`status-dot ${isConnected ? 'connected' : 'disconnected'}`} />
                 <span className="status-text">{isConnected ? '已連線' : '未連線'}</span>
@@ -196,7 +202,7 @@ const App: React.FC = () => {
 
       {/* Main Content */}
       <main className="app-content">
-        {activeTab === 'game' && <GameTab onShowRules={() => setShowRulesModal(true)} />}
+        {activeTab === 'game' && <GameTab />}
         {activeTab === 'live' && <LiveTab />}
         {activeTab === 'history' && <HistoryTab />}
         {activeTab === 'profile' && <ProfileTab />}
@@ -238,17 +244,9 @@ const App: React.FC = () => {
 }
 
 // Tab components
-interface GameTabProps {
-  onShowRules: () => void
-}
-
-const GameTab: React.FC<GameTabProps> = ({ onShowRules }) => {
+const GameTab: React.FC = () => {
   return (
     <div className="tab-content game-tab">
-      <button className="rules-btn" onClick={onShowRules}>
-        <FaQuestionCircle />
-        <span>規則說明</span>
-      </button>
       <GameStatus />
       <RecentResults />
       <div className="betting-section">
