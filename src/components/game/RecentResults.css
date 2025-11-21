@@ -527,10 +527,7 @@
 
 .last-result-section.voided::before {
   background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
-  border-radius: 15px 15px 0 0;
-  left: -1px;
-  right: -1px;
-  top: -1px;
+  border-radius: 16px 16px 0 0;
 }
 
 /* 無效局資訊顯示 */

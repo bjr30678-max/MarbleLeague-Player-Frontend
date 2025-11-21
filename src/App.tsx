@@ -109,30 +109,30 @@ const App: React.FC = () => {
               <div className="rules-section">
                 <h3>投注項目</h3>
 
-                <h4 style={{ fontSize: '1.1rem', color: '#94a3b8', marginTop: '1rem', marginBottom: '0.75rem' }}>第一名～第十名 車號指定</h4>
-                <p>每一個車號為一投注組合，開獎結果『投注車號』對應所投名次視為中獎，其餘情形視為不中獎。</p>
+                <h4 style={{ fontSize: '1.1rem', color: '#94a3b8', marginTop: '1rem', marginBottom: '0.75rem' }}>第一名～第十名 號碼指定</h4>
+                <p>每一個號碼為一投注組合，開獎結果『投注號碼』對應所投名次視為中獎，其餘情形視為不中獎。</p>
 
-                <h4 style={{ fontSize: '1.1rem', color: '#94a3b8', marginTop: '1rem', marginBottom: '0.75rem' }}>1～10 兩面（單雙、大小）</h4>
+                <h4 style={{ fontSize: '1.1rem', color: '#94a3b8', marginTop: '1rem', marginBottom: '0.75rem' }}>第1名～第10名 大小單雙</h4>
                 <ul>
                   <li><strong>單、雙：</strong>號碼為雙數叫雙（如4、8）；號碼為單數叫單（如5、9）</li>
                   <li><strong>大、小：</strong>開出之號碼大於或等於6為大，小於或等於5為小</li>
                 </ul>
 
-                <h4 style={{ fontSize: '1.1rem', color: '#94a3b8', marginTop: '1rem', marginBottom: '0.75rem' }}>1～5龍虎</h4>
+                <h4 style={{ fontSize: '1.1rem', color: '#94a3b8', marginTop: '1rem', marginBottom: '0.75rem' }}>龍虎</h4>
                 <ul>
-                  <li><strong>冠軍 龍/虎：</strong>『第一名』車號大於『第十名』車號視為【龍】中獎、反之小於視為【虎】中獎</li>
-                  <li><strong>亞軍 龍/虎：</strong>『第二名』車號大於『第九名』車號視為【龍】中獎、反之小於視為【虎】中獎</li>
-                  <li><strong>第三名 龍/虎：</strong>『第三名』車號大於『第八名』車號視為【龍】中獎、反之小於視為【虎】中獎</li>
-                  <li><strong>第四名 龍/虎：</strong>『第四名』車號大於『第七名』車號視為【龍】中獎、反之小於視為【虎】中獎</li>
-                  <li><strong>第五名 龍/虎：</strong>『第五名』車號大於『第六名』車號視為【龍】中獎、反之小於視為【虎】中獎</li>
+                  <li><strong>1V10 龍/虎：</strong>『第一名』號碼大於『第十名』號碼視為【龍】中獎、反之小於視為【虎】中獎</li>
+                  <li><strong>2V9 龍/虎：</strong>『第二名』號碼大於『第九名』號碼視為【龍】中獎、反之小於視為【虎】中獎</li>
+                  <li><strong>3V8 龍/虎：</strong>『第三名』號碼大於『第八名』號碼視為【龍】中獎、反之小於視為【虎】中獎</li>
+                  <li><strong>4V7 龍/虎：</strong>『第四名』號碼大於『第七名』號碼視為【龍】中獎、反之小於視為【虎】中獎</li>
+                  <li><strong>5V6 龍/虎：</strong>『第五名』號碼大於『第六名』號碼視為【龍】中獎、反之小於視為【虎】中獎</li>
                 </ul>
 
-                <h4 style={{ fontSize: '1.1rem', color: '#94a3b8', marginTop: '1rem', marginBottom: '0.75rem' }}>冠亞和值（3～19）</h4>
-                <p>冠軍車號 ＋ 亞軍車號 ＝ 冠亞和值</p>
+                <h4 style={{ fontSize: '1.1rem', color: '#94a3b8', marginTop: '1rem', marginBottom: '0.75rem' }}>冠亞和值</h4>
+                <p>第一名號碼 ＋ 第二名號碼 ＝ 冠亞和值（可能結果為3～19）</p>
                 <ul>
-                  <li><strong>冠亞和單雙：</strong>『冠亞和值』為單視為投注『單』的注單中獎，為雙視為投注『雙』的注單中獎</li>
+                  <li><strong>冠亞和值：</strong>投中對應數字視為中獎</li>
                   <li><strong>冠亞和大小：</strong>『冠亞和值』大於11時投注『大』中獎，小於或等於11時投注『小』中獎</li>
-                  <li><strong>冠亞和指定：</strong>『冠亞和值』可能出現的結果為3～19，投中對應數字視為中獎</li>
+                  <li><strong>冠亞和單雙：</strong>『冠亞和值』為單視為投注『單』的注單中獎，為雙視為投注『雙』的注單中獎</li>
                 </ul>
               </div>
 
@@ -178,13 +178,7 @@ const App: React.FC = () => {
               <img src="/Logo-1.png" alt="紅海彈珠聯賽" />
             </div>
             <div className="header-text">
-              <div className="title-row">
-                <h1 className="app-title">紅海彈珠聯賽</h1>
-                <button className="rules-btn-header" onClick={() => setShowRulesModal(true)}>
-                  <FaQuestionCircle />
-                  <span>規則</span>
-                </button>
-              </div>
+              <h1 className="app-title">紅海彈珠聯賽</h1>
               <div className="connection-status">
                 <span className={`status-dot ${isConnected ? 'connected' : 'disconnected'}`} />
                 <span className="status-text">{isConnected ? '已連線' : '未連線'}</span>
@@ -192,6 +186,10 @@ const App: React.FC = () => {
             </div>
           </div>
           <div className="header-right">
+            <button className="rules-btn-header" onClick={() => setShowRulesModal(true)}>
+              <FaQuestionCircle />
+              <span>規則</span>
+            </button>
             <div className="user-balance">
               <div className="balance-label">積分</div>
               <div className="balance-amount">{formatCurrency(user?.balance ?? 0)}</div>

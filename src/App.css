@@ -74,12 +74,6 @@ body {
   gap: 0.25rem;
 }
 
-.title-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
 .app-title {
   font-size: 1.5rem;
   font-weight: 800;
@@ -146,6 +140,7 @@ body {
 .header-right {
   display: flex;
   align-items: center;
+  gap: 1rem;
 }
 
 .user-balance {
@@ -822,14 +817,20 @@ body {
 .disclaimer-section-title {
   font-size: 1.15rem;
   font-weight: 700;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid rgba(102, 126, 234, 0.3);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-bottom: 2px solid rgba(139, 92, 246, 0.4);
+  background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+/* 為第一個標題減少頂部間距 */
+.disclaimer-text h4:first-of-type {
+  margin-top: 1.5rem;
 }
 
 /* ========== Rules Modal ========== */
@@ -849,14 +850,10 @@ body {
 .rules-section h3 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: #c7d2fe;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid rgba(102, 126, 234, 0.3);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .rules-section p {
