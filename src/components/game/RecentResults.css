@@ -527,6 +527,9 @@
 
 .last-result-section.voided::before {
   background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+  border-radius: 16px 16px 0 0;
+  left: 0;
+  right: 0;
 }
 
 /* 無效局資訊顯示 */
@@ -553,11 +556,11 @@
 
 /* 歷史記錄中的無效局 */
 .history-record.voided {
-  border-color: rgba(239, 68, 68, 0.3);
+  border-color: rgba(102, 126, 234, 0.2);
 }
 
 .history-record.voided::before {
-  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
 }
 
 .record-voided-info {

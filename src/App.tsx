@@ -9,7 +9,7 @@ import { useUserStore } from './stores/useUserStore'
 import { useGameStore } from './stores/useGameStore'
 import { useBettingStore } from './stores/useBettingStore'
 import { formatCurrency } from './utils/validation'
-import { FaGamepad, FaTv, FaClipboardList, FaUser, FaTrophy, FaTimesCircle, FaClock } from 'react-icons/fa'
+import { FaGamepad, FaTv, FaClipboardList, FaUser, FaTrophy, FaTimesCircle, FaClock, FaQuestionCircle, FaTimes } from 'react-icons/fa'
 import './App.css'
 
 type Tab = 'game' | 'live' | 'history' | 'profile'
@@ -19,6 +19,8 @@ const App: React.FC = () => {
   const { isConnected } = useWebSocket()
   const { user } = useUserStore()
   const [activeTab, setActiveTab] = useState<Tab>('game')
+  const [showDisclaimerModal, setShowDisclaimerModal] = useState(true)
+  const [showRulesModal, setShowRulesModal] = useState(false)
   const dataFetchedRef = useRef(false) // Prevent duplicate data fetching
 
   // Fetch betting data only (game data is fetched by useWebSocket)
@@ -29,6 +31,10 @@ const App: React.FC = () => {
       // Note: fetchCurrentGame and fetchRecentResults are now called in useWebSocket initialization
     }
   }, [isAuthenticated])
+
+  const handleAcceptDisclaimer = () => {
+    setShowDisclaimerModal(false)
+  }
 
   if (isInitializing) {
     return <Loading text="初始化中..." fullScreen />
@@ -46,6 +52,123 @@ const App: React.FC = () => {
   return (
     <div className="app">
       <ToastContainer />
+
+      {/* Disclaimer Modal */}
+      {showDisclaimerModal && (
+        <div className="modal-overlay">
+          <div className="modal-content disclaimer-modal">
+            <h2 className="modal-title">重要聲明</h2>
+            <div className="modal-body">
+              <div className="disclaimer-text">
+                <p style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1.25rem' }}>歡迎來到紅海彈珠聯賽</p>
+                <p style={{ marginBottom: '1rem' }}>在開始遊戲前，請您仔細閱讀以下重要聲明：</p>
+
+                <h4 style={{ fontSize: '1rem', color: '#667eea', marginTop: '1.25rem', marginBottom: '0.75rem' }}>遊戲注意事項</h4>
+                <ul>
+                  <li>本站為真人即時影像設置，若有發生特殊情況，將依照本網站公告之辦法處理</li>
+                  <li>比賽過程中如有彈珠停止在軌道上、卡住、掉落、飛出鏡頭或發生異常，該局視為無效局（已結算完成之局不受影響）</li>
+                  <li>攝影設備異常或遊戲斷線情況下，該局視為無效局</li>
+                  <li>遊戲過程中，如荷官操作造成順序錯亂無法立即判別，將暫停比賽，請主管調閱回放並依正確結果判定</li>
+                </ul>
+
+                <h4 style={{ fontSize: '1rem', color: '#667eea', marginTop: '1.25rem', marginBottom: '0.75rem' }}>其他條款</h4>
+                <ul>
+                  <li>遊戲規則與賠率以系統公告為準</li>
+                  <li>如有任何問題，請聯繫客服人員</li>
+                  <li>本平台提供之所有服務均提供於合法地區使用，非法地區將不承擔任何責任</li>
+                </ul>
+
+                <p className="disclaimer-highlight">點擊下方按鈕即表示您已詳細閱讀並同意以上聲明內容</p>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="modal-btn primary" onClick={handleAcceptDisclaimer}>
+                我已詳閱，接受並進入遊戲
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rules Modal */}
+      {showRulesModal && (
+        <div className="modal-overlay" onClick={() => setShowRulesModal(false)}>
+          <div className="modal-content rules-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">遊戲規則說明</h2>
+              <button className="modal-close" onClick={() => setShowRulesModal(false)}>
+                <FaTimes />
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="rules-section">
+                <h3>遊戲玩法</h3>
+                <p>紅海彈珠聯賽是一款結合運氣與策略的投注遊戲，每局會有10顆彈珠進行比賽，玩家可以對不同的投注項目下注。</p>
+              </div>
+
+              <div className="rules-section">
+                <h3>投注項目</h3>
+
+                <h4 style={{ fontSize: '1.1rem', color: '#94a3b8', marginTop: '1rem', marginBottom: '0.75rem' }}>第一名～第十名 車號指定</h4>
+                <p>每一個車號為一投注組合，開獎結果『投注車號』對應所投名次視為中獎，其餘情形視為不中獎。</p>
+
+                <h4 style={{ fontSize: '1.1rem', color: '#94a3b8', marginTop: '1rem', marginBottom: '0.75rem' }}>1～10 兩面（單雙、大小）</h4>
+                <ul>
+                  <li><strong>單、雙：</strong>號碼為雙數叫雙（如4、8）；號碼為單數叫單（如5、9）</li>
+                  <li><strong>大、小：</strong>開出之號碼大於或等於6為大，小於或等於5為小</li>
+                </ul>
+
+                <h4 style={{ fontSize: '1.1rem', color: '#94a3b8', marginTop: '1rem', marginBottom: '0.75rem' }}>1～5龍虎</h4>
+                <ul>
+                  <li><strong>冠軍 龍/虎：</strong>『第一名』車號大於『第十名』車號視為【龍】中獎、反之小於視為【虎】中獎</li>
+                  <li><strong>亞軍 龍/虎：</strong>『第二名』車號大於『第九名』車號視為【龍】中獎、反之小於視為【虎】中獎</li>
+                  <li><strong>第三名 龍/虎：</strong>『第三名』車號大於『第八名』車號視為【龍】中獎、反之小於視為【虎】中獎</li>
+                  <li><strong>第四名 龍/虎：</strong>『第四名』車號大於『第七名』車號視為【龍】中獎、反之小於視為【虎】中獎</li>
+                  <li><strong>第五名 龍/虎：</strong>『第五名』車號大於『第六名』車號視為【龍】中獎、反之小於視為【虎】中獎</li>
+                </ul>
+
+                <h4 style={{ fontSize: '1.1rem', color: '#94a3b8', marginTop: '1rem', marginBottom: '0.75rem' }}>冠亞和值（3～19）</h4>
+                <p>冠軍車號 ＋ 亞軍車號 ＝ 冠亞和值</p>
+                <ul>
+                  <li><strong>冠亞和單雙：</strong>『冠亞和值』為單視為投注『單』的注單中獎，為雙視為投注『雙』的注單中獎</li>
+                  <li><strong>冠亞和大小：</strong>『冠亞和值』大於11時投注『大』中獎，小於或等於11時投注『小』中獎</li>
+                  <li><strong>冠亞和指定：</strong>『冠亞和值』可能出現的結果為3～19，投中對應數字視為中獎</li>
+                </ul>
+              </div>
+
+              <div className="rules-section">
+                <h3>遊戲流程</h3>
+                <ol>
+                  <li>等待新回合開始</li>
+                  <li>在投注時間內選擇投注項目並下注</li>
+                  <li>投注截止後，系統會進行開獎</li>
+                  <li>根據開獎結果結算獎金</li>
+                  <li>如遇無效局，所有投注將全額退款</li>
+                </ol>
+              </div>
+
+              <div className="rules-section">
+                <h3>無效局說明</h3>
+                <p>當比賽過程中出現技術問題、系統異常或其他不可抗力因素時，該局可能被宣告為無效局。無效局的所有投注將全額退還至您的帳戶。</p>
+              </div>
+
+              <div className="rules-section">
+                <h3>注意事項</h3>
+                <ul>
+                  <li>請在投注時間內完成投注，截止後將無法下注</li>
+                  <li>每個投注項目都有最低和最高投注限額</li>
+                  <li>請確保帳戶餘額充足</li>
+                </ul>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="modal-btn secondary" onClick={() => setShowRulesModal(false)}>
+                關閉
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <header className="app-header">
@@ -73,7 +196,7 @@ const App: React.FC = () => {
 
       {/* Main Content */}
       <main className="app-content">
-        {activeTab === 'game' && <GameTab />}
+        {activeTab === 'game' && <GameTab onShowRules={() => setShowRulesModal(true)} />}
         {activeTab === 'live' && <LiveTab />}
         {activeTab === 'history' && <HistoryTab />}
         {activeTab === 'profile' && <ProfileTab />}
@@ -115,9 +238,17 @@ const App: React.FC = () => {
 }
 
 // Tab components
-const GameTab: React.FC = () => {
+interface GameTabProps {
+  onShowRules: () => void
+}
+
+const GameTab: React.FC<GameTabProps> = ({ onShowRules }) => {
   return (
     <div className="tab-content game-tab">
+      <button className="rules-btn" onClick={onShowRules}>
+        <FaQuestionCircle />
+        <span>規則說明</span>
+      </button>
       <GameStatus />
       <RecentResults />
       <div className="betting-section">
