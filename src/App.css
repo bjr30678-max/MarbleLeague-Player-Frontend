@@ -285,6 +285,11 @@ body {
   box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
 }
 
+.status-indicator.voided {
+  background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%);
+  box-shadow: 0 0 12px rgba(148, 163, 184, 0.3);
+}
+
 /* 頂部區域 */
 .record-top {
   display: flex;
@@ -345,6 +350,12 @@ body {
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%);
   color: #f59e0b;
   border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.status-badge.voided {
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.15) 0%, rgba(100, 116, 139, 0.1) 100%);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
 /* 投注內容區域 */
@@ -411,6 +422,11 @@ body {
 
 .amount-value.win {
   color: #10b981;
+  font-size: 1.25rem;
+}
+
+.amount-value.refund {
+  color: #94a3b8;
   font-size: 1.25rem;
 }
 

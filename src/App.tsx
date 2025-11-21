@@ -176,6 +176,7 @@ const HistoryTab: React.FC = () => {
               const isWin = record.status === 'win'
               const isLose = record.status === 'lose'
               const isPending = record.status === 'pending'
+              const isVoided = record.status === 'voided'
 
               return (
                 <div key={record.roundId + '-' + idx} className={`history-record ${record.status}`}>
@@ -199,6 +200,7 @@ const HistoryTab: React.FC = () => {
                       {isWin && <><FaTrophy /> 獲勝</>}
                       {isLose && <><FaTimesCircle /> 未中</>}
                       {isPending && <><FaClock /> 等待</>}
+                      {isVoided && <><FaTimesCircle /> 已退款</>}
                     </div>
                   </div>
 
@@ -222,7 +224,13 @@ const HistoryTab: React.FC = () => {
                         <span className="amount-value win">+{formatCurrency(record.winAmount)}</span>
                       </div>
                     )}
-                    {record.odds && (
+                    {isVoided && (
+                      <div className="bet-win">
+                        <span className="amount-label">退款</span>
+                        <span className="amount-value refund">+{formatCurrency(record.betAmount)}</span>
+                      </div>
+                    )}
+                    {record.odds && !isVoided && (
                       <div className="bet-odds">
                         <span className="odds-label">賠率</span>
                         <span className="odds-value">{record.odds}x</span>

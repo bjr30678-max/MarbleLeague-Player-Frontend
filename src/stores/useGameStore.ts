@@ -140,6 +140,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         })
         set({
           recentResults: results,
+          allRecentResults: [], // 清除快取，強制下次展開時重新載入
           currentResultsPage: 1,
         })
       }
