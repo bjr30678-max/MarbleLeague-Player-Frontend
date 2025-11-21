@@ -280,6 +280,54 @@ export const useWebSocket = () => {
       useUserStore.getState().updateBalance(data.balance)
     }
 
+    interface RoundVoidedData {
+      roundId: string
+      reason: string
+      voidedAt: string
+    }
+
+    const handleRoundVoided = (data: RoundVoidedData) => {
+      console.log('❌ [WebSocket] Round voided:', data)
+
+      // Stop polling Hot Bet statistics
+      stopHotBetsPolling()
+
+      // Update current game status to voided
+      const currentGame = useGameStore.getState().currentGame
+      if (currentGame && currentGame.roundId === data.roundId) {
+        useGameStore.getState().setCurrentGame({
+          ...currentGame,
+          status: 'voided' as any,
+        })
+      }
+
+      // Clear Hot Bets
+      useHotBetsStore.getState().clearStats()
+
+      // Clear previous bets (they've been refunded)
+      useBettingStore.getState().clearBets()
+
+      // Show toast notification with reason
+      toast.error(`期數 ${data.roundId} 已宣告無效\n原因: ${data.reason}`)
+
+      // Reload user balance (refund should be reflected)
+      useUserStore.getState().fetchBalance()
+
+      // Reload recent results to show voided status
+      useGameStore.getState().fetchRecentResults()
+
+      // Reload game history
+      useGameStore.getState().fetchHistory()
+
+      // After 5 seconds, reset to waiting state if no new round started
+      setTimeout(() => {
+        const currentGame = useGameStore.getState().currentGame
+        if (currentGame && (currentGame.status as any) === 'voided' && currentGame.roundId === data.roundId) {
+          useGameStore.getState().resetGame()
+        }
+      }, 5000)
+    }
+
     const handleIVSStatsUpdate = (data: IVSStatsUpdate) => {
       console.log('📊 [WebSocket] IVS stats update:', data)
       // Forward stats to IVS stats service
@@ -300,6 +348,7 @@ export const useWebSocket = () => {
     websocket.onRoundStarted(handleRoundStarted)
     websocket.onBettingClosed(handleBettingClosed)
     websocket.onResultConfirmed(handleResultConfirmed)
+    websocket.onRoundVoided(handleRoundVoided)
     websocket.onBalanceUpdated(handleBalanceUpdated)
     websocket.onNewBet(handleNewBet)
 

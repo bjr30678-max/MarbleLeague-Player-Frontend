@@ -206,6 +206,14 @@ class WebSocketService {
   }
 
   /**
+   * Subscribe to round voided event
+   * WebSocket sends: { roundId: string, reason: string, voidedAt: string }
+   */
+  onRoundVoided(callback: (data: any) => void): void {
+    this.on('round-voided', callback)
+  }
+
+  /**
    * Subscribe to new bet event
    */
   onNewBet(callback: (data: { userId: string; amount: number }) => void): void {
@@ -227,6 +235,7 @@ class WebSocketService {
       'round-started',
       'betting-closed',
       'result-confirmed',
+      'round-voided',
       'new-bet',
       'balance-updated',
     ]

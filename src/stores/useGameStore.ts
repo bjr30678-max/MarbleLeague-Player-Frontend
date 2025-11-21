@@ -116,16 +116,26 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       if (response.success && response.data && Array.isArray(response.data)) {
         // Convert RecentResult[] to GameResult[]
         const results = response.data.map((item) => {
-          const sum = item.result.slice(0, 2).reduce((a, b) => a + b, 0)
+          // 處理無效局
+          const isVoided = item.status === 'voided'
+          const sum = isVoided ? 0 : (item.result?.slice(0, 2).reduce((a, b) => a + b, 0) || 0)
+
           return {
             roundId: item.roundId,
             period: parseInt(item.roundId) || 0,
-            positions: item.result,
+            positions: isVoided ? [] : (item.result || []),
             sum,
             bigsmall: sum > 11 ? 'big' : 'small',
             oddeven: sum % 2 === 0 ? 'even' : 'odd',
             dragontiger: {},
-            timestamp: new Date(item.resultTime).getTime(),
+            timestamp: item.resultTime
+              ? new Date(item.resultTime).getTime()
+              : (item.createdAt ? new Date(item.createdAt).getTime() : Date.now()),
+            // 無效局相關欄位
+            status: item.status || 'finished',
+            voidedAt: item.voidedAt,
+            voidedBy: item.voidedBy,
+            voidReason: item.voidReason,
           } as GameResult
         })
         set({
@@ -154,16 +164,26 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         if (response.success && response.data && Array.isArray(response.data)) {
           // Convert RecentResult[] to GameResult[]
           const allResults = response.data.map((item) => {
-            const sum = item.result.slice(0, 2).reduce((a, b) => a + b, 0)
+            // 處理無效局
+            const isVoided = item.status === 'voided'
+            const sum = isVoided ? 0 : (item.result?.slice(0, 2).reduce((a, b) => a + b, 0) || 0)
+
             return {
               roundId: item.roundId,
               period: parseInt(item.roundId) || 0,
-              positions: item.result,
+              positions: isVoided ? [] : (item.result || []),
               sum,
               bigsmall: sum > 11 ? 'big' : 'small',
               oddeven: sum % 2 === 0 ? 'even' : 'odd',
               dragontiger: {},
-              timestamp: new Date(item.resultTime).getTime(),
+              timestamp: item.resultTime
+                ? new Date(item.resultTime).getTime()
+                : (item.createdAt ? new Date(item.createdAt).getTime() : Date.now()),
+              // 無效局相關欄位
+              status: item.status || 'finished',
+              voidedAt: item.voidedAt,
+              voidedBy: item.voidedBy,
+              voidReason: item.voidReason,
             } as GameResult
           })
 

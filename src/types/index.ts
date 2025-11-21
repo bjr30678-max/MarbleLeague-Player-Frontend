@@ -94,6 +94,11 @@ export interface GameResult {
   oddeven: 'odd' | 'even'
   dragontiger: { [key: string]: 'dragon' | 'tiger' }
   timestamp: number
+  // 無效局相關
+  status?: 'finished' | 'voided'
+  voidedAt?: string
+  voidedBy?: string
+  voidReason?: string
 }
 
 // Backend game history format
@@ -130,6 +135,12 @@ export interface RecentResult {
   roundId: string
   result: number[] // Array of 10 numbers (positions)
   resultTime: string
+  // 回合狀態欄位（後端新增）
+  status?: 'finished' | 'voided'
+  createdAt?: string
+  voidedAt?: string
+  voidedBy?: string
+  voidReason?: string
 }
 
 export type RecentResultsResponse = RecentResult[]

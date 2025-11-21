@@ -492,3 +492,91 @@
     font-size: 11px;
   }
 }
+
+/* ========== 無效局樣式 ========== */
+
+/* 無效局標記 */
+.voided-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(220, 38, 38, 0.3) 100%);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.voided-badge-small {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  background: rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* 無效局上期結果區域 */
+.last-result-section.voided {
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.last-result-section.voided::before {
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+}
+
+/* 無效局資訊顯示 */
+.voided-info {
+  padding: 15px;
+  text-align: center;
+}
+
+.voided-message {
+  color: #fca5a5;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.voided-reason {
+  color: #94a3b8;
+  font-size: 12px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  display: inline-block;
+}
+
+/* 歷史記錄中的無效局 */
+.history-record.voided {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.history-record.voided::before {
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+}
+
+.record-voided-info {
+  padding: 10px;
+  text-align: center;
+}
+
+.record-voided-message {
+  color: #fca5a5;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.record-voided-reason {
+  color: #94a3b8;
+  font-size: 11px;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  display: inline-block;
+}

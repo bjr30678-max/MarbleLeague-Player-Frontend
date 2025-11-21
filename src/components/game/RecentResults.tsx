@@ -36,8 +36,8 @@ export const RecentResults: React.FC = () => {
   // 取最新一期作為上期結果
   const lastResult = recentResults[0]
 
-  // 檢查是否有資料，並確保 positions 存在且是陣列
-  if (!lastResult || !lastResult.positions || !Array.isArray(lastResult.positions)) {
+  // 檢查是否有資料
+  if (!lastResult) {
     return (
       <div className="last-result-section empty">
         <p>暫無開獎記錄</p>
@@ -45,25 +45,44 @@ export const RecentResults: React.FC = () => {
     )
   }
 
+  // 檢查是否為無效局
+  const isVoided = lastResult.status === 'voided'
+
   return (
     <>
       {/* 上期結果區域 */}
-      <div className="last-result-section">
+      <div className={`last-result-section ${isVoided ? 'voided' : ''}`}>
         <div className="lr-header">
-          <div className="lr-title">上期結果 - 第 {lastResult.roundId} 期</div>
+          <div className="lr-title">
+            上期結果 - 第 {lastResult.roundId} 期
+            {isVoided && <span className="voided-badge">無效局</span>}
+          </div>
           <button className="expand-btn" onClick={() => setShowHistoryModal(true)}>
             展開
           </button>
         </div>
 
-        {/* 10顆球結果 - Grid布局 */}
-        <div className="history-numbers">
-          {lastResult.positions.map((num, idx) => (
-            <div key={idx} className="history-number">
-              {num}
-            </div>
-          ))}
-        </div>
+        {/* 無效局顯示原因，正常局顯示結果 */}
+        {isVoided ? (
+          <div className="voided-info">
+            <div className="voided-message">此局已宣告無效，所有投注已退款</div>
+            {lastResult.voidReason && (
+              <div className="voided-reason">原因: {lastResult.voidReason}</div>
+            )}
+          </div>
+        ) : lastResult.positions && Array.isArray(lastResult.positions) ? (
+          <div className="history-numbers">
+            {lastResult.positions.map((num, idx) => (
+              <div key={idx} className="history-number">
+                {num}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="voided-info">
+            <div className="voided-message">結果載入中...</div>
+          </div>
+        )}
       </div>
 
       {/* 歷史記錄模態窗口 */}
@@ -78,12 +97,16 @@ export const RecentResults: React.FC = () => {
             </div>
 
             <div className="history-body">
-              {recentResults
-                .filter((result) => result.positions && Array.isArray(result.positions))
-                .map((result) => (
-                  <div key={result.roundId} className="history-record">
+              {recentResults.map((result) => {
+                const resultIsVoided = result.status === 'voided'
+
+                return (
+                  <div key={result.roundId} className={`history-record ${resultIsVoided ? 'voided' : ''}`}>
                     <div className="record-header">
-                      <span className="record-title">第 {result.roundId} 期</span>
+                      <span className="record-title">
+                        第 {result.roundId} 期
+                        {resultIsVoided && <span className="voided-badge-small">無效</span>}
+                      </span>
                       <span className="record-time">
                         {new Date(result.timestamp).toLocaleString('zh-TW', {
                           month: '2-digit',
@@ -94,27 +117,39 @@ export const RecentResults: React.FC = () => {
                       </span>
                     </div>
 
-                    {/* 10顆球結果 */}
-                    <div className="record-numbers">
-                      {result.positions.map((num, idx) => (
-                        <div key={idx} className="record-number">
-                          {num}
+                    {resultIsVoided ? (
+                      <div className="record-voided-info">
+                        <div className="record-voided-message">此局已宣告無效</div>
+                        {result.voidReason && (
+                          <div className="record-voided-reason">原因: {result.voidReason}</div>
+                        )}
+                      </div>
+                    ) : result.positions && Array.isArray(result.positions) ? (
+                      <>
+                        {/* 10顆球結果 */}
+                        <div className="record-numbers">
+                          {result.positions.map((num, idx) => (
+                            <div key={idx} className="record-number">
+                              {num}
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
 
-                    {/* 統計資訊 */}
-                    <div className="record-stats">
-                      <span className="stat-badge">和: {result.sum}</span>
-                      <span className={`stat-badge ${result.bigsmall}`}>
-                        {result.bigsmall === 'big' ? '大' : '小'}
-                      </span>
-                      <span className={`stat-badge ${result.oddeven}`}>
-                        {result.oddeven === 'odd' ? '單' : '雙'}
-                      </span>
-                    </div>
+                        {/* 統計資訊 */}
+                        <div className="record-stats">
+                          <span className="stat-badge">和: {result.sum}</span>
+                          <span className={`stat-badge ${result.bigsmall}`}>
+                            {result.bigsmall === 'big' ? '大' : '小'}
+                          </span>
+                          <span className={`stat-badge ${result.oddeven}`}>
+                            {result.oddeven === 'odd' ? '單' : '雙'}
+                          </span>
+                        </div>
+                      </>
+                    ) : null}
                   </div>
-                ))}
+                )
+              })}
 
               {/* 分頁控制 */}
               {!isLoadingResults && recentResults.length > 0 && (

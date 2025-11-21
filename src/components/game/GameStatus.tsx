@@ -56,6 +56,14 @@ export const GameStatus: React.FC = () => {
           timerClass: 'small', // 20px
           timerColor: '#667eea',
         }
+      case 'voided':
+        // 無效局
+        return {
+          label: '無效局',
+          timer: '投注已退款',
+          timerClass: 'small', // 20px
+          timerColor: '#ef4444', // 紅色表示無效
+        }
       case 'waiting':
       default:
         return {
