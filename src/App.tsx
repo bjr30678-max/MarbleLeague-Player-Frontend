@@ -28,19 +28,16 @@ const App: React.FC = () => {
   useEffect(() => {
     if (showDisclaimerModal) {
       const text = '歡迎來到紅海彈珠聯賽'
-      let index = 0
+      let currentIndex = 0
       setTypedText('') // 重置文字
 
       const timer = setInterval(() => {
-        setTypedText(prev => {
-          if (index < text.length) {
-            index++
-            return text.slice(0, index)
-          } else {
-            clearInterval(timer)
-            return prev
-          }
-        })
+        currentIndex++
+        if (currentIndex <= text.length) {
+          setTypedText(text.slice(0, currentIndex))
+        } else {
+          clearInterval(timer)
+        }
       }, 150) // 每個字 150ms
 
       return () => clearInterval(timer)
@@ -216,11 +213,7 @@ const App: React.FC = () => {
         <div className="header-content">
           <div className="header-left">
             <div className="app-logo">
-              <div className="marble-collision">
-                <div className="marble marble-left"></div>
-                <div className="marble marble-right"></div>
-                <div className="collision-spark"></div>
-              </div>
+              <img src="/Logo-1.png" alt="紅海彈珠聯賽" />
             </div>
             <div className="header-text">
               <h1 className="app-title">紅海彈珠聯賽</h1>
