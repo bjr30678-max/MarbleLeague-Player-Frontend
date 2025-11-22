@@ -21,7 +21,28 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('game')
   const [showDisclaimerModal, setShowDisclaimerModal] = useState(true)
   const [showRulesModal, setShowRulesModal] = useState(false)
+  const [typedText, setTypedText] = useState('')
   const dataFetchedRef = useRef(false) // Prevent duplicate data fetching
+
+  // 打字機效果
+  useEffect(() => {
+    if (showDisclaimerModal) {
+      const text = '歡迎來到紅海彈珠聯賽'
+      let index = 0
+      setTypedText('')
+
+      const timer = setInterval(() => {
+        if (index < text.length) {
+          setTypedText(text.slice(0, index + 1))
+          index++
+        } else {
+          clearInterval(timer)
+        }
+      }, 100) // 每個字 100ms
+
+      return () => clearInterval(timer)
+    }
+  }, [showDisclaimerModal])
 
   // Fetch betting data only (game data is fetched by useWebSocket)
   useEffect(() => {
@@ -62,7 +83,10 @@ const App: React.FC = () => {
               <div className="disclaimer-text">
                 {/* 歡迎區塊 */}
                 <div className="disclaimer-welcome">
-                  <h3>歡迎來到紅海彈珠聯賽</h3>
+                  <h3 className="typewriter-text">
+                    {typedText}
+                    <span className="cursor"></span>
+                  </h3>
                   <p>在開始遊戲前，請您仔細閱讀以下重要聲明</p>
                 </div>
 
@@ -187,7 +211,11 @@ const App: React.FC = () => {
         <div className="header-content">
           <div className="header-left">
             <div className="app-logo">
-              <img src="/Logo-1.png" alt="紅海彈珠聯賽" />
+              <div className="marble-collision">
+                <div className="marble marble-left"></div>
+                <div className="marble marble-right"></div>
+                <div className="collision-spark"></div>
+              </div>
             </div>
             <div className="header-text">
               <h1 className="app-title">紅海彈珠聯賽</h1>
