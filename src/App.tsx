@@ -26,25 +26,27 @@ const App: React.FC = () => {
 
   // 打字機效果
   useEffect(() => {
-    if (showDisclaimerModal) {
-      const text = '歡迎來到紅海彈珠聯賽'
-      let currentIndex = 0
-      setTypedText('') // 重置文字
-
-      const timer = setInterval(() => {
-        currentIndex++
-        if (currentIndex <= text.length) {
-          setTypedText(text.slice(0, currentIndex))
-        } else {
-          clearInterval(timer)
-        }
-      }, 150) // 每個字 150ms
-
-      return () => clearInterval(timer)
-    } else {
-      setTypedText('') // 彈窗關閉時清空
+    // 只在彈窗可見且已通過初始化與登入時才啟動
+    if (!showDisclaimerModal || isInitializing || !isAuthenticated || !user) {
+      setTypedText('')
+      return
     }
-  }, [showDisclaimerModal])
+
+    const text = '歡迎來到紅海彈珠聯賽'
+    let currentIndex = 0
+    setTypedText('') // 重置文字
+
+    const timer = setInterval(() => {
+      currentIndex++
+      if (currentIndex <= text.length) {
+        setTypedText(text.slice(0, currentIndex))
+      } else {
+        clearInterval(timer)
+      }
+    }, 150) // 每個字 150ms
+
+    return () => clearInterval(timer)
+  }, [showDisclaimerModal, isInitializing, isAuthenticated, user])
 
   // Fetch betting data only (game data is fetched by useWebSocket)
   useEffect(() => {
