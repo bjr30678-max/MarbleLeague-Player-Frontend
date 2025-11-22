@@ -60,25 +60,37 @@ const App: React.FC = () => {
             <h2 className="modal-title">重要聲明</h2>
             <div className="modal-body">
               <div className="disclaimer-text">
-                <p style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1.25rem' }}>歡迎來到紅海彈珠聯賽</p>
-                <p style={{ marginBottom: '1rem' }}>在開始遊戲前，請您仔細閱讀以下重要聲明：</p>
+                {/* 歡迎區塊 */}
+                <div className="disclaimer-welcome">
+                  <h3>歡迎來到紅海彈珠聯賽</h3>
+                  <p>在開始遊戲前，請您仔細閱讀以下重要聲明</p>
+                </div>
 
-                <h4 className="disclaimer-section-title">遊戲注意事項</h4>
-                <ul>
-                  <li>本站為真人即時影像設置，若有發生特殊情況，將依照本網站公告之辦法處理</li>
-                  <li>比賽過程中如有彈珠停止在軌道上、卡住、掉落、飛出鏡頭或發生異常，該局視為無效局（已結算完成之局不受影響）</li>
-                  <li>攝影設備異常或遊戲斷線情況下，該局視為無效局</li>
-                  <li>遊戲過程中，如荷官操作造成順序錯亂無法立即判別，將暫停比賽，請主管調閱回放並依正確結果判定</li>
-                </ul>
+                {/* 遊戲注意事項 */}
+                <div className="disclaimer-section">
+                  <h4 className="disclaimer-section-title">遊戲注意事項</h4>
+                  <ul>
+                    <li>本站為真人即時影像設置，若有發生特殊情況，將依照本網站公告之辦法處理</li>
+                    <li>比賽過程中如有彈珠停止在軌道上、卡住、掉落、飛出鏡頭或發生異常，該局視為無效局（已結算完成之局不受影響）</li>
+                    <li>攝影設備異常或遊戲斷線情況下，該局視為無效局</li>
+                    <li>遊戲過程中，如荷官操作造成順序錯亂無法立即判別，將暫停比賽，請主管調閱回放並依正確結果判定</li>
+                  </ul>
+                </div>
 
-                <h4 className="disclaimer-section-title">其他條款</h4>
-                <ul>
-                  <li>遊戲規則與賠率以系統公告為準</li>
-                  <li>如有任何問題，請聯繫客服人員</li>
-                  <li>本平台提供之所有服務均提供於合法地區使用，非法地區將不承擔任何責任</li>
-                </ul>
+                {/* 其他條款 */}
+                <div className="disclaimer-section">
+                  <h4 className="disclaimer-section-title">其他條款</h4>
+                  <ul>
+                    <li>遊戲規則與賠率以系統公告為準</li>
+                    <li>如有任何問題，請聯繫客服人員</li>
+                    <li>本平台提供之所有服務均提供於合法地區使用，非法地區將不承擔任何責任</li>
+                  </ul>
+                </div>
 
-                <p className="disclaimer-highlight">點擊下方按鈕即表示您已詳細閱讀並同意以上聲明內容</p>
+                {/* 同意提示 */}
+                <div className="disclaimer-highlight">
+                  <p>點擊下方按鈕即表示您已詳細閱讀並同意以上聲明內容</p>
+                </div>
               </div>
             </div>
             <div className="modal-footer">

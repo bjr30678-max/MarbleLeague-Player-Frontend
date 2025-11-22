@@ -784,6 +784,77 @@ body {
   max-width: 550px;
 }
 
+/* 歡迎區塊 */
+.disclaimer-welcome {
+  text-align: center;
+  padding: 1.75rem 1.5rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.disclaimer-welcome::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.disclaimer-welcome h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.disclaimer-welcome p {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* 聲明區塊 */
+.disclaimer-section {
+  margin-bottom: 1.75rem;
+  padding: 1.5rem;
+  background: rgba(30, 41, 59, 0.4);
+  border-radius: 10px;
+  border: 1px solid rgba(102, 126, 234, 0.15);
+}
+
+.disclaimer-section-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  padding-left: 1rem;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.25);
+  color: #e2e8f0;
+  position: relative;
+}
+
+.disclaimer-section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+}
+
 .disclaimer-text p {
   margin-bottom: 1rem;
   line-height: 1.6;
@@ -793,46 +864,70 @@ body {
 .disclaimer-text ul {
   list-style: none;
   padding: 0;
-  margin: 1.5rem 0;
+  margin: 0;
 }
 
 .disclaimer-text li {
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
-  background: rgba(102, 126, 234, 0.08);
-  border-left: 3px solid #667eea;
-  border-radius: 6px;
-  line-height: 1.5;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  background: rgba(15, 23, 42, 0.5);
+  border-left: 4px solid #667eea;
+  border-radius: 8px;
+  line-height: 1.6;
   color: #cbd5e1;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
+.disclaimer-text li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+}
+
+.disclaimer-text li:hover {
+  background: rgba(102, 126, 234, 0.12);
+  transform: translateX(4px);
+  border-left-color: #764ba2;
+}
+
+.disclaimer-text li:last-child {
+  margin-bottom: 0;
+}
+
+/* 同意提示區塊 */
 .disclaimer-highlight {
+  text-align: center;
+  padding: 1.25rem 1.5rem;
+  margin-top: 2rem;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.15) 100%);
+  border-radius: 10px;
+  border: 2px solid rgba(251, 191, 36, 0.4);
+  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.1);
+  position: relative;
+}
+
+.disclaimer-highlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+  border-radius: 10px 10px 0 0;
+}
+
+.disclaimer-highlight p {
+  margin: 0;
   font-weight: 600;
   color: #fbbf24;
-  text-align: center;
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background: rgba(251, 191, 36, 0.1);
-  border-radius: 8px;
-  border: 1px solid rgba(251, 191, 36, 0.3);
-}
-
-.disclaimer-section-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid rgba(102, 126, 234, 0.3);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* 為第一個標題減少頂部間距 */
-.disclaimer-text h4:first-of-type {
-  margin-top: 1.5rem;
+  font-size: 0.95rem;
 }
 
 /* ========== Rules Modal ========== */
