@@ -74,94 +74,126 @@ body {
 
 /* 彈珠基礎樣式 */
 .marble {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   position: absolute;
-  background: radial-gradient(circle at 30% 30%,
-    rgba(255, 255, 255, 0.8) 0%,
-    rgba(102, 126, 234, 0.9) 25%,
-    #667eea 50%,
-    #764ba2 100%);
   box-shadow:
-    inset -2px -2px 8px rgba(0, 0, 0, 0.3),
-    inset 2px 2px 8px rgba(255, 255, 255, 0.4),
-    0 4px 12px rgba(102, 126, 234, 0.6);
-  animation: marbleCollision 2s ease-in-out infinite;
+    inset -3px -3px 10px rgba(0, 0, 0, 0.4),
+    inset 3px 3px 10px rgba(255, 255, 255, 0.5),
+    0 6px 20px rgba(102, 126, 234, 0.7),
+    0 0 40px rgba(102, 126, 234, 0.4);
 }
 
-/* 左側彈珠 */
+/* 左側彈珠 - 主題紫色漸層 */
 .marble-left {
-  background: radial-gradient(circle at 30% 30%,
-    rgba(255, 255, 255, 0.8) 0%,
-    rgba(239, 68, 68, 0.9) 25%,
-    #ef4444 50%,
-    #dc2626 100%);
+  background: radial-gradient(circle at 35% 35%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(167, 139, 250, 0.95) 15%,
+    #a78bfa 35%,
+    #8b5cf6 60%,
+    #7c3aed 85%,
+    #6d28d9 100%);
   box-shadow:
-    inset -2px -2px 8px rgba(0, 0, 0, 0.3),
-    inset 2px 2px 8px rgba(255, 255, 255, 0.4),
-    0 4px 12px rgba(239, 68, 68, 0.6);
-  left: 0;
+    inset -3px -3px 10px rgba(109, 40, 217, 0.6),
+    inset 3px 3px 10px rgba(255, 255, 255, 0.6),
+    0 6px 20px rgba(139, 92, 246, 0.8),
+    0 0 40px rgba(139, 92, 246, 0.5),
+    0 0 60px rgba(167, 139, 250, 0.3);
+  left: calc(50% - 32px);
+  animation: marbleSlideLeft 1.5s ease-out forwards;
 }
 
-/* 右側彈珠 */
+/* 右側彈珠 - 深紫色漸層 */
 .marble-right {
-  background: radial-gradient(circle at 30% 30%,
-    rgba(255, 255, 255, 0.8) 0%,
-    rgba(59, 130, 246, 0.9) 25%,
-    #3b82f6 50%,
-    #2563eb 100%);
+  background: radial-gradient(circle at 35% 35%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(196, 181, 253, 0.95) 15%,
+    #c4b5fd 35%,
+    #a78bfa 60%,
+    #8b5cf6 85%,
+    #7c3aed 100%);
   box-shadow:
-    inset -2px -2px 8px rgba(0, 0, 0, 0.3),
-    inset 2px 2px 8px rgba(255, 255, 255, 0.4),
-    0 4px 12px rgba(59, 130, 246, 0.6);
-  right: 0;
-  animation-delay: -1s;
+    inset -3px -3px 10px rgba(124, 58, 237, 0.6),
+    inset 3px 3px 10px rgba(255, 255, 255, 0.6),
+    0 6px 20px rgba(167, 139, 250, 0.8),
+    0 0 40px rgba(167, 139, 250, 0.5),
+    0 0 60px rgba(196, 181, 253, 0.3);
+  right: calc(50% - 32px);
+  animation: marbleSlideRight 1.5s ease-out forwards;
 }
 
 /* 碰撞火花效果 */
 .collision-spark {
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   background: radial-gradient(circle,
     rgba(255, 255, 255, 1) 0%,
-    rgba(251, 191, 36, 0.8) 40%,
-    transparent 70%);
+    rgba(196, 181, 253, 0.9) 30%,
+    rgba(139, 92, 246, 0.7) 50%,
+    rgba(109, 40, 217, 0.4) 70%,
+    transparent 90%);
   opacity: 0;
-  animation: sparkFlash 2s ease-in-out infinite;
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.8);
+  animation: sparkBurst 1.5s ease-out forwards;
+  box-shadow: 0 0 40px rgba(167, 139, 250, 1),
+              0 0 60px rgba(139, 92, 246, 0.8),
+              0 0 80px rgba(109, 40, 217, 0.6);
 }
 
-/* 彈珠碰撞動畫 */
-@keyframes marbleCollision {
+/* 左側彈珠滑入動畫 */
+@keyframes marbleSlideLeft {
   0% {
-    transform: translateX(-25px) scale(1);
+    left: -50px;
   }
-  45% {
-    transform: translateX(0) scale(1);
+  70% {
+    left: calc(50% - 32px);
   }
-  50% {
-    transform: translateX(0) scale(0.95);
-  }
-  55% {
-    transform: translateX(0) scale(1);
+  85% {
+    left: calc(50% - 30px);
   }
   100% {
-    transform: translateX(-25px) scale(1);
+    left: calc(50% - 32px);
   }
 }
 
-/* 火花閃爍動畫 */
-@keyframes sparkFlash {
-  0%, 45%, 55%, 100% {
-    opacity: 0;
-    transform: scale(0);
+/* 右側彈珠滑入動畫 */
+@keyframes marbleSlideRight {
+  0% {
+    right: -50px;
   }
-  50% {
+  70% {
+    right: calc(50% - 32px);
+  }
+  85% {
+    right: calc(50% - 30px);
+  }
+  100% {
+    right: calc(50% - 32px);
+  }
+}
+
+/* 火花爆發動畫 */
+@keyframes sparkBurst {
+  0%, 65% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  70% {
     opacity: 1;
-    transform: scale(1.5);
+    transform: translate(-50%, -50%) scale(2);
+  }
+  80% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(2.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3);
   }
 }
 
@@ -950,25 +982,9 @@ body {
 /* 歡迎區塊 */
 .disclaimer-welcome {
   text-align: center;
-  padding: 2rem 1.75rem;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-  border-radius: 16px;
+  padding: 1.5rem 0;
   margin-bottom: 2rem;
-  border: none;
   position: relative;
-  overflow: hidden;
-  box-shadow: none;
-}
-
-.disclaimer-welcome::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.5);
 }
 
 .disclaimer-welcome h3 {
@@ -987,16 +1003,20 @@ body {
 .typewriter-text {
   display: inline-block;
   position: relative;
+  background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 50%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .typewriter-text .cursor {
   display: inline-block;
   width: 2px;
   height: 1.3em;
-  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
-  margin-left: 2px;
+  background: #a78bfa;
+  margin-left: 4px;
   animation: blink 1s step-end infinite;
-  vertical-align: middle;
+  vertical-align: text-bottom;
 }
 
 @keyframes blink {
@@ -1066,37 +1086,26 @@ body {
 }
 
 .disclaimer-text li {
-  padding: 1rem 1.25rem 1rem 2.75rem;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
   margin-bottom: 0.75rem;
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 41, 59, 0.3) 100%);
-  border-radius: 12px;
   line-height: 1.7;
   color: #e2e8f0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   font-size: 0.95rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(102, 126, 234, 0.15);
 }
 
 .disclaimer-text li::before {
   content: '';
   position: absolute;
-  left: 1.25rem;
-  top: 1.25rem;
+  left: 1rem;
+  top: 1rem;
   width: 8px;
   height: 8px;
   background: linear-gradient(135deg, #667eea 0%, #a78bfa 100%);
   border-radius: 50%;
   box-shadow: 0 0 12px rgba(102, 126, 234, 0.6),
               0 0 4px rgba(167, 139, 250, 0.8);
-}
-
-.disclaimer-text li:hover {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.12) 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
-  border-color: rgba(102, 126, 234, 0.3);
 }
 
 .disclaimer-text li:hover::before {

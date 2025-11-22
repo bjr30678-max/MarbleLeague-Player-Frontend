@@ -29,18 +29,23 @@ const App: React.FC = () => {
     if (showDisclaimerModal) {
       const text = '歡迎來到紅海彈珠聯賽'
       let index = 0
-      setTypedText('')
+      setTypedText('') // 重置文字
 
       const timer = setInterval(() => {
-        if (index < text.length) {
-          setTypedText(text.slice(0, index + 1))
-          index++
-        } else {
-          clearInterval(timer)
-        }
-      }, 100) // 每個字 100ms
+        setTypedText(prev => {
+          if (index < text.length) {
+            index++
+            return text.slice(0, index)
+          } else {
+            clearInterval(timer)
+            return prev
+          }
+        })
+      }, 150) // 每個字 150ms
 
       return () => clearInterval(timer)
+    } else {
+      setTypedText('') // 彈窗關閉時清空
     }
   }, [showDisclaimerModal])
 
