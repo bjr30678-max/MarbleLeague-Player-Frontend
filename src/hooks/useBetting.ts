@@ -57,22 +57,33 @@ export const useBetting = () => {
       'dragontiger': 'dragon_tiger'
     }
 
+    // 🔥 修復：優先使用傳入的 betType 參數，否則才使用 selectedCategory
+    // 這樣可以確保冠亞和大小/單雙使用正確的限額（而不是冠亞和值的限額）
+    let actualBetType: string
+    if (betType) {
+      // 有傳入 betType，直接使用（例如：'sum_big_small', 'sum_odd_even'）
+      actualBetType = betType
+    } else {
+      // 沒有傳入 betType，從 selectedCategory 映射
+      actualBetType = categoryToBetTypeMap[selectedCategory] || selectedCategory
+    }
+
     // 構建限額查詢 key
     let backendKey: string
-    const backendBetType = categoryToBetTypeMap[selectedCategory] || selectedCategory
 
     // 對於 sum_value 類型，需要包含子選項（3-19）
-    if (backendBetType === 'sum_value' && content && content.length > 0) {
+    if (actualBetType === 'sum_value' && content && content.length > 0) {
       // 從 content 或 optionId 提取和值選項
       const sumValue = content[0] || optionId.split('-')[optionId.split('-').length - 1]
-      backendKey = `${backendBetType}:${sumValue}`
+      backendKey = `${actualBetType}:${sumValue}`
     } else {
       // 其他類型使用基礎 key（帶 : 後綴）
-      backendKey = `${backendBetType}:`
+      backendKey = `${actualBetType}:`
     }
 
     // 🔍 調試：打印所有限額鍵值
     console.log('[useBetting] selectedCategory:', selectedCategory)
+    console.log('[useBetting] actualBetType:', actualBetType)
     console.log('[useBetting] backendKey:', backendKey)
     console.log('[useBetting] bettingLimits.limits:', bettingLimits?.limits)
 
@@ -80,7 +91,7 @@ export const useBetting = () => {
     // 🔥 修復：對於 sum_value 類型，如果找不到精確的子選項 key，fallback 到基礎 key
     let categoryLimit = bettingLimits?.limits?.[backendKey]
 
-    if (!categoryLimit && backendBetType === 'sum_value') {
+    if (!categoryLimit && actualBetType === 'sum_value') {
       // 嘗試使用基礎 sum_value key（不含子選項）
       const baseSumValueKey = 'sum_value:'
       categoryLimit = bettingLimits?.limits?.[baseSumValueKey]

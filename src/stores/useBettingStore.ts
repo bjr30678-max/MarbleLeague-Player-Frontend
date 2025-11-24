@@ -257,6 +257,11 @@ export const useBettingStore = create<BettingState>((set, get) => ({
     return get().currentBets.reduce((total, bet) => total + bet.amount, 0)
   },
 
+  /**
+   * @deprecated 此函數存在限額查詢問題，請使用 useBetting.ts 的 placeBet 代替
+   * ⚠️ 問題：使用 selectedCategory 而非 betType，導致冠亞和大小/單雙使用錯誤限額
+   * 目前未被使用，保留僅供參考
+   */
   canPlaceBet: (amount) => {
     const { bettingLimits, selectedCategory } = get()
     const user = useUserStore.getState().user
@@ -267,10 +272,10 @@ export const useBettingStore = create<BettingState>((set, get) => ({
 
     const totalAmount = get().getTotalBetAmount() + amount
 
-    // 🔧 映射前端 category 到後端 betType 格式
+    // ⚠️ 警告：此邏輯有問題！使用 selectedCategory 會導致錯誤
     const categoryToBetTypeMap: Record<string, string> = {
       'position': 'position:',
-      'sum': 'sum_value:',
+      'sum': 'sum_value:',  // ❌ 問題：冠亞和大小/單雙也會使用冠亞和值限額
       'bigsmall': 'big_small:',
       'oddeven': 'odd_even:',
       'dragontiger': 'dragon_tiger:'
