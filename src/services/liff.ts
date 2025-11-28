@@ -220,6 +220,10 @@ class LiffService {
         displayName: user.displayName,
         pictureUrl: user.pictureUrl,
         balance: 0, // Will be fetched separately
+        bettingStatus: user.bettingStatus,
+        bettingDisabledReason: user.bettingDisabledReason,
+        bettingDisabledAt: user.bettingDisabledAt,
+        bettingDisabledBy: user.bettingDisabledBy,
       }
 
       // Store user profile
