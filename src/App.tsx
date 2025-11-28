@@ -9,7 +9,7 @@ import { useUserStore } from './stores/useUserStore'
 import { useGameStore } from './stores/useGameStore'
 import { useBettingStore } from './stores/useBettingStore'
 import { formatCurrency } from './utils/validation'
-import { FaGamepad, FaTv, FaClipboardList, FaUser, FaTrophy, FaTimesCircle, FaClock, FaQuestionCircle, FaTimes } from 'react-icons/fa'
+import { FaGamepad, FaTv, FaClipboardList, FaUser, FaTrophy, FaTimesCircle, FaClock, FaQuestionCircle, FaTimes, FaExclamationTriangle } from 'react-icons/fa'
 import './App.css'
 
 type Tab = 'game' | 'live' | 'history' | 'profile'
@@ -21,6 +21,7 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('game')
   const [showDisclaimerModal, setShowDisclaimerModal] = useState(true)
   const [showRulesModal, setShowRulesModal] = useState(false)
+  const [showBettingDisabledModal, setShowBettingDisabledModal] = useState(false)
   const [typedText, setTypedText] = useState('')
   const dataFetchedRef = useRef(false) // Prevent duplicate data fetching
 
@@ -56,6 +57,14 @@ const App: React.FC = () => {
       // Note: fetchCurrentGame and fetchRecentResults are now called in useWebSocket initialization
     }
   }, [isAuthenticated])
+
+  // 檢查投注禁用狀態
+  useEffect(() => {
+    // 當免責聲明關閉後，檢查是否需要顯示投注禁用通知
+    if (!showDisclaimerModal && user && user.bettingStatus === 'disabled') {
+      setShowBettingDisabledModal(true)
+    }
+  }, [showDisclaimerModal, user])
 
   const handleAcceptDisclaimer = () => {
     setShowDisclaimerModal(false)
@@ -124,6 +133,35 @@ const App: React.FC = () => {
             <div className="modal-footer">
               <button className="modal-btn primary" onClick={handleAcceptDisclaimer}>
                 我已詳閱，接受並進入遊戲
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Betting Disabled Modal */}
+      {showBettingDisabledModal && (
+        <div className="modal-overlay">
+          <div className="modal-content disclaimer-modal" style={{ maxWidth: '500px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '20px' }}>
+              <FaExclamationTriangle style={{ fontSize: '64px', color: '#ff4d4f', marginBottom: '16px' }} />
+              <h2 className="modal-title" style={{ color: '#ff4d4f', marginBottom: '8px' }}>投注已被禁止</h2>
+            </div>
+            <div className="modal-body">
+              <div className="disclaimer-text">
+                <div className="disclaimer-section">
+                  <p style={{ fontSize: '16px', textAlign: 'center', marginBottom: '16px' }}>
+                    您的帳號目前已被禁止投注
+                  </p>
+                  <p style={{ fontSize: '14px', textAlign: 'center', color: '#888' }}>
+                    請聯絡您的上級代理以恢復投注權限
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="modal-btn primary" onClick={() => setShowBettingDisabledModal(false)}>
+                我知道了
               </button>
             </div>
           </div>

@@ -5,6 +5,10 @@ export interface UserProfile {
   pictureUrl?: string
   balance: number
   statusMessage?: string
+  bettingStatus?: 'enabled' | 'disabled'
+  bettingDisabledReason?: string | null
+  bettingDisabledAt?: string | null
+  bettingDisabledBy?: string | null
 }
 
 // Betting Types
@@ -178,7 +182,10 @@ export interface LoginResponse {
     userId: string
     displayName: string
     pictureUrl?: string
-    bettingStatus?: 'active' | 'disabled'
+    bettingStatus?: 'enabled' | 'disabled'
+    bettingDisabledReason?: string | null
+    bettingDisabledAt?: string | null
+    bettingDisabledBy?: string | null
   }
 }
 
