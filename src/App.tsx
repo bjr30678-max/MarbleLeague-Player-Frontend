@@ -143,7 +143,7 @@ const App: React.FC = () => {
       {showBettingDisabledModal && (
         <div className="modal-overlay">
           <div className="modal-content disclaimer-modal" style={{ maxWidth: '500px' }}>
-            <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '20px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '32px' }}>
               <FaExclamationTriangle style={{ fontSize: '64px', color: '#ff4d4f', marginBottom: '16px' }} />
               <h2 className="modal-title" style={{ color: '#ff4d4f', marginBottom: '8px' }}>投注已被禁止</h2>
             </div>
